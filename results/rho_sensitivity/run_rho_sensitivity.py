@@ -33,6 +33,13 @@ def rho_tag(rho: float) -> str:
     return f"rho_{rho:.1f}".replace(".", "p")
 
 
+def repo_relative(path: Path, project_root: Path) -> str:
+    """Return a repository-relative POSIX path for provenance manifests."""
+    return path.resolve(strict=False).relative_to(
+        project_root.resolve(strict=False)
+    ).as_posix()
+
+
 def validate_base_config(cfg: dict) -> None:
     general = cfg.get("general", {})
     env = cfg.get("environment", {})
@@ -163,10 +170,12 @@ def main() -> None:
         )
 
     manifest = {
-        "base_config": str(base_config_path),
+        "base_config": repo_relative(base_config_path, project_root),
         "rho_values": RHO_VALUES,
         "seed": 0,
-        "official_training_preserved": str(official_training),
+        "official_training_preserved": repo_relative(
+            official_training, project_root
+        ),
         "runs": [],
     }
 
@@ -277,9 +286,11 @@ def main() -> None:
                 {
                     "rho": rho,
                     "tag": current_tag,
-                    "config": str(config_path),
-                    "training_results": str(target_training),
-                    "log": str(log_path),
+                    "config": repo_relative(config_path, project_root),
+                    "training_results": repo_relative(
+                        target_training, project_root
+                    ),
+                    "log": repo_relative(log_path, project_root),
                     "effective_payment_cost_fraction": effective_fraction,
                 }
             )
