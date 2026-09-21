@@ -1,0 +1,5 @@
+run,eta,seed,source,scope
+eta_0p00000,0.0,0,historical sensitivity run (seed 0),"training, validation, checkpoints, plots, and Q-action diagnostic"
+eta_0p01429,0.01429,0,historical sensitivity run (seed 0),"training, validation, checkpoints, plots, and Q-action diagnostic"
+eta_0p03571,0.03571,0,historical sensitivity run (seed 0),"training, validation, checkpoints, plots, and Q-action diagnostic"
+eta_0p07143,0.07143,0,primary seed-0 run; comparable training/validation and Q diagnostic only,"training, validation, checkpoints, plots, and Q-action diagnostic"

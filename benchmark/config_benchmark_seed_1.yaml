@@ -1,0 +1,106 @@
+general:
+  load_file: data/load_hourly_2018.csv
+  price_file: data/ercot_hourly_price.csv
+  year: 2018
+  expected_hours_per_day: 24
+  seed: 1
+environment:
+  house_ids:
+  - 661
+  - 3039
+  - 8565
+  off_peak_hours:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 22
+  - 23
+  mid_peak_hours:
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  on_peak_hours:
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  elasticity:
+    off_peak: 0.5
+    mid_peak: 0.3
+    on_peak: 0.1
+  mu:
+  - 0.3
+  - 0.6
+  - 0.9
+  kappa: 0.1
+  rho: 0.9
+  sp_reward_weight: 0.5
+  max_reduction_fraction: 0.3
+  incentive_bounds:
+    reference: daily_min_strictly_positive_price
+    lower_multiplier: 0.3
+    upper_multiplier: 1.0
+training:
+  train_ranges:
+  - - 2
+    - 167
+  val_range:
+  - 168
+  - 181
+  time_steps_train: 24
+  time_steps_test: 24
+testing:
+  periods:
+    july:
+      range:
+      - 182
+      - 212
+      plot_days:
+      - 208
+    august:
+      range:
+      - 213
+      - 243
+      plot_days:
+      - 220
+    november:
+      range:
+      - 305
+      - 334
+      plot_days:
+      - 312
+external_reference:
+  capacity_threshold_kw: 7.0
+  usage: post_hoc_testing_and_plotting_only
+DDQN:
+  tie_break:
+    enabled: true
+    q_tolerance: 1.0e-06
+  max_steps: 24
+  gamma: 0.99
+  epsilon_start: 1.0
+  epsilon_min: 0.01
+  epsilon_decay: 0.998
+  episodes: 2500
+  BUFFER_SIZE: 50000
+  BATCH_SIZE: 256
+  TAU: 0.003
+  TRAINING_INTERVAL: 16
+  hidden_layers:
+  - 128
+  - 64
+  eval_interval: 50
+  eval_epsilon: 0.0
+  LEARNING_RATE_DDQN: 0.0001

@@ -1,0 +1,185 @@
+general:
+  load_file: data/load_hourly_2018.csv
+  price_file: data/ercot_hourly_price.csv
+  year: 2018
+  expected_hours_per_day: 24
+  seed: 0
+environment:
+  house_ids:
+  - 661
+  - 3039
+  - 8565
+  off_peak_hours:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 22
+  - 23
+  mid_peak_hours:
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  on_peak_hours:
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  elasticity:
+    off_peak: 0.5
+    mid_peak: 0.3
+    on_peak: 0.1
+  capacity_threshold: 7
+  mu:
+  - 0.3
+  - 0.6
+  - 0.9
+  omega: 0.1
+  customer_reward_weight: 0.5
+  rho: 0.1
+  reward_mode: weighted_stakeholder_tracking_no_need
+  c_cap: 0.0
+  c_over: 0.0
+  reward_normalization:
+    enabled: true
+    price_percentile: 95.0
+    discomfort_percentile: 95.0
+    economic_scale: null
+    discomfort_scale: null
+    discomfort_mode: per_class_mean
+    discomfort_class_scales: {}
+    discomfort_weight: 1.0
+  incentive_offer_regularization:
+    enabled: false
+    coefficient: 0.0
+    fraction_of_1kwh_p95_value: 0.01
+  weighted_stakeholder:
+    sp_weight: 0.65
+    minimum_effective_payment_cost_fraction: 0.5
+  target_tracking:
+    track_c_violation: auto_capacity_anchored
+    track_c_under: auto_economic_anchored
+    deadband_kwh: auto
+  symmetric_tracking:
+    loss: smooth_l1
+    lambda_c: 0.2216381800923157
+    lambda_source: train_p95_scenario_action_matching
+    huber_delta: auto_deadband_normalized
+  no_need_offer_regularization:
+    enabled: true
+    coefficient: 0.07143
+    gate_tolerance_kw: 1.0e-09
+  max_reduction_fraction: 0.3
+  data_validation_tolerance: 1.0e-06
+  DEVICES:
+  - air
+  - car
+  - clotheswasher
+  - dishwasher
+  - dry
+  DEVICE_CONSUMPTION:
+  - 2.5
+  - 4.0
+  - 1.0
+  - 2.0
+  - 2.0
+  DISSATISFACTION_COEFFICIENTS:
+  - 3.5
+  - 0.05
+  - 0.4
+  - 0.2
+  - 0.1
+  DISSATISFACTION_COEFFICIENTS_STD:
+  - 2.0
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  DISSATISFACTION_COEFFICIENTS_MIN:
+  - 1.0
+  - 0.01
+  - 0.01
+  - 0.01
+  - 0.01
+  DEVICE_NON_INTERRUPTIBLE:
+  - false
+  - false
+  - true
+  - true
+  - true
+  POWER_RATE:
+  - 0
+  - 0.1
+  - 0.2
+  - 0.3
+  - 0.4
+  - 0.5
+  - 0.6
+  ts_deadline_hour:
+    air: 23
+    car: 23
+    clotheswasher: 23
+    dishwasher: 23
+    dry: 23
+  DISABLE_PC: false
+  fixed_household_coefficients:
+  - - 3.7514604421867865
+    - 0.036789513670869814
+    - 0.4640422650443282
+    - 0.210490011715304
+    - 0.04643306268388891
+  - - 4.22319010981897
+    - 0.18040000451301375
+    - 0.49470809631292423
+    - 0.12962647641930075
+    - 0.01
+  - - 2.2534510749252954
+    - 0.054132597934724365
+    - 0.1674969225361166
+    - 0.17812083360674544
+    - 0.01
+training:
+  train_ranges:
+  - - 2
+    - 167
+  val_range:
+  - 168
+  - 181
+  test_range:
+  - 213
+  - 243
+  time_steps_train: 24
+  time_steps_test: 24
+testing:
+  plot_days:
+  - 220
+DDQN:
+  tie_break:
+    enabled: true
+    q_tolerance: 1.0e-06
+  max_steps: 24
+  gamma: 0.99
+  epsilon_start: 1
+  epsilon_min: 0.01
+  epsilon_decay: 0.998
+  episodes: 2500
+  BUFFER_SIZE: 50000
+  BATCH_SIZE: 256
+  TAU: 0.003
+  TRAINING_INTERVAL: 16
+  HIDDEN_LAYER_SIZE: 128
+  eval_interval: 50
+  eval_episodes: 10
+  eval_epsilon: 0.01
+  LEARNING_RATE_DDQN: 0.0001

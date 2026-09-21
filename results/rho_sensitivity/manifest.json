@@ -1,0 +1,54 @@
+{
+  "base_config": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\config_seed_0.yaml",
+  "rho_values": [
+    0.1,
+    0.3,
+    0.5,
+    0.7,
+    0.9
+  ],
+  "seed": 0,
+  "official_training_preserved": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\seed_0\\training",
+  "runs": [
+    {
+      "rho": 0.1,
+      "tag": "rho_0p1",
+      "config": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\configs\\rho_sensitivity\\config_rho_0p1.yaml",
+      "training_results": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\rho_0p1\\training",
+      "log": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\logs\\rho_0p1.log",
+      "effective_payment_cost_fraction": 0.9461538461538461
+    },
+    {
+      "rho": 0.3,
+      "tag": "rho_0p3",
+      "config": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\configs\\rho_sensitivity\\config_rho_0p3.yaml",
+      "training_results": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\rho_0p3\\training",
+      "log": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\logs\\rho_0p3.log",
+      "effective_payment_cost_fraction": 0.8384615384615385
+    },
+    {
+      "rho": 0.5,
+      "tag": "rho_0p5",
+      "config": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\configs\\rho_sensitivity\\config_rho_0p5.yaml",
+      "training_results": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\rho_0p5\\training",
+      "log": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\logs\\rho_0p5.log",
+      "effective_payment_cost_fraction": 0.7307692307692308
+    },
+    {
+      "rho": 0.7,
+      "tag": "rho_0p7",
+      "config": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\configs\\rho_sensitivity\\config_rho_0p7.yaml",
+      "training_results": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\rho_0p7\\training",
+      "log": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\logs\\rho_0p7.log",
+      "effective_payment_cost_fraction": 0.6230769230769231
+    },
+    {
+      "rho": 0.9,
+      "tag": "rho_0p9",
+      "config": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\configs\\rho_sensitivity\\config_rho_0p9.yaml",
+      "training_results": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\rho_0p9\\training",
+      "log": "C:\\Users\\SPashaki\\OneDrive - University of Lincoln\\PhD\\PhD Project-First Phase\\results\\rho_sensitivity\\logs\\rho_0p9.log",
+      "effective_payment_cost_fraction": 0.5153846153846154
+    }
+  ]
+}
