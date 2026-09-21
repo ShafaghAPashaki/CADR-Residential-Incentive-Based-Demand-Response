@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local data (third-party / non-redistributable)
+data/*.csv
+data/*.xlsx
+data/*.parquet
+!data/README.md
+
+# Generated training/test outputs
+results/**/ddqn_episode_*.pth
+results/**/ddqn_final.pth
+results/**/audit.xlsx
+results/**/q_diagnostic.xlsx
+results/**/q_action_diagnostic.xlsx
+results/**/*.log
+
+# Temporary / local outputs
+*.tmp
+*.bak
