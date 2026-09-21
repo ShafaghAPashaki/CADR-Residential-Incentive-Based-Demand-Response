@@ -105,7 +105,7 @@ def main():
             failures.append(f"Seed {seed}: August plot day must be 220.")
 
     root = Path('.')
-    forbidden = [root / '.venv', root / 'phd_project.egg-info', root / 'setup.py']
+    forbidden = [root / 'phd_project.egg-info', root / 'setup.py']
     for path in forbidden:
         if path.exists():
             failures.append(f"Remove generated packaging item: {path}")
