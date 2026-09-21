@@ -53,7 +53,7 @@ See [`benchmark/README.md`](benchmark/README.md) and [`benchmark/BENCHMARK_IMPLE
 
 ## Environment
 
-Create a clean Python environment and install the pinned dependencies:
+Python 3.12 is recommended (the publication package was verified with Python 3.12.3). Create a clean virtual environment and install the pinned dependencies:
 
 ```bash
 python -m venv .venv
@@ -63,19 +63,43 @@ On Windows PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+```
+
+If PowerShell execution policy prevents activation, activation is optional; use the virtual-environment interpreter directly:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 Then place the required data files in `data/` as described in [`data/README.md`](data/README.md).
 
 ## Verification
 
-From the project root:
+From the project root, after installing the dependencies:
 
 ```powershell
-python .\verify.py
-python -m benchmark.verify_benchmark
+.\.venv\Scripts\python.exe verify.py
+.\.venv\Scripts\python.exe -m benchmark.verify_benchmark
 ```
+
+Both commands should report `PASS` before evaluation or retraining.
+
+## Quick reproducibility check
+
+With the required data files present, the included validation-selected checkpoints can be evaluated without retraining. For example, a one-day CADR check for Seed 0 is:
+
+```powershell
+.\.venv\Scripts\python.exe test.py --model_path "results/seed_0/training/ddqn_best.pth" --config_path "config_seed_0.yaml" --test_start 220 --test_end 220 --target_plot_day 220 --output_dir "local_validation/cadr_seed0_day220"
+```
+
+A corresponding one-day EBDR benchmark check is:
+
+```powershell
+.\.venv\Scripts\python.exe -m benchmark.test_benchmark --model_path "results/benchmark/seed_0/training/ddqn_best.pth" --config_path "benchmark/config_benchmark_seed_0.yaml" --test_start 220 --test_end 220 --plot_days 220 --output_dir "local_validation/ebdr_seed0_day220"
+```
+
+These commands use the archived checkpoints and do not retrain either model.
 
 ## Training
 
