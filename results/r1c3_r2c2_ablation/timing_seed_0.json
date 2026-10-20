@@ -1,0 +1,13 @@
+{
+  "protocol": "MATCHED_HEMS_SP_ABLATION_2026_10_15_V1",
+  "seed": 0,
+  "start_utc": "2026-10-15T15:46:19.394396+00:00",
+  "end_utc": "2026-10-15T15:54:11.005484+00:00",
+  "elapsed_seconds": 471.6124004000012,
+  "device": "cpu",
+  "python": "3.12.3",
+  "torch": "2.13.0+cpu",
+  "original_env_sha256": "5ae8182054e42be741a2450a5650f8f320f48e0aade06b8f3cb378af622ad9a6",
+  "ablation_sha256": "34a01c77d5b33e1e0972446525aabf004f3428861aae9d90ad1a90b81ad5efe7",
+  "driver_sha256": "b522aee95002991a0c522dc4d2f2dbe24f301dc0a0f62d1f33434a47749083c2"
+}

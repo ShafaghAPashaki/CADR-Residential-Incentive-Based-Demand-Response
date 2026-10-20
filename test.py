@@ -27,7 +27,7 @@ mpl.rcParams["hatch.linewidth"] = 3
 BIN_SIZE = 2
 EPS = 1e-9
 AUDIT_TOL = 1e-8
-ARTICLE_PLOT_DAY = 208
+DEFAULT_PLOT_DAY = 208
 SCRIPT_VERSION = "final_ddqn_testing"
 
 
@@ -44,7 +44,7 @@ class ModelTester:
         self,
         model_path,
         cfg_override=None,
-        target_plot_day=ARTICLE_PLOT_DAY,
+        target_plot_day=DEFAULT_PLOT_DAY,
         target_plot_days=None,
         output_dir=None,
         allow_legacy_checkpoint=False,
@@ -180,6 +180,12 @@ class ModelTester:
             "accounting_version",
             "state_dim",
             "state_feature_names",
+            "forecast_state_mode",
+            "forecast_state_input_sha256",
+            "forecast_training_source",
+            "forecast_validation_test_source",
+            "forecast_load_floor_kw",
+            "forecast_price_unit",
             "action_dim",
             "house_ids",
             "device_names",
@@ -232,7 +238,7 @@ class ModelTester:
         if missing:
             message = f"Legacy/incomplete checkpoint metadata: missing {missing}."
             if not self.allow_legacy_checkpoint:
-                raise ValueError(message + " Final paper testing requires a new checkpoint.")
+                raise ValueError(message + " Final evaluation requires a new checkpoint.")
             warnings.warn(message, RuntimeWarning)
 
         checks = []
@@ -250,6 +256,17 @@ class ModelTester:
             ))
         if "state_dim" in checkpoint:
             checks.append(("state_dim", int(checkpoint["state_dim"]), int(state_dim)))
+        forecast_meta = self.env.get_forecast_metadata()
+        for field in [
+            "forecast_state_mode",
+            "forecast_state_input_sha256",
+            "forecast_training_source",
+            "forecast_validation_test_source",
+            "forecast_load_floor_kw",
+            "forecast_price_unit",
+        ]:
+            if field in checkpoint:
+                checks.append((field, checkpoint[field], forecast_meta[field]))
         if "action_dim" in checkpoint:
             checks.append(("action_dim", int(checkpoint["action_dim"]), int(action_dim)))
         if "house_ids" in checkpoint:
@@ -483,7 +500,7 @@ class ModelTester:
             if model_type != "best_validation":
                 warnings.warn(
                     "The selected checkpoint is not labelled 'best_validation'. "
-                    "Final paper results should normally use "
+                    "Final evaluation results should normally use "
                     "ddqn_best.pth.",
                     RuntimeWarning,
                 )
@@ -654,6 +671,11 @@ class ModelTester:
             "device_curtailed": self.env.device_curtailed[:valid_steps].copy(),
             "device_shifted_out": self.env.device_shifted_out[:valid_steps].copy(),
             "device_shifted_in": self.env.device_shifted_in[:valid_steps].copy(),
+            "device_conflict_deferred_out": self.env.device_conflict_deferred_out[:valid_steps].copy(),
+            "device_conflict_deferred_in": self.env.device_conflict_deferred_in[:valid_steps].copy(),
+            "device_conflict_discomfort": self.env.device_conflict_discomfort[:valid_steps].copy(),
+            "device_conflict_unserved": self.env.device_conflict_unserved[:valid_steps].copy(),
+            "device_unmet": self.env.device_unmet[:valid_steps].copy(),
             "device_unshifted_request": self.env.device_unshifted_request[:valid_steps].copy(),
             "device_settlement_ineligible_request": (
                 self.env.device_settlement_ineligible_request[:valid_steps].copy()
@@ -672,6 +694,15 @@ class ModelTester:
             ),
             "device_settlement_decision_hour": (
                 self.env.device_settlement_decision_hour[:valid_steps].copy()
+            ),
+            "device_settlement_rate_above_price": (
+                self.env.device_settlement_rate_above_price[:valid_steps].copy()
+            ),
+            "device_settlement_above_price_energy": (
+                self.env.device_settlement_above_price_energy[:valid_steps].copy()
+            ),
+            "device_settlement_negative_margin": (
+                self.env.device_settlement_negative_margin[:valid_steps].copy()
             ),
             "shifted_out_locked_rate": (
                 self.env.shifted_out_locked_rate[:valid_steps].copy()
@@ -727,6 +758,11 @@ class ModelTester:
             curtailment_house = r["net_curtailment_per_house"]
             shifted_out_house = r["shifted_out_per_house"]
             shifted_in_house = r["shifted_in_per_house"]
+            conflict_deferred_out = r["device_conflict_deferred_out"]
+            conflict_deferred_in = r["device_conflict_deferred_in"]
+            conflict_discomfort = r["device_conflict_discomfort"]
+            conflict_unserved = r["device_conflict_unserved"]
+            unmet = r["device_unmet"]
             unshifted_request = r["device_unshifted_request"]
             settlement_ineligible = r["device_settlement_ineligible_request"]
             device_raw_settlement = r["device_raw_settlement_relief"]
@@ -734,6 +770,9 @@ class ModelTester:
             device_settlement_payment = r["device_settlement_payment"]
             device_settlement_rate = r["device_settlement_rate"]
             device_settlement_decision_hour = r["device_settlement_decision_hour"]
+            settlement_rate_above_price = r["device_settlement_rate_above_price"]
+            settlement_above_price_energy = r["device_settlement_above_price_energy"]
+            settlement_negative_margin = r["device_settlement_negative_margin"]
             incentives = r["incentives"]
             prices = r["prices"]
             discomforts = r["discomforts"]
@@ -817,6 +856,13 @@ class ModelTester:
                 & (agg_after > self.capacity + 1e-6)
                 & (after_without_shifted_in <= self.capacity + 1e-6)
             )
+            conflict_arrivals = conflict_deferred_in.sum(axis=(1, 2))
+            conflict_induced_rebound = (
+                (conflict_arrivals > EPS)
+                & (agg_baseline <= self.capacity + 1e-6)
+                & (agg_after > self.capacity + 1e-6)
+                & (agg_after - conflict_arrivals <= self.capacity + 1e-6)
+            )
             safe_shifted_in_energy = float(
                 shifted_in[shifted_in_capacity_safe].sum()
             )
@@ -836,7 +882,17 @@ class ModelTester:
             )
 
 
-            verified_from_physics = np.maximum(0.0, baseline - after)
+            # Forced conflict deferrals are scheduling corrections rather than
+            # incentive-settled DR. Reconstruct the same physical settlement
+            # counterfactual independently from the conflict movement logs.
+            conflict_out_house = conflict_deferred_out.sum(axis=2)
+            conflict_in_house = conflict_deferred_in.sum(axis=2)
+            settlement_reference_from_physics = (
+                baseline - conflict_out_house + conflict_in_house
+            )
+            verified_from_physics = np.maximum(
+                0.0, settlement_reference_from_physics - after
+            )
             physics_to_settlement_error = float(
                 np.max(
                     np.abs(settlement - verified_from_physics),
@@ -1129,6 +1185,22 @@ class ModelTester:
                 "capacity_unsafe_shifted_in_energy": unsafe_shifted_in_energy,
                 "capacity_safe_shifted_in_ratio_percentage": float(safe_shifted_in_ratio),
                 "rebound_induced_violation_hours": int(rebound_induced_violation.sum()),
+                "rebound_induced_violation_excess_kwh": float(
+                    np.maximum(agg_after - self.capacity, 0.0)[
+                        rebound_induced_violation
+                    ].sum()
+                ),
+                "conflict_induced_rebound_hours": int(conflict_induced_rebound.sum()),
+                "conflict_induced_rebound_excess_kwh": float(
+                    np.maximum(agg_after - self.capacity, 0.0)[
+                        conflict_induced_rebound
+                    ].sum()
+                ),
+                "unserved_energy_kwh": float(unmet.sum()),
+                "unserved_conflict_energy_kwh": float(conflict_unserved.sum()),
+                "forced_conflict_deferral_energy_kwh": float(conflict_deferred_out.sum()),
+                "forced_conflict_deferral_received_energy_kwh": float(conflict_deferred_in.sum()),
+                "conflict_discomfort": float(conflict_discomfort.sum()),
                 "maximum_post_DR_load_during_shifted_in_hours": maximum_secondary_peak,
                 "unshifted_EV_request": float(unshifted_ev_request.sum()),
                 "settlement_ineligible_TSNI_request": float(
@@ -1142,6 +1214,18 @@ class ModelTester:
                     r["sp_settlement_incentive_cost"].sum()
                 ),
                 "SP_settlement_value": float(sp_rewards.sum()),
+                "settlement_rate_above_price_hours": int(
+                    np.any(settlement_rate_above_price, axis=(1, 2)).sum()
+                ),
+                "settlement_rate_above_price_device_hours": int(
+                    settlement_rate_above_price.sum()
+                ),
+                "settlement_above_price_energy": float(
+                    settlement_above_price_energy.sum()
+                ),
+                "settlement_negative_margin": float(
+                    settlement_negative_margin.sum()
+                ),
                 "net_wholesale_procurement_impact": float(
                     r["net_wholesale_procurement_impact"].sum()
                 ),
@@ -1353,6 +1437,8 @@ class ModelTester:
                     "post_DR_load_without_shifted_in": float(after_without_shifted_in[h]),
                     "shifted_in_capacity_safe": bool(shifted_in_capacity_safe[h]),
                     "rebound_induced_violation": bool(rebound_induced_violation[h]),
+                    "conflict_deferred_in_this_hour": float(conflict_arrivals[h]),
+                    "conflict_induced_rebound": bool(conflict_induced_rebound[h]),
                     "unshifted_EV_request_this_hour": float(unshifted_ev_request[h]),
                     "settlement_ineligible_TSNI_request_this_hour": float(
                         settlement_ineligible_request[h]
@@ -1506,6 +1592,12 @@ class ModelTester:
                             "settlement_payment": float(
                                 device_settlement_payment[h, i, d]
                             ),
+                            "settlement_rate_above_price": bool(
+                                settlement_rate_above_price[h, i, d]
+                            ),
+                            "settlement_negative_margin": float(
+                                settlement_negative_margin[h, i, d]
+                            ),
                             "SP_settlement_value_contribution": float(
                                 prices[h] * verified_source
                                 - device_settlement_payment[h, i, d]
@@ -1649,7 +1741,7 @@ class ModelTester:
             "Important_notes": [                "This workbook covers the complete configured test range with exactly 24 hourly observations per day.",
                 "immediate_action_capacity_relief is the non-negative relief caused by the current action and is used only for capacity analysis and reward shaping.",
                 "signed_load_change equals baseline minus realised post-DR load; it may be negative during shifted-in hours and is used only for energy-balance, rebound, and net-procurement diagnostics.",
-                "settlement_DR_energy equals max(0, baseline minus realised post-DR load) at household-hour level and is allocated proportionally across the physical relief sources active in that hour.",
+                "settlement_DR_energy excludes forced conflict deferrals from the incentive-settlement counterfactual: max(0, baseline - conflict_deferred_out + conflict_deferred_in - realised post-DR load), allocated proportionally across incentivised physical relief sources active in that hour.",
                 "Multi-hour shifted jobs use the incentive rate locked when the job was moved; each origin-hour slice is valued at its own verification-hour wholesale price.",
                 "action_attributed_DR_energy equals current curtailment plus the full energy of jobs newly shifted by the current action and is a diagnostic only.",
                 "SP_settlement_value is the origin-hour capacity-relief settlement value: verified relief valued at the origin-hour price minus incentive payment. net_wholesale_procurement_impact separately includes shifted-in destination effects.",
@@ -1660,7 +1752,7 @@ class ModelTester:
                 "The no-need regularizer applies a non-monetary action-parsimony cost only when pre-action committed load is at or below capacity plus the numerical tolerance.",
                 "The no-need regularizer changes the training objective but does not alter settlement energy, incentive payment, capacity-relief value, customer utility, discomfort, or physical accounting definitions.",
                 "No social-welfare column is reported because a complete bill-saving and system-cost welfare definition has not yet been adopted.",
-                "The independent physics-to-settlement check recomputes max(0, baseline_house - after_house) without using Environment settlement arrays.",
+                "The independent physics-to-settlement check recomputes max(0, baseline_house - conflict_deferred_out_house + conflict_deferred_in_house - after_house) from physical logs without using Environment settlement arrays.",
                 "Ledger energy, payment, SP-value, customer-reward, and total-reward reconstruction errors must not exceed the strict audit tolerance.",
                 f"Strict numerical audit tolerance: {AUDIT_TOL:.1e}.",
                 "Detailed figures are generated only for day(s): "
@@ -1852,7 +1944,7 @@ class ModelTester:
 
     @staticmethod
     def _device_display_name(name):
-        """Return compact appliance abbreviations used in the manuscript."""
+        """Return compact appliance abbreviations used in the project outputs."""
         key = str(name).strip().lower().replace("_", " ").replace("-", " ")
         compact = "".join(key.split())
         aliases = {
@@ -2178,7 +2270,7 @@ class ModelTester:
         return f"{values.mean():.2f} ± {values.std(ddof=0):.2f}"
 
     def _build_paper_ready_tables(self, tables):
-        """Build the manuscript tables from the single Environment accounting."""
+        """Build the summary tables from the single Environment accounting."""
         daily = tables["Daily_Summary"].copy()
         household = tables["Household_Daily"].copy()
         hourly = tables["Hourly_Audit"].copy()
@@ -2532,7 +2624,7 @@ class ModelTester:
                         os.remove(path)
 
     def save_paper_ready_results(self, tables):
-        """Save only the three agreed manuscript tables plus fairness support."""
+        """Save the retained summary tables plus fairness support."""
         outputs = self._build_paper_ready_tables(tables)
         excel_path = os.path.join(
             self.results_dir,
@@ -2816,7 +2908,7 @@ class ModelTester:
             missing = [name for name in expected_sheets if name not in check_wb.sheetnames]
             check_wb.close()
             if missing:
-                raise RuntimeError(f"Paper workbook is missing sheets: {missing}")
+                raise RuntimeError(f"Results workbook is missing sheets: {missing}")
         except ImportError as exc:
             raise ImportError(
                 "openpyxl is required to create the Excel reports. "
@@ -2826,7 +2918,7 @@ class ModelTester:
         return excel_path
 
     def generate_detailed_plots(self):
-        """Generate all retained article figures for each requested plot day."""
+        """Generate all retained figures for each requested plot day."""
         original_target_day = self.target_plot_day
         try:
             for plot_day in self.target_plot_days:
@@ -2915,13 +3007,13 @@ def main():
         action="store_true",
         help=(
             "Allow diagnostic loading of a checkpoint without the new metadata. "
-            "Do not use this option for final paper results."
+            "Do not use this option for final evaluation results."
         ),
     )
     parser.add_argument(
         "--target_plot_day",
         type=int,
-        default=ARTICLE_PLOT_DAY,
+        default=DEFAULT_PLOT_DAY,
         help=(
             "Illustrative day for detailed figures. Default: 208."
         ),

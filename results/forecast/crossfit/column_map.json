@@ -1,0 +1,28 @@
+{
+  "file": "ddqn_crossfit_forecasts_days_002_167.csv",
+  "rows": "one per hour, days 2-167 of 2018 (DDQN training days)",
+  "eu_to_household": {
+    "eu1": 661,
+    "eu2": 3039,
+    "eu3": 8565
+  },
+  "forecast_columns": [
+    "forecast_load_eu1_kw",
+    "forecast_load_eu2_kw",
+    "forecast_load_eu3_kw",
+    "forecast_aggregate_load_kw",
+    "forecast_price_cent_per_kwh"
+  ],
+  "audit_columns_do_not_use_as_ddqn_inputs": [
+    "audit_actual_load_eu1_kw",
+    "audit_actual_load_eu2_kw",
+    "audit_actual_load_eu3_kw",
+    "audit_actual_aggregate_load_kw",
+    "audit_actual_price_cent_per_kwh",
+    "audit_forecast_price_usd_per_mwh"
+  ],
+  "aggregate_definition": "forecast_aggregate_load_kw = eu1 + eu2 + eu3 (exact sum)",
+  "price_unit": "cent/kWh = (USD/MWh) / 10",
+  "startup_padding": "inputs_padding_free_all_targets is False for early hours whose input window reached before the start of the series (zero-padded, as in the full models); these hours are forecast but excluded from metrics.",
+  "days_168_onward": "not in this file; use the existing full-model forecasts"
+}

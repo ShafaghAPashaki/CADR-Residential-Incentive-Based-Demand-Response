@@ -1,0 +1,52 @@
+{
+  "threshold_kw": 7.0,
+  "definition": "strict forecast and actual > 7 kW",
+  "forecast_aggregate_definition": "Unfloored sum of archived per-household LSTM forecasts for a diagnostic confusion table. Controller state independently floors negative household load forecasts at zero before summing. The controller feature itself is not redefined by this diagnostic.",
+  "splits": {
+    "train": {
+      "hours": 3984,
+      "actual_capacity_need_hours": 276,
+      "forecast_capacity_need_hours": 111,
+      "true_positives": 90,
+      "false_negatives": 186,
+      "false_positives": 21,
+      "true_negatives": 3687
+    },
+    "validation": {
+      "hours": 336,
+      "actual_capacity_need_hours": 90,
+      "forecast_capacity_need_hours": 74,
+      "true_positives": 60,
+      "false_negatives": 30,
+      "false_positives": 14,
+      "true_negatives": 232
+    },
+    "july": {
+      "hours": 744,
+      "actual_capacity_need_hours": 341,
+      "forecast_capacity_need_hours": 335,
+      "true_positives": 283,
+      "false_negatives": 58,
+      "false_positives": 52,
+      "true_negatives": 351
+    },
+    "august": {
+      "hours": 744,
+      "actual_capacity_need_hours": 335,
+      "forecast_capacity_need_hours": 369,
+      "true_positives": 292,
+      "false_negatives": 43,
+      "false_positives": 77,
+      "true_negatives": 332
+    },
+    "november": {
+      "hours": 720,
+      "actual_capacity_need_hours": 4,
+      "forecast_capacity_need_hours": 74,
+      "true_positives": 4,
+      "false_negatives": 0,
+      "false_positives": 70,
+      "true_negatives": 646
+    }
+  }
+}

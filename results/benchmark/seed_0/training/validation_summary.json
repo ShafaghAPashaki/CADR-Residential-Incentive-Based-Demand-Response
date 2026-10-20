@@ -1,0 +1,20 @@
+{
+  "selection_rule": "highest mean deterministic validation reward; lowest population SD as tie-break; earliest episode in final tie",
+  "capacity_used_for_selection": false,
+  "best_validation_episode": 600,
+  "best_validation_metrics": {
+    "episode": 600,
+    "validation_days": 14,
+    "mean_validation_reward": 30.603769739801887,
+    "validation_reward_sd": 5.847710125668053,
+    "minimum_day_reward": 23.489440949124216,
+    "maximum_day_reward": 42.18864258959706,
+    "total_curtailment_kWh": 413.87253749999996,
+    "incentive_payment_cent": 749.080142048125,
+    "avoided_wholesale_value_cent": 945.4601857128425,
+    "net_wholesale_after_payment_cent": 196.3800436647175,
+    "intervention_hours": 336,
+    "household_intervention_events": 1008,
+    "no_response_events": 0
+  }
+}

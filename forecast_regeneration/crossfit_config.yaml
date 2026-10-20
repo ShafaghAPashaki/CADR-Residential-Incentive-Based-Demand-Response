@@ -1,0 +1,45 @@
+# Cross-fitting stage settings for the CADR forecasting pipeline.
+#
+# This file is deliberately separate from config_seed_*.yaml so that the
+# forecasting configuration used by the full models stays byte-identical
+# (its SHA-256 is checked against the full-model manifests at start-up).
+#
+# None of these values is a tuned hyperparameter. The model specification,
+# optimiser settings, batch size and data splits are all read from the main
+# config; the epoch count is read from the saved full-model training history.
+
+crossfit:
+  # Contiguous blocks over the DDQN/LSTM training days (must equal
+  # training.train_ranges in the main config).
+  train_days: [2, 167]
+  n_folds: 5
+
+  # Exclusion buffer around each held-out block, in hours. Must be at least
+  # the model's receptive field (window_size - 1 + max lag = 23 + 50 = 73 h);
+  # this is asserted at start-up.
+  buffer_hours: 73
+
+  # Fold seed = seed_base + fold_index (fold indices 0-4).
+  seed_base: 42
+
+  # Fixed epochs per target = best epoch of the corresponding full model,
+  # read from its saved training history. No search is performed.
+  epoch_source: full_model_history_best_validation_epoch
+
+  # CPU with deterministic algorithms gives run-to-run reproducible results.
+  device: cpu
+  torch_num_threads: 4
+  deterministic_algorithms: true
+
+  # Determinism check: fold 0 of every target is trained a second time from
+  # scratch and its held-out predictions must match within this tolerance.
+  determinism_check: true
+  determinism_tolerance: 1.0e-6
+
+  # Pre-registered train-vs-validation gap threshold (reported, not gating).
+  # Must equal forecast.train_validation_wape_relative_gap_threshold.
+  gap_threshold: 0.20
+
+  # Locations, relative to the main config file's folder.
+  full_model_dir: results/forecast
+  output_dir: crossfit_results

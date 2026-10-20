@@ -1,0 +1,47 @@
+{
+  "status": "ORIGINAL_RETAINED",
+  "lambda_source": "train_p95_scenario_action_matching_original_retained",
+  "retained_lambda_c": 0.2216381800923157,
+  "capacity_reference_kw": 7.0,
+  "environment_version": "forecast_state_v1",
+  "method_original": "train-only Q95(abs(stakeholder component)) / Q95(unweighted tracking loss)",
+  "historical_component_magnitudes": {
+    "economic_q95": 0.138830910593618,
+    "tracking_q95": 0.626385357142857,
+    "derived_lambda_c": 0.2216381800923157,
+    "historical_scenarios": 12,
+    "historical_actions": 1500,
+    "historical_scenario_identifiers_available": false
+  },
+  "retention_basis": "Original historical scenario IDs were not archived. Independent review compared zero-action-prefix counterfactual re-evaluations on legacy versus frozen causal dynamics using alternative training-only selections. At 12 scenarios the compared values were equal to reported precision; at 48 they differed by 0.00006. The replacement quantile-sampling estimate varied materially with sample count (12, 48, 96), so replacing the original coefficient from that sample was rejected. No test-set model performance or policy reward was used to select a coefficient.",
+  "independent_reviewer_reported_replays_not_recomputed_in_this_package": [
+    {
+      "scenario_count": 12,
+      "legacy_lambda_approx": 0.19906,
+      "causal_lambda_approx": 0.19906
+    },
+    {
+      "scenario_count": 48,
+      "legacy_lambda_approx": 0.19063,
+      "causal_lambda_approx": 0.19057
+    },
+    {
+      "scenario_count": 96,
+      "legacy_lambda_approx": null,
+      "causal_lambda_approx": 0.1599
+    }
+  ],
+  "caution": "Independent reviewer replays are transcribed from the supplied review; full replay logs were not provided. They are not claimed to reproduce the original archived calibration scenarios.",
+  "training_forecast_file_sha256": "b86e09baae30d3093ecb4cf8efb71dd273104739fc690120807edda8df88cd17",
+  "frozen_cadr_environment_sha256": "5ae8182054e42be741a2450a5650f8f320f48e0aade06b8f3cb378af622ad9a6",
+  "fixed_hyperparameters_not_changed": [
+    "omega",
+    "rho",
+    "no_need_offer_coefficient",
+    "deadband",
+    "epsilon_schedule",
+    "learning_rate",
+    "network_architecture"
+  ],
+  "alternative_capacity_protocol": "Hold the same lambda_c for 6/8 kW; recompute automatic economic normalisation and delta=0.1033/Lcap. Separate future sensitivity runs are not launched by this 7-kW script."
+}

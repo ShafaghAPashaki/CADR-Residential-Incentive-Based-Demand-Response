@@ -1,0 +1,1415 @@
+{
+  "gate": "READY",
+  "failures": [],
+  "combined_file": "combined/ddqn_crossfit_forecasts_days_002_167.csv",
+  "combined_file_sha256": "7ffbed0c3af69b9421fc534fc4998df5b1cbeef7eb3968863f7aa955e1e4d11b",
+  "train_validation_gap_informational": [
+    {
+      "target": "household_661",
+      "OOF_WAPE_percent": 59.98976294270214,
+      "full_model_validation_WAPE_percent": 37.397857293813104,
+      "relative_gap_validation_vs_OOF": -0.6040962580127959,
+      "preregistered_threshold": 0.2,
+      "gap_exceeds_threshold_informational": false
+    },
+    {
+      "target": "household_3039",
+      "OOF_WAPE_percent": 47.34070073180633,
+      "full_model_validation_WAPE_percent": 35.700643268478075,
+      "relative_gap_validation_vs_OOF": -0.326046154849144,
+      "preregistered_threshold": 0.2,
+      "gap_exceeds_threshold_informational": false
+    },
+    {
+      "target": "household_8565",
+      "OOF_WAPE_percent": 37.05659524050532,
+      "full_model_validation_WAPE_percent": 49.73749793370893,
+      "relative_gap_validation_vs_OOF": 0.2549565864793793,
+      "preregistered_threshold": 0.2,
+      "gap_exceeds_threshold_informational": true
+    },
+    {
+      "target": "price",
+      "OOF_WAPE_percent": 38.16317880423562,
+      "full_model_validation_WAPE_percent": 12.59275297468028,
+      "relative_gap_validation_vs_OOF": -2.0305667776512983,
+      "preregistered_threshold": 0.2,
+      "gap_exceeds_threshold_informational": false
+    }
+  ],
+  "note": "The gap is reported transparently and does not gate; no further tuning is performed.",
+  "checks": {
+    "completion": {
+      "all_four_targets_completed": {
+        "pass": true,
+        "detail": null
+      },
+      "household_661_oof_file_present": {
+        "pass": true,
+        "detail": null
+      },
+      "household_3039_oof_file_present": {
+        "pass": true,
+        "detail": null
+      },
+      "household_8565_oof_file_present": {
+        "pass": true,
+        "detail": null
+      },
+      "price_oof_file_present": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "coverage_household_661": {
+      "chronological": {
+        "pass": true,
+        "detail": null
+      },
+      "no_duplicates": {
+        "pass": true,
+        "detail": 0
+      },
+      "hourly_spacing": {
+        "pass": true,
+        "detail": 0
+      },
+      "exact_days_coverage": {
+        "pass": true,
+        "detail": {
+          "expected": 3984,
+          "produced": 3984,
+          "missing": 0,
+          "extra": 0
+        }
+      },
+      "no_missing_forecasts": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "test_isolation_household_661": {
+      "oof_rows_only_days_2_167": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_661_fold0": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 816,
+          "excluded_buffer": 73,
+          "excluded_startup_padding": 0,
+          "accepted_fitting_samples": 3095,
+          "held_out_forecast_hours": 816,
+          "held_out_padded_hours": 55
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_661_fold1": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_661_fold2": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_661_fold3": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_661_fold4": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 73,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 3064,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "folds_household_661": {
+      "blocks_tile_days_2_167_contiguously": {
+        "pass": true,
+        "detail": null
+      },
+      "same_fixed_epochs_all_folds": {
+        "pass": true,
+        "detail": [
+          22
+        ]
+      },
+      "seed_rule_42_plus_fold": {
+        "pass": true,
+        "detail": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ]
+      },
+      "fixed_epochs_equal_full_model_best_epoch": {
+        "pass": true,
+        "detail": {
+          "fixed": [
+            22
+          ],
+          "full_model_best": 22
+        }
+      }
+    },
+    "padding_household_661": {
+      "padded_hours_match_full_model_convention": {
+        "pass": true,
+        "detail": {
+          "padded_oof_hours": 55,
+          "full_model_train_n": 3929
+        }
+      },
+      "padded_hours_only_at_series_start": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "coverage_household_3039": {
+      "chronological": {
+        "pass": true,
+        "detail": null
+      },
+      "no_duplicates": {
+        "pass": true,
+        "detail": 0
+      },
+      "hourly_spacing": {
+        "pass": true,
+        "detail": 0
+      },
+      "exact_days_coverage": {
+        "pass": true,
+        "detail": {
+          "expected": 3984,
+          "produced": 3984,
+          "missing": 0,
+          "extra": 0
+        }
+      },
+      "no_missing_forecasts": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "test_isolation_household_3039": {
+      "oof_rows_only_days_2_167": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_3039_fold0": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 816,
+          "excluded_buffer": 73,
+          "excluded_startup_padding": 0,
+          "accepted_fitting_samples": 3095,
+          "held_out_forecast_hours": 816,
+          "held_out_padded_hours": 55
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_3039_fold1": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_3039_fold2": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_3039_fold3": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_3039_fold4": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 73,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 3064,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "folds_household_3039": {
+      "blocks_tile_days_2_167_contiguously": {
+        "pass": true,
+        "detail": null
+      },
+      "same_fixed_epochs_all_folds": {
+        "pass": true,
+        "detail": [
+          13
+        ]
+      },
+      "seed_rule_42_plus_fold": {
+        "pass": true,
+        "detail": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ]
+      },
+      "fixed_epochs_equal_full_model_best_epoch": {
+        "pass": true,
+        "detail": {
+          "fixed": [
+            13
+          ],
+          "full_model_best": 13
+        }
+      }
+    },
+    "padding_household_3039": {
+      "padded_hours_match_full_model_convention": {
+        "pass": true,
+        "detail": {
+          "padded_oof_hours": 55,
+          "full_model_train_n": 3929
+        }
+      },
+      "padded_hours_only_at_series_start": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "coverage_household_8565": {
+      "chronological": {
+        "pass": true,
+        "detail": null
+      },
+      "no_duplicates": {
+        "pass": true,
+        "detail": 0
+      },
+      "hourly_spacing": {
+        "pass": true,
+        "detail": 0
+      },
+      "exact_days_coverage": {
+        "pass": true,
+        "detail": {
+          "expected": 3984,
+          "produced": 3984,
+          "missing": 0,
+          "extra": 0
+        }
+      },
+      "no_missing_forecasts": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "test_isolation_household_8565": {
+      "oof_rows_only_days_2_167": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_8565_fold0": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 816,
+          "excluded_buffer": 73,
+          "excluded_startup_padding": 0,
+          "accepted_fitting_samples": 3095,
+          "held_out_forecast_hours": 816,
+          "held_out_padded_hours": 55
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_8565_fold1": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_8565_fold2": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_8565_fold3": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 2991,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_household_8565_fold4": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 73,
+          "excluded_startup_padding": 55,
+          "accepted_fitting_samples": 3064,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "folds_household_8565": {
+      "blocks_tile_days_2_167_contiguously": {
+        "pass": true,
+        "detail": null
+      },
+      "same_fixed_epochs_all_folds": {
+        "pass": true,
+        "detail": [
+          3
+        ]
+      },
+      "seed_rule_42_plus_fold": {
+        "pass": true,
+        "detail": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ]
+      },
+      "fixed_epochs_equal_full_model_best_epoch": {
+        "pass": true,
+        "detail": {
+          "fixed": [
+            3
+          ],
+          "full_model_best": 3
+        }
+      }
+    },
+    "padding_household_8565": {
+      "padded_hours_match_full_model_convention": {
+        "pass": true,
+        "detail": {
+          "padded_oof_hours": 55,
+          "full_model_train_n": 3929
+        }
+      },
+      "padded_hours_only_at_series_start": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "coverage_price": {
+      "chronological": {
+        "pass": true,
+        "detail": null
+      },
+      "no_duplicates": {
+        "pass": true,
+        "detail": 0
+      },
+      "hourly_spacing": {
+        "pass": true,
+        "detail": 0
+      },
+      "exact_days_coverage": {
+        "pass": true,
+        "detail": {
+          "expected": 3984,
+          "produced": 3984,
+          "missing": 0,
+          "extra": 0
+        }
+      },
+      "no_missing_forecasts": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "test_isolation_price": {
+      "oof_rows_only_days_2_167": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_price_fold0": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 816,
+          "excluded_buffer": 73,
+          "excluded_startup_padding": 0,
+          "accepted_fitting_samples": 3095,
+          "held_out_forecast_hours": 816,
+          "held_out_padded_hours": 49
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_price_fold1": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 49,
+          "accepted_fitting_samples": 2997,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_price_fold2": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 49,
+          "accepted_fitting_samples": 2997,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_price_fold3": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 146,
+          "excluded_startup_padding": 49,
+          "accepted_fitting_samples": 2997,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "leakage_price_fold4": {
+      "buffer_ge_receptive_field": {
+        "pass": true,
+        "detail": {
+          "buffer": 73,
+          "receptive": 73
+        }
+      },
+      "excluded_range_matches_block_plus_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_outside_block_and_buffer": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_input_windows_exclude_held_out": {
+        "pass": true,
+        "detail": null
+      },
+      "fit_targets_and_inputs_before_validation_and_test": {
+        "pass": true,
+        "detail": null
+      },
+      "oof_rows_inside_own_block": {
+        "pass": true,
+        "detail": null
+      },
+      "sample_counts_consistent": {
+        "pass": true,
+        "detail": {
+          "training_period_samples": 3984,
+          "excluded_held_out_block": 792,
+          "excluded_buffer": 73,
+          "excluded_startup_padding": 49,
+          "accepted_fitting_samples": 3070,
+          "held_out_forecast_hours": 792,
+          "held_out_padded_hours": 0
+        }
+      },
+      "training_run_leakage_checks": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "folds_price": {
+      "blocks_tile_days_2_167_contiguously": {
+        "pass": true,
+        "detail": null
+      },
+      "same_fixed_epochs_all_folds": {
+        "pass": true,
+        "detail": [
+          19
+        ]
+      },
+      "seed_rule_42_plus_fold": {
+        "pass": true,
+        "detail": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ]
+      },
+      "fixed_epochs_equal_full_model_best_epoch": {
+        "pass": true,
+        "detail": {
+          "fixed": [
+            19
+          ],
+          "full_model_best": 19
+        }
+      }
+    },
+    "padding_price": {
+      "padded_hours_match_full_model_convention": {
+        "pass": true,
+        "detail": {
+          "padded_oof_hours": 49,
+          "full_model_train_n": 3935
+        }
+      },
+      "padded_hours_only_at_series_start": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "determinism": {
+      "report_present_for_all_targets": {
+        "pass": true,
+        "detail": [
+          "household_3039",
+          "household_661",
+          "household_8565",
+          "price"
+        ]
+      },
+      "household_661_fold0_reproduced": {
+        "pass": true,
+        "detail": 0.0
+      },
+      "household_3039_fold0_reproduced": {
+        "pass": true,
+        "detail": 0.0
+      },
+      "household_8565_fold0_reproduced": {
+        "pass": true,
+        "detail": 0.0
+      },
+      "price_fold0_reproduced": {
+        "pass": true,
+        "detail": 0.0
+      }
+    },
+    "coverage_combined": {
+      "chronological": {
+        "pass": true,
+        "detail": null
+      },
+      "no_duplicates": {
+        "pass": true,
+        "detail": 0
+      },
+      "hourly_spacing": {
+        "pass": true,
+        "detail": 0
+      },
+      "exact_days_coverage": {
+        "pass": true,
+        "detail": {
+          "expected": 3984,
+          "produced": 3984,
+          "missing": 0,
+          "extra": 0
+        }
+      },
+      "no_missing_forecasts": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "aggregate_identity": {
+      "aggregate_equals_eu1_eu2_eu3": {
+        "pass": true,
+        "detail": 2.6645352591003757e-15
+      },
+      "eu1_matches_household_661_oof": {
+        "pass": true,
+        "detail": 0.0
+      },
+      "eu2_matches_household_3039_oof": {
+        "pass": true,
+        "detail": 0.0
+      },
+      "eu3_matches_household_8565_oof": {
+        "pass": true,
+        "detail": 0.0
+      }
+    },
+    "price_units": {
+      "cent_per_kwh_equals_usd_per_mwh_div_10": {
+        "pass": true,
+        "detail": 2.842170943040401e-14
+      },
+      "per_target_file_conversion": {
+        "pass": true,
+        "detail": 2.842170943040401e-14
+      },
+      "combined_matches_price_oof": {
+        "pass": true,
+        "detail": 0.0
+      }
+    },
+    "hashes": {
+      "all_artifacts_present": {
+        "pass": true,
+        "detail": null
+      },
+      "all_artifact_hashes_match": {
+        "pass": true,
+        "detail": null
+      },
+      "manifest_lists_artifacts": {
+        "pass": true,
+        "detail": 90
+      },
+      "crossfit_lstm.py_unchanged_since_run": {
+        "pass": true,
+        "detail": null
+      },
+      "crossfit_config.yaml_unchanged_since_run": {
+        "pass": true,
+        "detail": null
+      },
+      "predict_load_lstm.py_unchanged_since_run": {
+        "pass": true,
+        "detail": null
+      },
+      "predict_price_lstm.py_unchanged_since_run": {
+        "pass": true,
+        "detail": null
+      }
+    },
+    "full_models_unchanged": {
+      "unchanged_during_run": {
+        "pass": true,
+        "detail": null
+      },
+      "unchanged_since_run": {
+        "pass": true,
+        "detail": null
+      },
+      "load_predictions_match_full_manifest": {
+        "pass": true,
+        "detail": null
+      },
+      "load_metrics_match_full_manifest": {
+        "pass": true,
+        "detail": null
+      },
+      "price_predictions_match_full_manifest": {
+        "pass": true,
+        "detail": null
+      },
+      "price_metrics_match_full_manifest": {
+        "pass": true,
+        "detail": null
+      }
+    }
+  }
+}

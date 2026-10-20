@@ -16,6 +16,8 @@ CONFIGS = [Path(f"config_seed_{seed}.yaml") for seed in (0, 1, 2)]
 PYTHON_FILES = [
     Path("main.py"), Path("test.py"), Path("q_action_diagnostic.py"),
     Path("reward_counterfactual_audit.py"), Path("summarize_results.py"),
+    Path("predict_load_lstm.py"), Path("predict_price_lstm.py"),
+    Path("build_forecast_outputs.py"),
     Path("agent/agent_ddqn.py"), Path("env/env.py"), Path("utils/replay_buffer.py"),
     Path("utils/config_loader.py"), Path("utils/load_demand.py"), Path("utils/load_price.py"),
     Path("benchmark/env_benchmark.py"), Path("benchmark/test_benchmark.py"),
@@ -23,7 +25,8 @@ PYTHON_FILES = [
 
 IMPORT_MODULES = [
     "main", "test", "q_action_diagnostic", "reward_counterfactual_audit",
-    "summarize_results", "agent.agent_ddqn", "env.env",
+    "summarize_results", "predict_load_lstm", "predict_price_lstm",
+    "build_forecast_outputs", "agent.agent_ddqn", "env.env",
     "utils.replay_buffer", "utils.config_loader", "utils.load_demand",
     "utils.load_price", "benchmark.env_benchmark", "benchmark.test_benchmark",
 ]
@@ -105,7 +108,14 @@ def main():
             failures.append(f"Seed {seed}: August plot day must be 220.")
 
     root = Path('.')
-    forbidden = [root / 'phd_project.egg-info', root / 'setup.py']
+    forbidden = [
+        root / '.venv',
+        root / 'phd_project.egg-info',
+        root / 'setup.py',
+        root / 'README_REPORTING_REFRESH.txt',
+        root / 'refresh_lstm_reporting.py',
+        root / 'run_refresh_lstm_reporting.ps1',
+    ]
     for path in forbidden:
         if path.exists():
             failures.append(f"Remove generated packaging item: {path}")

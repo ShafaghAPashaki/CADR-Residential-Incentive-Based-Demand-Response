@@ -1,4 +1,4 @@
-"""Aggregate the three benchmark seeds into a paper-analysis workbook."""
+"""Aggregate the three benchmark seeds into a comparison workbook."""
 
 from __future__ import annotations
 

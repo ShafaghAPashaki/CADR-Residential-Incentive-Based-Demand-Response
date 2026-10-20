@@ -1,6 +1,7 @@
 import hashlib
 import itertools
 import json
+import os
 import random
 
 import holidays
@@ -57,7 +58,7 @@ class Environment:
     allocated proportionally across those sources.
     """
 
-    VERSION = "final_ddqn_environment"
+    VERSION = "forecast_state_v1"
     ACCOUNTING_VERSION = "verified_hourly_settlement"
     REWARD_DEFINITION_VERSION = "weighted_stakeholder_tracking_no_need"
     EPS = 1e-10
@@ -88,6 +89,14 @@ class Environment:
 
         self.DEVICES = list(self.cfg["environment"]["DEVICES"])
         self.num_devices = len(self.DEVICES)
+        self.DEVICE_CONSUMPTION = np.asarray(
+            self.cfg["environment"].get(
+                "DEVICE_CONSUMPTION", [np.inf] * self.num_devices
+            ),
+            dtype=float,
+        )
+        if self.DEVICE_CONSUMPTION.shape != (self.num_devices,):
+            raise ValueError("DEVICE_CONSUMPTION must match DEVICES length.")
         self.idx_car = (
             self.DEVICES.index("car") if "car" in self.DEVICES else None
         )
@@ -106,6 +115,11 @@ class Environment:
         )
         self.all_baselines = load_baselines(self.df_demand)
 
+        # Decision-state forecasts are loaded once and routed by day. Training
+        # days use out-of-fold/cross-fitted predictions; later days use the
+        # fixed full-model forecasts. Physical response, reward, settlement,
+        # and the incentive bound continue to use realised current quantities.
+        self._load_decision_state_forecasts()
 
         self.train_ranges = self.cfg["training"]["train_ranges"]
         self.val_range = self.cfg["training"]["val_range"]
@@ -507,10 +521,158 @@ class Environment:
         payload = json.dumps(self.cfg, sort_keys=True, separators=(",", ":"), default=str)
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
+    @staticmethod
+    def _sha256_file(path):
+        hasher = hashlib.sha256()
+        with open(path, "rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                hasher.update(chunk)
+        return hasher.hexdigest()
+
+    def _load_decision_state_forecasts(self):
+        """Load the precomputed DDQN decision-state forecast table.
+
+        The table intentionally contains forecast columns only. Days 2--167
+        must be out-of-fold/cross-fitted; later days use fixed full-model
+        forecasts. Audit actuals are not permitted in this input file.
+        """
+        forecast_cfg = self.cfg.get("forecast", {}) or {}
+        self.forecast_state_mode = str(
+            forecast_cfg.get("state_input_mode", "forecast")
+        ).strip().lower()
+        if self.forecast_state_mode not in {"forecast", "oracle_actual"}:
+            raise ValueError(
+                "forecast.state_input_mode must be 'forecast' or 'oracle_actual'."
+            )
+
+        self.forecast_state_input_file = str(
+            forecast_cfg.get(
+                "ddqn_state_input_file",
+                "results/forecast/ddqn_state_forecasts.csv",
+            )
+        )
+        self.forecast_state_provenance_file = str(
+            forecast_cfg.get(
+                "ddqn_state_provenance_file",
+                "results/forecast/ddqn_state_forecasts_provenance.json",
+            )
+        )
+        self.forecast_load_floor_kw = float(
+            forecast_cfg.get("state_load_floor_kw", 0.0)
+        )
+        if not np.isfinite(self.forecast_load_floor_kw) or self.forecast_load_floor_kw < 0.0:
+            raise ValueError("forecast.state_load_floor_kw must be finite and non-negative.")
+
+        path = self.forecast_state_input_file
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"DDQN state-forecast file not found: {path}")
+        table = pd.read_csv(path, parse_dates=["timestamp"])
+        if any("actual" in str(column).lower() for column in table.columns):
+            raise ValueError(
+                "Decision-state forecast input must not contain audit/actual columns."
+            )
+
+        load_columns = [
+            f"forecast_load_house_{int(house_id)}_kw"
+            for house_id in self.data_ids
+        ]
+        required = [
+            "timestamp",
+            "doy",
+            "forecast_source",
+            *load_columns,
+            "forecast_aggregate_load_kw",
+            "forecast_price_cent_per_kwh",
+        ]
+        missing = [column for column in required if column not in table.columns]
+        if missing:
+            raise ValueError(
+                f"DDQN state-forecast file is missing required columns: {missing}"
+            )
+        if table["timestamp"].duplicated().any():
+            raise ValueError("Duplicate timestamps in DDQN state-forecast file.")
+
+        numeric = table[
+            load_columns
+            + ["forecast_aggregate_load_kw", "forecast_price_cent_per_kwh"]
+        ].to_numpy(dtype=float)
+        if not np.isfinite(numeric).all():
+            raise ValueError("Non-finite values found in DDQN state forecasts.")
+
+        aggregate_error = np.max(
+            np.abs(
+                table[load_columns].sum(axis=1).to_numpy(dtype=float)
+                - table["forecast_aggregate_load_kw"].to_numpy(dtype=float)
+            )
+        )
+        if aggregate_error > 1e-8:
+            raise ValueError(
+                "Forecast aggregate is inconsistent with the sum of household forecasts: "
+                f"max error={aggregate_error:.3e}."
+            )
+
+        train_days = set(
+            day
+            for start, end in self.cfg["training"]["train_ranges"]
+            for day in range(int(start), int(end) + 1)
+        )
+        for day in train_days:
+            rows = table[table["doy"] == int(day)]
+            if len(rows) != self.expected_hours_per_day:
+                raise ValueError(
+                    f"Forecast day {day} has {len(rows)} rows; expected "
+                    f"{self.expected_hours_per_day}."
+                )
+            if set(rows["forecast_source"].astype(str)) != {"crossfit"}:
+                raise ValueError(
+                    f"Training day {day} must use cross-fitted forecasts only."
+                )
+
+        val_start, _ = self.cfg["training"]["val_range"]
+        max_forecast_day = int(table["doy"].max())
+        for day in range(int(val_start), max_forecast_day + 1):
+            rows = table[table["doy"] == int(day)]
+            if len(rows) != self.expected_hours_per_day:
+                raise ValueError(
+                    f"Forecast day {day} has {len(rows)} rows; expected "
+                    f"{self.expected_hours_per_day}."
+                )
+            if set(rows["forecast_source"].astype(str)) != {"full_model"}:
+                raise ValueError(
+                    "Every forecast day from validation onward must use fixed "
+                    f"full-model forecasts; day {day} does not."
+                )
+
+        self.forecast_load_columns = load_columns
+        self.decision_state_forecasts = table.sort_values("timestamp").set_index(
+            "timestamp", drop=False
+        )
+        self.forecast_state_input_sha256 = self._sha256_file(path)
+        self.forecast_state_provenance_sha256 = None
+        if os.path.exists(self.forecast_state_provenance_file):
+            self.forecast_state_provenance_sha256 = self._sha256_file(
+                self.forecast_state_provenance_file
+            )
+
+    def get_forecast_metadata(self):
+        return {
+            "forecast_state_mode": str(self.forecast_state_mode),
+            "forecast_state_input_file": str(self.forecast_state_input_file),
+            "forecast_state_input_sha256": str(self.forecast_state_input_sha256),
+            "forecast_state_provenance_file": str(
+                self.forecast_state_provenance_file
+            ),
+            "forecast_state_provenance_sha256": self.forecast_state_provenance_sha256,
+            "forecast_training_source": "crossfit",
+            "forecast_validation_test_source": "full_model",
+            "forecast_load_floor_kw": float(self.forecast_load_floor_kw),
+            "forecast_price_unit": "cent/kWh",
+        }
+
     def get_state_feature_names(self):
         names = []
         groups = [
-            "committed_house_load_norm",
+            "forecast_pre_action_house_load_norm",
             "current_pc_available_norm",
             "current_ev_available_norm",
             "current_tsni_startable_energy_norm",
@@ -527,13 +689,13 @@ class Environment:
             names.extend(f"{group}_house_{house_id}" for house_id in self.data_ids)
         names.extend(
             [
-                "log_clipped_wholesale_price",
+                "log_clipped_forecast_wholesale_price",
                 "normalized_hour",
-                "total_committed_load_norm",
+                "forecast_total_pre_action_load_norm",
                 "is_holiday",
                 "is_weekend",
-                "capacity_need_flag",
-                "needed_reduction_norm",
+                "forecast_capacity_need_flag",
+                "forecast_needed_reduction_norm",
             ]
         )
         return names
@@ -1088,6 +1250,27 @@ class Environment:
         self.is_weekend = 1.0 if ts0.weekday() >= 5 else 0.0
         self.is_holiday = 1.0 if ts0.date() in self.us_holidays else 0.0
 
+        forecast_day = self.decision_state_forecasts.reindex(expected_index)
+        if forecast_day[self.forecast_load_columns + ["forecast_price_cent_per_kwh"]].isna().any().any():
+            raise ValueError(
+                f"Missing DDQN state forecasts on day {self.day}; exact hourly "
+                "coverage is required."
+            )
+        self.state_forecast_load_per_house = forecast_day[
+            self.forecast_load_columns
+        ].to_numpy(dtype=float)
+        self.state_forecast_price = forecast_day[
+            "forecast_price_cent_per_kwh"
+        ].to_numpy(dtype=float)
+        self.state_forecast_source = tuple(
+            forecast_day["forecast_source"].astype(str).tolist()
+        )
+        if len(set(self.state_forecast_source)) != 1:
+            raise ValueError(
+                f"Mixed forecast sources within day {self.day}: "
+                f"{sorted(set(self.state_forecast_source))}."
+            )
+
         day_mask = self.all_baselines["timestamp"].dt.dayofyear == self.day
         baselines_day = self.all_baselines[day_mask].copy()
         if baselines_day.duplicated(subset=["timestamp", "house_id"]).any():
@@ -1107,6 +1290,50 @@ class Environment:
 
         self.baseline_per_house = baseline_wide.to_numpy(dtype=float)
         self.total_baseline = self.baseline_per_house.sum(axis=1)
+
+        # Causal future-capacity reference used only by the HEMS scheduler.
+        # For each wall-clock hour, use the mean aggregate household baseline
+        # over up to the preceding seven days.  Only observations strictly
+        # before the current episode are eligible.  Known shift commitments
+        # are applied separately when candidate destinations are screened.
+        if self.day <= 1:
+            raise ValueError(
+                "Causal future-capacity screening requires historical observations."
+            )
+        history_start = expected_index[0] - pd.Timedelta(days=7)
+        history = self.all_baselines[
+            (self.all_baselines["timestamp"] < expected_index[0])
+            & (self.all_baselines["timestamp"] >= history_start)
+        ].copy()
+        history["hour"] = history["timestamp"].dt.hour
+        mean_by_hour = history.groupby(
+            ["hour", "house_id"], sort=False
+        )["baseline_demand"].mean().unstack("house_id")
+        mean_by_hour = mean_by_hour.reindex(
+            index=np.arange(self.expected_hours_per_day), columns=self.data_ids
+        )
+
+        # For early source hours with no same-hour history (only possible near
+        # the start of the dataset), fall back to the latest genuinely
+        # available observation before the episode begins.
+        if mean_by_hour.isna().any().any():
+            prior_rows = self.all_baselines[
+                self.all_baselines["timestamp"] < expected_index[0]
+            ].sort_values("timestamp")
+            for house_id in self.data_ids:
+                series = prior_rows[
+                    prior_rows["house_id"] == house_id
+                ]["baseline_demand"]
+                if series.empty:
+                    raise ValueError(
+                        f"No historical household load is available before day {self.day} "
+                        f"for household {house_id}."
+                    )
+                mean_by_hour[house_id] = mean_by_hour[house_id].fillna(
+                    float(series.iloc[-1])
+                )
+        reference = mean_by_hour.to_numpy(dtype=float)
+        self.future_capacity_reference_per_house = reference
 
         device_index, self.device_demands = get_device_day_demands(
             self.df_device_demands,
@@ -1231,6 +1458,14 @@ class Environment:
         self.device_shifted_out = np.zeros(shape, dtype=float)
         self.device_shifted_in = np.zeros(shape, dtype=float)
         self.device_future_inj = np.zeros(shape, dtype=float)
+        # Physical feasibility deferrals caused by an already committed
+        # shifted-in TS-NI cycle occupying the appliance when a new original
+        # programme is requested. These deferrals are not incentive-settled.
+        self.device_conflict_deferred_out = np.zeros(shape, dtype=float)
+        self.device_conflict_deferred_in = np.zeros(shape, dtype=float)
+        self.device_conflict_future_inj = np.zeros(shape, dtype=float)
+        self.device_conflict_unserved = np.zeros(shape, dtype=float)
+        self.device_conflict_discomfort = np.zeros(shape, dtype=float)
         self.device_curtailed = np.zeros(shape, dtype=float)
 
 
@@ -1244,6 +1479,12 @@ class Environment:
         self.device_settlement_payment = np.zeros(shape, dtype=float)
         self.device_settlement_rate = np.zeros(shape, dtype=float)
         self.device_settlement_decision_hour = np.full(shape, -1, dtype=int)
+        # Locked incentive rates are set at the original decision hour. If the
+        # realised wholesale price is lower at a later verification hour, the
+        # settlement remains valid and the SP absorbs the resulting loss.
+        self.device_settlement_rate_above_price = np.zeros(shape, dtype=bool)
+        self.device_settlement_above_price_energy = np.zeros(shape, dtype=float)
+        self.device_settlement_negative_margin = np.zeros(shape, dtype=float)
         self.settlement_allocation_factor = np.zeros((self.T, self.N), dtype=float)
 
 
@@ -1327,9 +1568,16 @@ class Environment:
     def _current_pre_action_device(self, h):
         """Committed controllable load before the current action."""
         original_remaining = np.maximum(
-            self.device_demands[h] - self.device_shifted_out[h], 0.0
+            self.device_demands[h]
+            - self.device_shifted_out[h]
+            - self.device_conflict_deferred_out[h],
+            0.0,
         )
-        return original_remaining + self.device_future_inj[h]
+        return (
+            original_remaining
+            + self.device_future_inj[h]
+            + self.device_conflict_future_inj[h]
+        )
 
     def _current_pre_action_house_load(self, h):
         return (
@@ -1337,14 +1585,76 @@ class Environment:
             + self.nonshift_baseline_per_house[h]
         )
 
+    def _decision_state_pre_action_house_load(self, h):
+        """Pre-action household load exposed to the DDQN decision state.
+
+        Production mode uses the one-step-ahead household forecast for the
+        current decision hour, adjusted only by commitments that were already
+        created before the current action. ``oracle_actual`` is a diagnostic
+        mode used solely to verify exact mapping against the pre-integration
+        environment.
+        """
+        if self.forecast_state_mode == "oracle_actual":
+            return self._current_pre_action_house_load(h)
+
+        forecast_baseline = np.maximum(
+            self.state_forecast_load_per_house[h],
+            self.forecast_load_floor_kw,
+        )
+        known_origin_relief = (
+            self.device_shifted_out[h].sum(axis=1)
+            + self.device_conflict_deferred_out[h].sum(axis=1)
+        )
+        known_shifted_in = (
+            self.device_future_inj[h].sum(axis=1)
+            + self.device_conflict_future_inj[h].sum(axis=1)
+        )
+        return np.maximum(
+            forecast_baseline - known_origin_relief + known_shifted_in,
+            0.0,
+        )
+
+    def _decision_state_price(self, h):
+        if self.forecast_state_mode == "oracle_actual":
+            return float(self.prices[h])
+        return float(self.state_forecast_price[h])
+
     def _committed_total_at(self, t):
-        """Aggregate physical load committed at future hour t."""
+        """Aggregate realised/current-day physical load at hour ``t``.
+
+        This quantity is retained for physical accounting and diagnostics.
+        Future scheduling decisions must use ``_causal_capacity_estimate_at``
+        instead.
+        """
         if t < 0 or t >= self.T:
             return 0.0
         return float(
             self.nonshift_baseline_per_house[t].sum()
             + self._current_pre_action_device(t).sum()
         )
+
+    def _causal_capacity_estimate_at(self, t):
+        """Return a causal estimate of aggregate load at a future hour.
+
+        The baseline reference is the mean of the same wall-clock hour over
+        up to the preceding seven days. Only commitments created by decisions
+        already made in the current episode are then applied: known origin
+        relief is subtracted and known shifted-in load is added. No realised
+        current-day baseline or appliance observation after the decision hour
+        is consulted.
+        """
+        if t < 0 or t >= self.T:
+            return 0.0
+        baseline_reference = float(self.future_capacity_reference_per_house[t].sum())
+        known_origin_relief = float(
+            self.device_shifted_out[t].sum()
+            + self.device_conflict_deferred_out[t].sum()
+        )
+        known_shifted_in = float(
+            self.device_future_inj[t].sum()
+            + self.device_conflict_future_inj[t].sum()
+        )
+        return max(0.0, baseline_reference - known_origin_relief + known_shifted_in)
 
     def _refresh_planned_load(self):
         self.planned_load = np.asarray(
@@ -1364,27 +1674,53 @@ class Environment:
         values[:] = np.maximum(
             0.0,
             self.device_demands[h, :, self.idx_car]
-            - self.device_shifted_out[h, :, self.idx_car],
+            - self.device_shifted_out[h, :, self.idx_car]
+            - self.device_conflict_deferred_out[h, :, self.idx_car],
         )
         return values
 
     def _current_tsni_startable_energy_per_house(self, h):
+        """Return TS-NI demand whose operating block starts at hour ``h``.
+
+        This state feature is deliberately causal: it uses only the current
+        hour, the immediately preceding observed hour, and commitments already
+        created by earlier decisions.  It does not inspect the realised
+        appliance profile after ``h``.  The complete non-interruptible block
+        is handled by the HEMS scheduling logic; this state component only
+        indicates demand that is currently available to start/reschedule.
+        """
         values = np.zeros(self.N, dtype=float)
         for d in range(self.num_devices):
             if not self.TS_NI_MASK[d]:
                 continue
             for i in range(self.N):
-                block = self._find_original_tsni_block(h, i, d)
-                if block is not None:
-                    values[i] += float(block[2].sum())
+                current = float(self.device_demands[h, i, d])
+                if current <= self.EPS:
+                    continue
+                if (
+                    float(self.device_shifted_out[h, i, d]) > self.EPS
+                    or float(self.device_conflict_deferred_out[h, i, d]) > self.EPS
+                ):
+                    continue
+
+                if h == 0:
+                    started_now = not bool(self.ts_carry_over[i, d])
+                else:
+                    started_now = (
+                        float(self.device_demands[h - 1, i, d]) <= self.EPS
+                    )
+
+                if started_now:
+                    values[i] += current
         return values
 
     def _shifted_in_commitments_per_house(self, h):
         if h + 1 >= self.T:
             zeros = np.zeros(self.N, dtype=float)
             return zeros, zeros.copy()
-        next_hour = self.device_future_inj[h + 1].sum(axis=1)
-        remaining = self.device_future_inj[h + 1 :].sum(axis=(0, 2))
+        future_known = self.device_future_inj + self.device_conflict_future_inj
+        next_hour = future_known[h + 1].sum(axis=1)
+        remaining = future_known[h + 1 :].sum(axis=(0, 2))
         return next_hour, remaining
 
     def _current_settlement_commitments_per_house(self, h):
@@ -1429,13 +1765,13 @@ class Environment:
         return next_energy, next_payment, remaining_energy, remaining_payment
 
     def get_state(self):
-        """Return the documented 12N+7 state vector (43 values for N=3)."""
+        """Return the 12N+7 decision state using one-step forecasts where specified."""
         h = self.curr_step
-        price = float(self.prices[h])
+        price = self._decision_state_price(h)
         if self.capacity_threshold <= self.EPS:
             raise ValueError("capacity_threshold must be strictly positive.")
 
-        committed_house = self._current_pre_action_house_load(h)
+        committed_house = self._decision_state_pre_action_house_load(h)
         pc_available = self._current_pc_available_per_house(h)
         ev_available = self._current_ev_available_per_house(h)
         tsni_startable = self._current_tsni_startable_energy_per_house(h)
@@ -1518,6 +1854,9 @@ class Environment:
         self.curr_step += 1
         done = self.curr_step >= self.max_steps
         self.done = done
+
+        if not done:
+            self._resolve_physical_conflicts_at_hour(self.curr_step)
 
         observation = (
             np.zeros(self.state_dim, dtype=np.float32)
@@ -1642,7 +1981,10 @@ class Environment:
         """Return (start, end, profile) for an original TS-NI block."""
         if self.device_demands[h, i, d] <= self.EPS:
             return None
-        if self.device_shifted_out[h, i, d] > self.EPS:
+        if (
+            self.device_shifted_out[h, i, d] > self.EPS
+            or self.device_conflict_deferred_out[h, i, d] > self.EPS
+        ):
             return None
 
         t0 = h
@@ -1668,10 +2010,186 @@ class Environment:
             return None
         return t0, t1, profile
 
+    def _find_conflict_deferral_destination(self, h, profile, i, d):
+        """Find the earliest causal device-feasible slot for a forced deferral."""
+        length = len(profile)
+        ddl = self._deadline_index(d)
+        latest = min(self.T - length, ddl - length + 1)
+        if h + 1 > latest:
+            return None
+        for start in range(h + 1, latest + 1):
+            occupied = False
+            for k in range(length):
+                t = start + k
+                known_inj = (
+                    self.device_future_inj[t, i, d]
+                    + self.device_conflict_future_inj[t, i, d]
+                )
+                if known_inj > self.EPS:
+                    occupied = True
+                    break
+            if not occupied:
+                return start
+        return None
+
+    def _record_conflict_discomfort(self, h, i, d, discomfort):
+        """Record non-incentivised physical-delay discomfort at hour ``h``."""
+        value = max(0.0, float(discomfort))
+        if value <= self.EPS:
+            return
+        self.discomforts[h, i] += value
+        self.device_discomfort[h, i, d] += value
+        self.device_conflict_discomfort[h, i, d] += value
+
+    def _resolve_tsni_conflicts_at_hour(self, h):
+        """Defer a newly declared TS-NI programme if its appliance is occupied.
+
+        The conflict is detected only when the original programme becomes
+        observable at hour ``h``. The complete programme profile is treated as
+        declared to the household HEMS at request time. Forced deferrals carry
+        no incentive settlement. Their delay dissatisfaction is nevertheless
+        included in the household utility/reward because the physical delay is
+        caused by an earlier scheduling commitment.
+        """
+        if h < 0 or h >= self.T:
+            return
+        for d in range(self.num_devices):
+            if not self.TS_NI_MASK[d]:
+                continue
+            for i in range(self.N):
+                block = self._find_original_tsni_block(h, i, d)
+                if block is None:
+                    continue
+                t0, t1, profile = block
+                known_occupancy = (
+                    self.device_future_inj[t0 : t1 + 1, i, d]
+                    + self.device_conflict_future_inj[t0 : t1 + 1, i, d]
+                )
+                if not np.any(known_occupancy > self.EPS):
+                    continue
+
+                destination = self._find_conflict_deferral_destination(
+                    h, profile, i, d
+                )
+                self.device_conflict_deferred_out[t0 : t1 + 1, i, d] += profile
+                phi = float(self.dissatisfaction_coefficients[i, d])
+
+                if destination is None:
+                    # No device-feasible slot remains before the completion
+                    # deadline. The energy is explicitly recorded as unmet,
+                    # rather than silently disappearing from the load. Apply
+                    # the maximum feasible within-day delay dissatisfaction.
+                    self.device_conflict_unserved[t0 : t1 + 1, i, d] += profile
+                    self.device_unmet[t0 : t1 + 1, i, d] += profile
+                    delay = self.T - t0
+                    self._record_conflict_discomfort(
+                        h, i, d, phi * (delay ** 2)
+                    )
+                    continue
+
+                self.device_conflict_future_inj[
+                    destination : destination + len(profile), i, d
+                ] += profile
+                self.device_conflict_deferred_in[
+                    destination : destination + len(profile), i, d
+                ] += profile
+                delay = destination - t0
+                self._record_conflict_discomfort(
+                    h, i, d, phi * (delay ** 2)
+                )
+
+    def _allocate_forced_ev_deferral(self, amount, h, i, d):
+        """Place forced EV deferral in earliest charger-feasible future slots."""
+        ddl = self._deadline_index(d)
+        charger_limit = float(self.DEVICE_CONSUMPTION[d])
+        remaining = max(0.0, float(amount))
+        allocation = []
+        for t in range(h + 1, ddl + 1):
+            known = float(
+                self.device_future_inj[t, i, d]
+                + self.device_conflict_future_inj[t, i, d]
+            )
+            headroom = max(0.0, charger_limit - known)
+            move = min(headroom, remaining)
+            if move > self.EPS:
+                allocation.append((t, move))
+                remaining -= move
+            if remaining <= self.EPS:
+                break
+        return allocation, remaining
+
+    def _resolve_ev_charger_conflicts_at_hour(self, h):
+        """Enforce the EV charger rating when a new original request appears.
+
+        Earlier shifted-in commitments have priority because they were already
+        fixed before hour ``h``. Any newly observed original EV request that
+        would push the physical charging power above the configured rating is
+        deferred causally to the earliest later charger-feasible slots, without
+        incentive settlement. Remaining energy at the deadline is recorded as
+        unmet.
+        """
+        if self.idx_car is None or h < 0 or h >= self.T:
+            return
+        d = self.idx_car
+        limit = float(self.DEVICE_CONSUMPTION[d])
+        ddl = self._deadline_index(d)
+        for i in range(self.N):
+            original = max(
+                0.0,
+                float(
+                    self.device_demands[h, i, d]
+                    - self.device_shifted_out[h, i, d]
+                    - self.device_conflict_deferred_out[h, i, d]
+                ),
+            )
+            incoming = float(
+                self.device_future_inj[h, i, d]
+                + self.device_conflict_future_inj[h, i, d]
+            )
+            excess = max(0.0, original + incoming - limit)
+            if excess <= self.EPS:
+                continue
+
+            forced = min(original, excess)
+            if forced <= self.EPS:
+                # This should be impossible once known commitments are capped.
+                raise RuntimeError(
+                    "Known EV commitments exceed the configured charger rating "
+                    f"at hour {h}, house {self.data_ids[i]}."
+                )
+
+            allocation, unserved = self._allocate_forced_ev_deferral(
+                forced, h, i, d
+            )
+            self.device_conflict_deferred_out[h, i, d] += forced
+
+            phi = float(self.dissatisfaction_coefficients[i, d])
+            scale = max(original, self.EPS)
+            for t, move in allocation:
+                self.device_conflict_future_inj[t, i, d] += move
+                self.device_conflict_deferred_in[t, i, d] += move
+                delay = t - h
+                self._record_conflict_discomfort(
+                    h, i, d, phi * (move / scale) * (delay ** 2)
+                )
+
+            if unserved > self.EPS:
+                self.device_conflict_unserved[h, i, d] += unserved
+                self.device_unmet[h, i, d] += unserved
+                max_delay = self.T - h
+                self._record_conflict_discomfort(
+                    h, i, d, phi * (unserved / scale) * (max_delay ** 2)
+                )
+
+    def _resolve_physical_conflicts_at_hour(self, h):
+        """Apply causal appliance-level execution constraints before state h."""
+        self._resolve_tsni_conflicts_at_hour(h)
+        self._resolve_ev_charger_conflicts_at_hour(h)
+
     def _candidate_total_after_tsni_move(
         self, t, origin_start, origin_profile, dest_start, dest_profile
     ):
-        total = self._committed_total_at(t)
+        total = self._causal_capacity_estimate_at(t)
         origin_end = origin_start + len(origin_profile) - 1
         dest_end = dest_start + len(dest_profile) - 1
 
@@ -1699,18 +2217,15 @@ class Environment:
             window_totals = []
             for k, power in enumerate(profile):
                 t = start + k
-                own_committed = (
-                    self.device_demands[t, i, d]
-                    - self.device_shifted_out[t, i, d]
-                    + self.device_future_inj[t, i, d]
-                )
-                origin_power_here = (
-                    profile[t - t0]
-                    if t0 <= t < t0 + length
-                    else 0.0
-                )
-                other_own_load = max(0.0, own_committed - origin_power_here)
-                if other_own_load > self.EPS:
+                # Avoid double-booking only against schedules already
+                # committed by earlier decisions.  Future realised appliance
+                # demand is not available at decision time and is therefore
+                # not consulted here.
+                if (
+                    self.device_future_inj[t, i, d]
+                    + self.device_conflict_future_inj[t, i, d]
+                    > self.EPS
+                ):
                     feasible = False
                     break
 
@@ -1756,13 +2271,11 @@ class Environment:
                 t0, t1, profile = block
 
 
-                origin_prices = np.asarray(self.prices[t0 : t1 + 1], dtype=float)
+                # The admissibility decision is made at the request hour.
+                # Future realised prices are not available at that time.
                 locked_rate = float(incentives[i])
-                admissible_rate = (
-                    0.95 * float(origin_prices.min())
-                    if np.all(origin_prices > self.EPS)
-                    else 0.0
-                )
+                current_price = float(self.prices[h])
+                admissible_rate = max(0.0, 0.95 * current_price)
                 if locked_rate > admissible_rate + self.EPS:
                     self.device_settlement_ineligible_request[h, i, d] += float(
                         profile.sum()
@@ -1800,7 +2313,7 @@ class Environment:
                 self.device_discomfort[h, i, d] += discomfort
                 self.new_shifted_out_at_action[h, i, d] += float(profile.sum())
 
-    def _plan_ev_allocation(self, amount, h, d):
+    def _plan_ev_allocation(self, amount, h, i, d):
         ddl = self._deadline_index(d)
         if amount <= self.EPS or h >= ddl:
             return []
@@ -1808,10 +2321,19 @@ class Environment:
         allocation = []
         remaining = float(amount)
         temp_additions = {}
+        charger_limit = float(self.DEVICE_CONSUMPTION[d])
         for t in range(h + 1, ddl + 1):
-            committed = self._committed_total_at(t) + temp_additions.get(t, 0.0)
-            available = max(0.0, self.capacity_threshold - committed)
-            move = min(available, remaining)
+            committed = self._causal_capacity_estimate_at(t) + temp_additions.get(t, 0.0)
+            capacity_headroom = max(0.0, self.capacity_threshold - committed)
+            known_ev_commitment = float(
+                self.device_future_inj[t, i, d]
+                + self.device_conflict_future_inj[t, i, d]
+            )
+            charger_headroom = max(
+                0.0,
+                charger_limit - known_ev_commitment - temp_additions.get(t, 0.0),
+            )
+            move = min(capacity_headroom, charger_headroom, remaining)
             if move > self.EPS:
                 allocation.append((t, move))
                 temp_additions[t] = temp_additions.get(t, 0.0) + move
@@ -1837,7 +2359,8 @@ class Environment:
             original_available = max(
                 0.0,
                 self.device_demands[h, i, d]
-                - self.device_shifted_out[h, i, d],
+                - self.device_shifted_out[h, i, d]
+                - self.device_conflict_deferred_out[h, i, d],
             )
             if original_available <= self.EPS:
                 continue
@@ -1851,7 +2374,7 @@ class Environment:
             if requested_move <= self.EPS:
                 continue
 
-            allocation = self._plan_ev_allocation(requested_move, h, d)
+            allocation = self._plan_ev_allocation(requested_move, h, i, d)
             feasible_move = float(sum(move for _, move in allocation))
             unshifted_request = max(0.0, requested_move - feasible_move)
             if hasattr(self, "device_unshifted_request"):
@@ -1909,8 +2432,16 @@ class Environment:
             + shifted_origin_relief * self.shifted_out_locked_rate[h]
         )
         raw_house = raw_by_device.sum(axis=1)
+        # Forced device-conflict deferrals are physical scheduling corrections,
+        # not incentive-settled DR. Remove their signed effect from the
+        # settlement counterfactual before verifying incentivised relief.
+        conflict_out = self.device_conflict_deferred_out[h].sum(axis=1)
+        conflict_in = self.device_conflict_deferred_in[h].sum(axis=1)
+        settlement_reference = (
+            self.baseline_per_house[h] - conflict_out + conflict_in
+        )
         verified_house = np.maximum(
-            0.0, self.baseline_per_house[h] - np.asarray(after_house, dtype=float)
+            0.0, settlement_reference - np.asarray(after_house, dtype=float)
         )
 
         if np.any(verified_house > raw_house + self.data_tolerance):
@@ -1939,17 +2470,13 @@ class Environment:
 
 
         price = float(self.prices[h])
-        invalid_margin = (verified_by_device > self.EPS) & (
+        above_price = (verified_by_device > self.EPS) & (
             rate_by_device > price + self.data_tolerance
         )
-        if np.any(invalid_margin):
-            location = np.argwhere(invalid_margin)[0]
-            raise RuntimeError(
-                "Settlement rate exceeds verification-hour wholesale price: "
-                f"hour={h}, house={self.data_ids[int(location[0])]}, "
-                f"device={self.DEVICES[int(location[1])]}, "
-                f"rate={rate_by_device[tuple(location)]:.8f}, price={price:.8f}."
-            )
+        negative_margin = np.maximum(
+            0.0,
+            payment_by_device - price * verified_by_device,
+        )
 
         decision_hour = np.full((self.N, self.num_devices), -1, dtype=int)
         decision_hour[current_curtailment > self.EPS] = h
@@ -1961,6 +2488,11 @@ class Environment:
         self.device_settlement_payment[h] = payment_by_device
         self.device_settlement_rate[h] = rate_by_device
         self.device_settlement_decision_hour[h] = decision_hour
+        self.device_settlement_rate_above_price[h] = above_price
+        self.device_settlement_above_price_energy[h] = np.where(
+            above_price, verified_by_device, 0.0
+        )
+        self.device_settlement_negative_margin[h] = negative_margin
         self.settlement_allocation_factor[h] = factor
         self.settlement_dr_energy[h] = verified_by_device.sum(axis=1)
         self.incentive_payment[h] = payment_by_device.sum(axis=1)
@@ -2059,6 +2591,7 @@ class Environment:
 
 
         self.device_future_inj[h] = 0.0
+        self.device_conflict_future_inj[h] = 0.0
         self._refresh_planned_load()
 
     def compute_service_provider_reward(self):
@@ -2546,6 +3079,11 @@ class Environment:
             "shifted_out": self.shifted_out_per_house.copy(),
             "shifted_in": self.shifted_in_per_house.copy(),
             "device_discomfort": self.device_discomfort.copy(),
+            "device_conflict_discomfort": self.device_conflict_discomfort.copy(),
+            "device_conflict_deferred_out": self.device_conflict_deferred_out.copy(),
+            "device_conflict_deferred_in": self.device_conflict_deferred_in.copy(),
+            "device_conflict_unserved": self.device_conflict_unserved.copy(),
+            "device_unmet": self.device_unmet.copy(),
             "device_verified_settlement_energy": (
                 self.device_verified_settlement_energy.copy()
             ),
@@ -2583,5 +3121,9 @@ class Environment:
             "curtailed": curtailed,
             "unmet": unmet,
             "unshifted_request": unshifted_request,
+            "conflict_deferred_out": self.device_conflict_deferred_out.sum(axis=0),
+            "conflict_deferred_in": self.device_conflict_deferred_in.sum(axis=0),
+            "conflict_unserved": self.device_conflict_unserved.sum(axis=0),
+            "conflict_discomfort": self.device_conflict_discomfort.sum(axis=0),
             "balance_error": balance_error,
         }

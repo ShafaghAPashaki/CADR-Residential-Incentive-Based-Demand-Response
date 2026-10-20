@@ -194,7 +194,7 @@ class BenchmarkTester:
                     "hour": int(self.env.hours[h]),
                     "price_cent_per_kWh": float(self.env.prices[h]),
                     "elasticity": float(self.env.elasticities[h]),
-                    "daily_reference_price_cent_per_kWh": float(self.env.daily_reference_price),
+                    "previous_day_reference_price_cent_per_kWh": float(self.env.previous_day_reference_price),
                     "lambda_min_cent_per_kWh": float(self.env.lambda_min[h]),
                     "lambda_max_cent_per_kWh": float(self.env.lambda_max[h]),
                     "action_index": int(action_index),
@@ -226,10 +226,15 @@ class BenchmarkTester:
                 aggregate_rows.append(aggregate)
 
                 for idx, house_id in enumerate(self.house_ids):
+                    # Physical EBDR response is independent of the daily
+                    # incentive-reference sign/value once an action is chosen.
+                    # The frozen causal benchmark retains the Appendix-D
+                    # elasticity response and only shifts the incentive-price
+                    # reference to the previous day.
                     expected_reduction = min(
                         baseline[idx] * self.env.elasticities[h] * raw[idx],
                         self.env.max_reduction_fraction * baseline[idx],
-                    ) if self.env.daily_reference_price > 0.0 else 0.0
+                    )
                     expected_nominal = self.env.lambda_min[h] + raw[idx] * (
                         self.env.lambda_max[h] - self.env.lambda_min[h]
                     )

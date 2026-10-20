@@ -1032,6 +1032,9 @@ def main() -> None:
 
     metadata = pd.DataFrame([{
         "script_version": SCRIPT_VERSION,
+        "environment_version": template.VERSION,
+        "forecast_state_mode": template.get_forecast_metadata()["forecast_state_mode"],
+        "forecast_state_input_sha256": template.get_forecast_metadata()["forecast_state_input_sha256"],
         "label": args.label,
         "model_path": os.path.abspath(args.model_path),
         "config_path": os.path.abspath(args.config_path),

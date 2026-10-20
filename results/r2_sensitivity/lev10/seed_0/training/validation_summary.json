@@ -1,0 +1,52 @@
+{
+  "selection_rule": [
+    "maximum deterministic mean validation reward",
+    "minimum validation reward standard deviation (tie-break)",
+    "earliest episode (final tie-break)"
+  ],
+  "run_seed": 0,
+  "config_signature": "c89703369e1f116e740e25e4db2f23c3c7f75c584f3720aa43ad060c74598075",
+  "household_coefficients_source": "configured_fixed_matrix",
+  "household_coefficients_hash": "468b5b24603e49fa84ea6e71180d0e18283f556fb43d72be5733571322b5d0e0",
+  "selection_key": [
+    0.1434201348,
+    0.1372729014,
+    1650
+  ],
+  "best_metrics": {
+    "episode": 1650,
+    "validation_days": 14,
+    "mean_reward": -0.1434201348459872,
+    "std_reward": 0.13727290139832166,
+    "minimum_reward": -0.33823535313372505,
+    "maximum_reward": 0.07685112705147246,
+    "total_reward": -2.007881887843821,
+    "violation_steps": 37,
+    "evaluated_steps": 336,
+    "violation_percentage": 11.011904761904763,
+    "cumulative_excess": 40.5527,
+    "maximum_overrun": 4.489000000000001,
+    "gross_hourly_capacity_relief": 161.46710000000002,
+    "true_net_curtailment": 128.9115,
+    "max_abs_energy_balance_error": 2.4868995751603507e-14,
+    "useful_settlement_dr_energy": 101.01045,
+    "excess_settlement_dr_energy": 89.684525,
+    "target_tracking_mae_kwh": 0.29770104166666667,
+    "target_tracking_penalty": 2.9186847217368004,
+    "incentive_steps": 334,
+    "unnecessary_incentive_steps": 251,
+    "positive_incentive_no_response_steps": 169,
+    "maximum_action_steps": 0,
+    "no_need_gate_steps": 253,
+    "no_need_offer_penalty": 1.843952222222222,
+    "combined_offer_penalty": 1.843952222222222,
+    "stakeholder_sp_normalized_component": 1.9681846111625514,
+    "stakeholder_eu_normalized_component": 4.215528739598695,
+    "stakeholder_reward_component": 2.7547550561152017,
+    "symmetric_tracking_loss": 13.168691064513899,
+    "symmetric_tracking_penalty": 2.9186847217368004,
+    "average_offered_incentive_rate": 0.3606789613227513,
+    "incentive_payment": 178.63090040723642,
+    "raw_discomfort": 512.6244271484288
+  }
+}

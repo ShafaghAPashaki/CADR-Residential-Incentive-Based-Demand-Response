@@ -1,0 +1,52 @@
+{
+  "selection_rule": [
+    "maximum deterministic mean validation reward",
+    "minimum validation reward standard deviation (tie-break)",
+    "earliest episode (final tie-break)"
+  ],
+  "run_seed": 2,
+  "config_signature": "07d07e4296697ea9f64a754da45f8810436adc1217d86c7cf741ba1e8c776691",
+  "household_coefficients_source": "configured_fixed_matrix",
+  "household_coefficients_hash": "468b5b24603e49fa84ea6e71180d0e18283f556fb43d72be5733571322b5d0e0",
+  "selection_key": [
+    -0.8459294619,
+    0.1663887607,
+    2250
+  ],
+  "best_metrics": {
+    "episode": 2250,
+    "validation_days": 14,
+    "mean_reward": 0.8459294619365754,
+    "std_reward": 0.16638876072317793,
+    "minimum_reward": 0.5513264823928227,
+    "maximum_reward": 1.2177472388111403,
+    "total_reward": 11.843012467112056,
+    "violation_steps": 16,
+    "evaluated_steps": 336,
+    "violation_percentage": 4.761904761904762,
+    "cumulative_excess": 19.177225000000007,
+    "maximum_overrun": 3.085725,
+    "gross_hourly_capacity_relief": 385.1680392857143,
+    "true_net_curtailment": 339.90165,
+    "max_abs_energy_balance_error": 1.9539925233402755e-14,
+    "useful_settlement_dr_energy": 118.560925,
+    "excess_settlement_dr_energy": 299.595275,
+    "target_tracking_mae_kwh": 0.8410242559523808,
+    "target_tracking_penalty": 8.505225772627172,
+    "incentive_steps": 335,
+    "unnecessary_incentive_steps": 255,
+    "positive_incentive_no_response_steps": 52,
+    "maximum_action_steps": 0,
+    "no_need_gate_steps": 256,
+    "no_need_offer_penalty": 9.839482499999997,
+    "combined_offer_penalty": 9.839482499999997,
+    "stakeholder_sp_normalized_component": -9.558995833926605,
+    "stakeholder_eu_normalized_component": 14.198972059295805,
+    "stakeholder_reward_component": -1.243707071298762,
+    "symmetric_tracking_loss": 38.37437109926013,
+    "symmetric_tracking_penalty": 8.505225772627172,
+    "average_offered_incentive_rate": 1.3374054603807042,
+    "incentive_payment": 600.7835918591327,
+    "raw_discomfort": 897.2854154987068
+  }
+}

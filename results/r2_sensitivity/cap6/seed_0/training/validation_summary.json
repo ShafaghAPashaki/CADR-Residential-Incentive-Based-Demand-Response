@@ -1,0 +1,52 @@
+{
+  "selection_rule": [
+    "maximum deterministic mean validation reward",
+    "minimum validation reward standard deviation (tie-break)",
+    "earliest episode (final tie-break)"
+  ],
+  "run_seed": 0,
+  "config_signature": "69c648f640bf1744a177ad67df069bc9cfc8c610512c640b4365711a697be139",
+  "household_coefficients_source": "configured_fixed_matrix",
+  "household_coefficients_hash": "468b5b24603e49fa84ea6e71180d0e18283f556fb43d72be5733571322b5d0e0",
+  "selection_key": [
+    0.0347640684,
+    0.1520667381,
+    2000
+  ],
+  "best_metrics": {
+    "episode": 2000,
+    "validation_days": 14,
+    "mean_reward": -0.03476406835347328,
+    "std_reward": 0.15206673810133076,
+    "minimum_reward": -0.23487625746529522,
+    "maximum_reward": 0.2633913387400061,
+    "total_reward": -0.4866969569486259,
+    "violation_steps": 62,
+    "evaluated_steps": 336,
+    "violation_percentage": 18.452380952380953,
+    "cumulative_excess": 76.34407499999998,
+    "maximum_overrun": 4.679499999999999,
+    "gross_hourly_capacity_relief": 212.49527500000005,
+    "true_net_curtailment": 176.34797500000002,
+    "max_abs_energy_balance_error": 0.6388749999999774,
+    "useful_settlement_dr_energy": 160.48297142857143,
+    "excess_settlement_dr_energy": 80.068,
+    "target_tracking_mae_kwh": 0.378757738095238,
+    "target_tracking_penalty": 4.400471620677832,
+    "incentive_steps": 214,
+    "unnecessary_incentive_steps": 104,
+    "positive_incentive_no_response_steps": 43,
+    "maximum_action_steps": 0,
+    "no_need_gate_steps": 224,
+    "no_need_offer_penalty": 1.5952699999999997,
+    "combined_offer_penalty": 1.5952699999999997,
+    "stakeholder_sp_normalized_component": 4.918201748437314,
+    "stakeholder_eu_normalized_component": 6.606324363557007,
+    "stakeholder_reward_component": 5.509044663729207,
+    "symmetric_tracking_loss": 19.854303165839784,
+    "symmetric_tracking_penalty": 4.400471620677832,
+    "average_offered_incentive_rate": 0.3811393951996528,
+    "incentive_payment": 234.63295672405246,
+    "raw_discomfort": 480.668620748551
+  }
+}

@@ -24,10 +24,12 @@ from __future__ import annotations
 import hashlib
 import itertools
 import json
+import os
 from copy import deepcopy
 from typing import Any, Iterable
 
 import numpy as np
+import pandas as pd
 
 from utils.config_loader import load_config
 from utils.load_demand import load_baselines, load_demand
@@ -46,11 +48,11 @@ EPS = 1.0e-12
 class Environment:
     """Elasticity-based, capacity-blind, curtailment-only environment."""
 
-    VERSION = "benchmark_elasticity_env_v2"
+    VERSION = "benchmark_elasticity_env_v3_fair_forecast"
     ACCOUNTING_VERSION = "benchmark_curtailment_ledger_v2"
     RESPONSE_MODEL_VERSION = "direct_action_elasticity_v2"
     REWARD_VERSION = "raw_weighted_sp_eu_v1"
-    NEGATIVE_PRICE_CONVENTION = "daily_min_strictly_positive_reference_v1"
+    NEGATIVE_PRICE_CONVENTION = "previous_day_min_strictly_positive_reference_v1"
 
     _PROPOSED_ONLY_ENV_KEYS = {
         "capacity_threshold",
@@ -87,7 +89,7 @@ class Environment:
         # not retained, so the environment cannot inspect them accidentally.
         self.cfg = {
             key: incoming_cfg[key]
-            for key in ("general", "environment", "training", "DDQN")
+            for key in ("general", "environment", "training", "DDQN", "forecast")
         }
         self.data_ids = [int(value) for value in data_ids]
         if not self.data_ids or len(set(self.data_ids)) != len(self.data_ids):
@@ -109,6 +111,7 @@ class Environment:
         )
         self.df_price = load_price(data_path=str(general["price_file"]))
         self.all_baselines = load_baselines(self.df_demand)
+        self._load_decision_state_forecasts()
 
         self.train_ranges = [tuple(map(int, value)) for value in training["train_ranges"]]
         self.val_range = tuple(map(int, training["val_range"]))
@@ -191,8 +194,178 @@ class Environment:
         self.done = False
         self.state_dim = len(self.get_state_feature_names())
 
+    @staticmethod
+    def _sha256_file(path: str) -> str:
+        hasher = hashlib.sha256()
+        with open(path, "rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                hasher.update(chunk)
+        return hasher.hexdigest()
+
+    def _load_decision_state_forecasts(self) -> None:
+        """Load the same frozen one-step forecast inputs used by CADR."""
+        forecast_cfg = self.cfg.get("forecast", {}) or {}
+        self.forecast_state_mode = str(
+            forecast_cfg.get("state_input_mode", "forecast")
+        ).strip().lower()
+        if self.forecast_state_mode not in {"forecast", "oracle_actual"}:
+            raise ValueError(
+                "forecast.state_input_mode must be 'forecast' or 'oracle_actual'."
+            )
+
+        self.forecast_state_input_file = str(
+            forecast_cfg.get(
+                "ddqn_state_input_file",
+                "results/forecast/ddqn_state_forecasts.csv",
+            )
+        )
+        self.forecast_state_provenance_file = str(
+            forecast_cfg.get(
+                "ddqn_state_provenance_file",
+                "results/forecast/ddqn_state_forecasts_provenance.json",
+            )
+        )
+        self.forecast_load_floor_kw = float(
+            forecast_cfg.get("state_load_floor_kw", 0.0)
+        )
+        if (
+            not np.isfinite(self.forecast_load_floor_kw)
+            or self.forecast_load_floor_kw < 0.0
+        ):
+            raise ValueError(
+                "forecast.state_load_floor_kw must be finite and non-negative."
+            )
+
+        path = self.forecast_state_input_file
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"Benchmark decision-state forecast file not found: {path}"
+            )
+        table = pd.read_csv(path, parse_dates=["timestamp"])
+        if any("actual" in str(column).lower() for column in table.columns):
+            raise ValueError(
+                "Benchmark decision-state forecast input must not contain "
+                "audit/actual columns."
+            )
+
+        self.forecast_load_columns = [
+            f"forecast_load_house_{int(house_id)}_kw"
+            for house_id in self.data_ids
+        ]
+        required = [
+            "timestamp",
+            "doy",
+            "forecast_source",
+            *self.forecast_load_columns,
+            "forecast_aggregate_load_kw",
+            "forecast_price_cent_per_kwh",
+        ]
+        missing = [column for column in required if column not in table.columns]
+        if missing:
+            raise ValueError(
+                f"Benchmark state-forecast file is missing columns: {missing}"
+            )
+        if table["timestamp"].duplicated().any():
+            raise ValueError("Duplicate timestamps in benchmark state forecasts.")
+
+        numeric = table[
+            self.forecast_load_columns
+            + ["forecast_aggregate_load_kw", "forecast_price_cent_per_kwh"]
+        ].to_numpy(dtype=float)
+        if not np.isfinite(numeric).all():
+            raise ValueError("Non-finite benchmark state forecasts were found.")
+
+        aggregate_error = np.max(
+            np.abs(
+                table[self.forecast_load_columns].sum(axis=1).to_numpy(dtype=float)
+                - table["forecast_aggregate_load_kw"].to_numpy(dtype=float)
+            )
+        )
+        if aggregate_error > 1e-8:
+            raise ValueError(
+                "Benchmark forecast aggregate is inconsistent with household "
+                f"forecasts: max error={aggregate_error:.3e}."
+            )
+
+        train_days = {
+            day
+            for start, end in self.cfg["training"]["train_ranges"]
+            for day in range(int(start), int(end) + 1)
+        }
+        for day in train_days:
+            rows = table[table["doy"] == int(day)]
+            if len(rows) != self.expected_hours_per_day:
+                raise ValueError(
+                    f"Forecast day {day} has {len(rows)} rows; expected "
+                    f"{self.expected_hours_per_day}."
+                )
+            if set(rows["forecast_source"].astype(str)) != {"crossfit"}:
+                raise ValueError(
+                    f"Benchmark training day {day} must use cross-fitted forecasts."
+                )
+
+        val_start, _ = self.cfg["training"]["val_range"]
+        max_forecast_day = int(table["doy"].max())
+        for day in range(int(val_start), max_forecast_day + 1):
+            rows = table[table["doy"] == int(day)]
+            if len(rows) != self.expected_hours_per_day:
+                raise ValueError(
+                    f"Forecast day {day} has {len(rows)} rows; expected "
+                    f"{self.expected_hours_per_day}."
+                )
+            if set(rows["forecast_source"].astype(str)) != {"full_model"}:
+                raise ValueError(
+                    "Every benchmark forecast day from validation onward must "
+                    f"use full-model forecasts; day {day} does not."
+                )
+
+        self.decision_state_forecasts = table.sort_values("timestamp").set_index(
+            "timestamp", drop=False
+        )
+        self.forecast_state_input_sha256 = self._sha256_file(path)
+        self.forecast_state_provenance_sha256 = None
+        if os.path.exists(self.forecast_state_provenance_file):
+            self.forecast_state_provenance_sha256 = self._sha256_file(
+                self.forecast_state_provenance_file
+            )
+
+    def get_forecast_metadata(self) -> dict[str, Any]:
+        return {
+            "forecast_state_mode": str(self.forecast_state_mode),
+            "forecast_state_input_file": str(self.forecast_state_input_file),
+            "forecast_state_input_sha256": str(self.forecast_state_input_sha256),
+            "forecast_state_provenance_file": str(
+                self.forecast_state_provenance_file
+            ),
+            "forecast_state_provenance_sha256": self.forecast_state_provenance_sha256,
+            "forecast_training_source": "crossfit",
+            "forecast_validation_test_source": "full_model",
+            "forecast_load_floor_kw": float(self.forecast_load_floor_kw),
+            "forecast_price_unit": "cent/kWh",
+        }
+
+    def _previous_day_positive_price_reference(self, day: int) -> float:
+        """Return the minimum strictly positive price observed on day d-1."""
+        previous_day = int(day) - 1
+        if previous_day < 1:
+            raise ValueError(
+                "Previous-day price reference requires an episode day >= 2."
+            )
+        index = self._expected_day_index(previous_day)
+        rows = self.df_price.reindex(index)
+        if len(rows) != self.expected_hours_per_day or rows["price"].isna().any():
+            raise ValueError(
+                f"Previous day {previous_day} does not have 24 aligned prices."
+            )
+        positive = rows.loc[rows["price"] > 0.0, "price"].to_numpy(dtype=float)
+        if positive.size == 0:
+            raise ValueError(
+                f"Previous day {previous_day} has no strictly positive price."
+            )
+        return float(np.min(positive))
+
     def _validate_config_boundary(self) -> None:
-        required_sections = {"general", "environment", "training", "DDQN"}
+        required_sections = {"general", "environment", "training", "DDQN", "forecast"}
         missing_sections = sorted(required_sections.difference(self.cfg))
         if missing_sections:
             raise ValueError(f"Benchmark config is missing sections: {missing_sections}")
@@ -268,18 +441,43 @@ class Environment:
         self.baseline_per_house = baseline_wide.to_numpy(dtype=float)
         self.total_baseline = self.baseline_per_house.sum(axis=1)
 
-        positive_prices = self.prices[self.prices > 0.0]
-        self.daily_reference_price = (
-            float(np.min(positive_prices)) if positive_prices.size else 0.0
+        forecast_day = self.decision_state_forecasts.reindex(expected_index)
+        forecast_fields = self.forecast_load_columns + [
+            "forecast_price_cent_per_kwh"
+        ]
+        if forecast_day[forecast_fields].isna().any().any():
+            raise ValueError(
+                f"Missing benchmark decision-state forecasts on day {self.day}."
+            )
+        self.state_forecast_load_per_house = forecast_day[
+            self.forecast_load_columns
+        ].to_numpy(dtype=float)
+        self.state_forecast_price = forecast_day[
+            "forecast_price_cent_per_kwh"
+        ].to_numpy(dtype=float)
+        self.state_forecast_source = tuple(
+            forecast_day["forecast_source"].astype(str).tolist()
+        )
+        if len(set(self.state_forecast_source)) != 1:
+            raise ValueError(
+                f"Mixed benchmark forecast sources on day {self.day}: "
+                f"{sorted(set(self.state_forecast_source))}."
+            )
+
+        # Minimal causal version of Appendix D.1: retain one flat daily
+        # reference, but use the previous day's minimum strictly positive price,
+        # which is known before the current day begins.
+        self.previous_day_reference_price = (
+            self._previous_day_positive_price_reference(self.day)
         )
         self.lambda_min = np.full(
             self.max_steps,
-            self.lambda_min_multiplier * self.daily_reference_price,
+            self.lambda_min_multiplier * self.previous_day_reference_price,
             dtype=float,
         )
         self.lambda_max = np.full(
             self.max_steps,
-            self.lambda_max_multiplier * self.daily_reference_price,
+            self.lambda_max_multiplier * self.previous_day_reference_price,
             dtype=float,
         )
 
@@ -368,7 +566,7 @@ class Environment:
             "hour": int(self.hours[h]),
             "action_index": action_index,
             "raw_action": raw_action.copy(),
-            "daily_reference_price": float(self.daily_reference_price),
+            "previous_day_reference_price": float(self.previous_day_reference_price),
             "wholesale_avoided_value": float(self.wholesale_avoided_value[h]),
             "incentive_payment": float(self.incentive_payment[h]),
             "sp_reward": float(sp_reward),
@@ -380,12 +578,20 @@ class Environment:
         if self.day is None:
             return np.zeros(len(self.get_state_feature_names()), dtype=np.float32)
         h = self.curr_step
-        baselines = self.baseline_per_house[h]
-        price = float(self.prices[h])
-        price_for_state = float(np.log1p(np.clip(price, 0.0, 80.0)))
+        if self.forecast_state_mode == "oracle_actual":
+            state_loads = self.baseline_per_house[h].astype(float)
+            state_price = float(self.prices[h])
+        else:
+            state_loads = np.maximum(
+                self.state_forecast_load_per_house[h],
+                self.forecast_load_floor_kw,
+            ).astype(float)
+            state_price = float(self.state_forecast_price[h])
+
+        price_for_state = float(np.log1p(np.clip(state_price, 0.0, 80.0)))
         elasticity = float(self.elasticities[h])
         hour_normalized = float(h / max(self.max_steps - 1, 1))
-        total_baseline = float(baselines.sum())
+        total_state_load = float(state_loads.sum())
         current_hour = int(self.hours[h])
         hour_type = np.zeros(3, dtype=float)  # on, mid, off
         if current_hour in self.on_peak_hours:
@@ -397,13 +603,13 @@ class Environment:
 
         values = np.concatenate(
             [
-                baselines.astype(float),
+                state_loads,
                 np.asarray(
                     [
                         price_for_state,
                         elasticity,
                         hour_normalized,
-                        total_baseline,
+                        total_state_load,
                         self.is_holiday,
                         self.is_weekend,
                     ],
@@ -416,11 +622,11 @@ class Environment:
 
     def get_state_feature_names(self) -> list[str]:
         return [
-            *[f"baseline_house_{house_id}_kW" for house_id in self.data_ids],
-            "log_clipped_wholesale_price",
+            *[f"forecast_house_{house_id}_load_kW" for house_id in self.data_ids],
+            "log_clipped_forecast_wholesale_price",
             "hourly_elasticity",
             "normalized_hour",
-            "aggregate_baseline_kW",
+            "forecast_aggregate_load_kW",
             "holiday_flag",
             "weekend_flag",
             "on_peak_flag",
@@ -448,8 +654,6 @@ class Environment:
         raw_action = np.asarray(raw_action, dtype=float)
         if baselines.shape != (self.N,) or raw_action.shape != (self.N,):
             raise ValueError("baselines and raw_action must each have one value per household.")
-        if self.daily_reference_price <= 0.0:
-            return np.zeros(self.N, dtype=float)
         raw_delta = baselines * float(elasticity) * raw_action
         upper = self.max_reduction_fraction * baselines
         return np.clip(raw_delta, 0.0, upper)
@@ -477,7 +681,7 @@ class Environment:
             ),
             "max_reduction_fraction": float(self.max_reduction_fraction),
             "negative_price_convention": self.NEGATIVE_PRICE_CONVENTION,
-            "daily_reference_price": "minimum strictly positive hourly price of the day",
+            "incentive_reference_price": "minimum strictly positive price on previous day",
             "lambda_min_multiplier": float(self.lambda_min_multiplier),
             "lambda_max_multiplier": float(self.lambda_max_multiplier),
             "zero_action_convention": (
@@ -499,6 +703,7 @@ class Environment:
             "environment": self.cfg["environment"],
             "training": self.cfg["training"],
             "DDQN": self.cfg["DDQN"],
+            "forecast": self.cfg["forecast"],
             "versions": {
                 "environment": self.VERSION,
                 "accounting": self.ACCOUNTING_VERSION,

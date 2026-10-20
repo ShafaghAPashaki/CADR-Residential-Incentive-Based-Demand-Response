@@ -1,0 +1,23 @@
+{
+  "holiday_backend": "python-holidays / holidays.US(years=[2018])",
+  "holiday_version": "0.100",
+  "holiday_module_path": "<REDACTED_LOCAL_PYTHON_INSTALLATION_PATH>",
+  "environment_version": "forecast_state_v1",
+  "forecast_file_sha256": "b86e09baae30d3093ecb4cf8efb71dd273104739fc690120807edda8df88cd17",
+  "configuration_sha256": "0f00ee7264056da1fab0be564cc1d0540b209e8aabcc7589cfd2e3397533677c",
+  "code_hashes_sha256": "da69d7f3a064bd16514de9b811c70eb29ec2d655b26070f5258bcbec804d2ef6",
+  "code_hashes": {
+    "env/env.py": "5ae8182054e42be741a2450a5650f8f320f48e0aade06b8f3cb378af622ad9a6",
+    "benchmark/env_benchmark.py": "b8e5ea4685fd7809dc402ae66da080bb9c47c3e873629efc8a82877ea08d30d7",
+    "main.py": "1d785d6e5d4d1c3a0d5281c67d5a81f50db123a6b50322cbf556149f14702dde",
+    "benchmark/main_benchmark.py": "32c9df08e35ed6c644690b97b95110cbaa873ac4bfb5432c259ed4b69446d8ee",
+    "agent/agent_ddqn.py": "aa9b08b01f4401e3c6037b315d422a178f37e0e4ec097b3af54f023f96fb16b0",
+    "utils/load_demand.py": "8f114a0fcdb75a56b20160465e5b6b2b09b943c288baed65931337c92dd6f622",
+    "utils/load_price.py": "3133660ea1f90f7af248011b967b7694d3b8f040b0bca21d4b5f7dcf2ed941f2",
+    "utils/final_run_protocol.py": "cf9764d881d28bb3b21c09189d4d1e8c735902d1c43c279caaa4bf8f0dde5cae",
+    "calibrate_lambda_c.py": "b37e20129f539ba53bbd256d05f5621427e934d703e5430fbdcd0e396cd47c19",
+    "test.py": "abc150fcd893be8f24c0f6a57186b9deb41fb7989dce1e63bd57d926d04ab7c3",
+    "benchmark/test_benchmark.py": "d8ae69f15cde0b4c5fa132888eec25945180d6facaceab1b3a818ac9d999e549"
+  },
+  "calibration_file_sha256": "325d3344b881c57e37e41e55fd2fa74e019652babde56fbb8dd8316483d5028a"
+}

@@ -2,7 +2,7 @@
 
 The loaders deliberately avoid silent imputation.  Missing timestamps,
 households, appliance values, duplicates, NaNs, and negative loads are treated
-as data errors so that training and paper results cannot be generated from an
+as data errors so that training and final evaluation outputs cannot be generated from an
 incomplete day without an explicit failure.
 """
 

@@ -1,0 +1,1284 @@
+{
+  "stage": "CADR LSTM cross-fitting (DDQN training days only)",
+  "created_utc": "2026-10-05T12:38:30.407256+00:00",
+  "runtime_seconds": 581.3,
+  "design": {
+    "train_days": [
+      2,
+      167
+    ],
+    "n_folds": 5,
+    "buffer_hours": 73,
+    "receptive_field_hours": 73,
+    "seed_rule": "seed = 42 + fold_index",
+    "epoch_rule": "fixed = best validation epoch of the corresponding full model",
+    "scaler_rule": "fitted on each fold's accepted fitting samples only",
+    "padding_rule": "padded samples excluded from fitting, scaling and metrics; still forecast",
+    "validation_and_test_forecasts": "unchanged; taken from the existing full models"
+  },
+  "folds": [
+    {
+      "fold_id": 0,
+      "first_day": 2,
+      "last_day": 35,
+      "n_days": 34,
+      "block_start": "2018-01-02 00:00:00",
+      "block_end": "2018-02-04 23:00:00"
+    },
+    {
+      "fold_id": 1,
+      "first_day": 36,
+      "last_day": 68,
+      "n_days": 33,
+      "block_start": "2018-02-05 00:00:00",
+      "block_end": "2018-03-09 23:00:00"
+    },
+    {
+      "fold_id": 2,
+      "first_day": 69,
+      "last_day": 101,
+      "n_days": 33,
+      "block_start": "2018-03-10 00:00:00",
+      "block_end": "2018-04-11 23:00:00"
+    },
+    {
+      "fold_id": 3,
+      "first_day": 102,
+      "last_day": 134,
+      "n_days": 33,
+      "block_start": "2018-04-12 00:00:00",
+      "block_end": "2018-05-14 23:00:00"
+    },
+    {
+      "fold_id": 4,
+      "first_day": 135,
+      "last_day": 167,
+      "n_days": 33,
+      "block_start": "2018-05-15 00:00:00",
+      "block_end": "2018-06-16 23:00:00"
+    }
+  ],
+  "targets": {
+    "household_661": {
+      "folds": [
+        {
+          "target": "household_661",
+          "fold_id": 0,
+          "held_out_days": [
+            2,
+            35
+          ],
+          "held_out_range": [
+            "2018-01-02 00:00:00",
+            "2018-02-04 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2017-12-29 23:00:00",
+            "2018-02-08 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-02-08 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 816,
+            "excluded_buffer": 73,
+            "excluded_startup_padding": 0,
+            "accepted_fitting_samples": 3095,
+            "held_out_forecast_hours": 816,
+            "held_out_padded_hours": 55
+          },
+          "fixed_epochs": 22,
+          "seeds": {
+            "python_random": 42,
+            "numpy": 42,
+            "torch_cpu": 42,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.324534506780458,
+          "fit_seconds": 38.12,
+          "sha256": {
+            "model": "5a1b864c4de91cf74a15addd71a39555f9e8006c2875f9fa9496af60d45b4cf3",
+            "scaler": "a150dc77cb10b436b76cd46bf5b424dee148901c5fd0c7a56e8f0ff100abff59",
+            "training_history": "ec763f96255a55cdfb5aa98262ff659d69a692bf07cbfa101427a35935604ec8"
+          }
+        },
+        {
+          "target": "household_661",
+          "fold_id": 1,
+          "held_out_days": [
+            36,
+            68
+          ],
+          "held_out_range": [
+            "2018-02-05 00:00:00",
+            "2018-03-09 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-02-01 23:00:00",
+            "2018-03-13 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-02-01 22:00:00"
+            ],
+            [
+              "2018-03-13 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 22,
+          "seeds": {
+            "python_random": 43,
+            "numpy": 43,
+            "torch_cpu": 43,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.30360010145241423,
+          "fit_seconds": 37.08,
+          "sha256": {
+            "model": "dbe76a56a443d9cce2027dca28b58633df644661d48a566b36fd1a53524b5c73",
+            "scaler": "955404629cc5313127dc8e30e49a9245edf2f14bc5d527bd134752c46e0e5c98",
+            "training_history": "2058623dbb1e09ef51d9fc2bedcf0754a3e7f90b80d8c5679c8d6efca23788c7"
+          }
+        },
+        {
+          "target": "household_661",
+          "fold_id": 2,
+          "held_out_days": [
+            69,
+            101
+          ],
+          "held_out_range": [
+            "2018-03-10 00:00:00",
+            "2018-04-11 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-03-06 23:00:00",
+            "2018-04-15 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-03-06 22:00:00"
+            ],
+            [
+              "2018-04-15 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 22,
+          "seeds": {
+            "python_random": 44,
+            "numpy": 44,
+            "torch_cpu": 44,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.28674093437848464,
+          "fit_seconds": 35.66,
+          "sha256": {
+            "model": "28971534f83ebff5dc5640da8b44f2df1c1c5af3b2fed948afe5df95c939e8a6",
+            "scaler": "689ad586ca14f46e0a93aad9e34735b59c1d735e0991920deaa1667390edf762",
+            "training_history": "4fcc6945571fc821e38516242fb4ac0cd31acf08ab2e8e3676afe38ce0308057"
+          }
+        },
+        {
+          "target": "household_661",
+          "fold_id": 3,
+          "held_out_days": [
+            102,
+            134
+          ],
+          "held_out_range": [
+            "2018-04-12 00:00:00",
+            "2018-05-14 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-04-08 23:00:00",
+            "2018-05-18 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-04-08 22:00:00"
+            ],
+            [
+              "2018-05-18 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 22,
+          "seeds": {
+            "python_random": 45,
+            "numpy": 45,
+            "torch_cpu": 45,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.3232188827714088,
+          "fit_seconds": 37.0,
+          "sha256": {
+            "model": "94af409dc004c8785a9fb03689163f619a7330ab8531d4ac0c708f036b7ebfc2",
+            "scaler": "e337d184cf133c6a2e4dde203d401afe270176011b3abba04089b2691d1db3f7",
+            "training_history": "5201ed19753a70c695f723af6078a1c3cac4c92787012218f2741c445843e9e9"
+          }
+        },
+        {
+          "target": "household_661",
+          "fold_id": 4,
+          "held_out_days": [
+            135,
+            167
+          ],
+          "held_out_range": [
+            "2018-05-15 00:00:00",
+            "2018-06-16 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-05-11 23:00:00",
+            "2018-06-20 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-05-11 22:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 73,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 3064,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 22,
+          "seeds": {
+            "python_random": 46,
+            "numpy": 46,
+            "torch_cpu": 46,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.3619450417106519,
+          "fit_seconds": 37.19,
+          "sha256": {
+            "model": "ef3f451d494f96794ff88fb57b3bbd46ad27ef6a7aa81d7cafd95b51593d21a9",
+            "scaler": "21ea341e4236b90934938da825ae8afa3b415f213230ea418319851f772b838d",
+            "training_history": "9e1dc745f80dba31b9a549136bfde8429b385f94c0f9b7fffb2b55742249be25"
+          }
+        }
+      ],
+      "oof_file": "crossfit_results/household_661/oof_predictions.csv",
+      "oof_sha256": "a4568d4dcab50830892fde145ccc1f03bb86b425262dc4092664f15c73256d76",
+      "fixed_epochs": {
+        "history_file": "results/forecast/load/lstm_load_house_661_history.csv",
+        "best_epoch": 22,
+        "last_epoch": 62,
+        "best_validation_loss": 0.8401322024209159,
+        "history_sha256": "aec52cb9e8f46adfb92988de9f665fb0aa8210a66b8455c0efe1cb9b8ba7ce5e"
+      },
+      "startup_padded_training_samples": 55
+    },
+    "household_3039": {
+      "folds": [
+        {
+          "target": "household_3039",
+          "fold_id": 0,
+          "held_out_days": [
+            2,
+            35
+          ],
+          "held_out_range": [
+            "2018-01-02 00:00:00",
+            "2018-02-04 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2017-12-29 23:00:00",
+            "2018-02-08 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-02-08 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 816,
+            "excluded_buffer": 73,
+            "excluded_startup_padding": 0,
+            "accepted_fitting_samples": 3095,
+            "held_out_forecast_hours": 816,
+            "held_out_padded_hours": 55
+          },
+          "fixed_epochs": 13,
+          "seeds": {
+            "python_random": 42,
+            "numpy": 42,
+            "torch_cpu": 42,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.31147720752605906,
+          "fit_seconds": 22.36,
+          "sha256": {
+            "model": "06afa8e95771850ba84d128aa09865ff7bd5714b06992d6a7c1af476746ff37f",
+            "scaler": "5e3c7a057ad018e09687da622c0a871f25d93fa8f5ac143152703a5df493f1f1",
+            "training_history": "e891548e10eb34c5a23fb97c9fb89243c35529d934ad78f2f0bef2304a262524"
+          }
+        },
+        {
+          "target": "household_3039",
+          "fold_id": 1,
+          "held_out_days": [
+            36,
+            68
+          ],
+          "held_out_range": [
+            "2018-02-05 00:00:00",
+            "2018-03-09 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-02-01 23:00:00",
+            "2018-03-13 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-02-01 22:00:00"
+            ],
+            [
+              "2018-03-13 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 13,
+          "seeds": {
+            "python_random": 43,
+            "numpy": 43,
+            "torch_cpu": 43,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.2968443806196925,
+          "fit_seconds": 21.8,
+          "sha256": {
+            "model": "f2dbe0b152625b594e5ca46a7e9171cd23496a31bf2df3ddf9581c30d81c8d84",
+            "scaler": "d487a60e55fc5cd132d68c54174928b99a1bb82d776adb93be03b8ba378a691a",
+            "training_history": "b67f1fd03faa2e91aeb7e3a6421709af7e57b0e18c985d6ff601be80120127b6"
+          }
+        },
+        {
+          "target": "household_3039",
+          "fold_id": 2,
+          "held_out_days": [
+            69,
+            101
+          ],
+          "held_out_range": [
+            "2018-03-10 00:00:00",
+            "2018-04-11 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-03-06 23:00:00",
+            "2018-04-15 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-03-06 22:00:00"
+            ],
+            [
+              "2018-04-15 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 13,
+          "seeds": {
+            "python_random": 44,
+            "numpy": 44,
+            "torch_cpu": 44,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.29720447072712564,
+          "fit_seconds": 21.93,
+          "sha256": {
+            "model": "0d1557a05d213afecc649b585fa68b03b2d88673ce051eca0b0ff2eb50264abc",
+            "scaler": "78bd1191acc5cc18431650a1dfb7bb8dc1b485843c509f10079542efaffc2117",
+            "training_history": "4368733be4f632253ba8d65b0e257b8a0ec7306d26f13c38724c7881567fb716"
+          }
+        },
+        {
+          "target": "household_3039",
+          "fold_id": 3,
+          "held_out_days": [
+            102,
+            134
+          ],
+          "held_out_range": [
+            "2018-04-12 00:00:00",
+            "2018-05-14 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-04-08 23:00:00",
+            "2018-05-18 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-04-08 22:00:00"
+            ],
+            [
+              "2018-05-18 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 13,
+          "seeds": {
+            "python_random": 45,
+            "numpy": 45,
+            "torch_cpu": 45,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.31917310758443707,
+          "fit_seconds": 21.96,
+          "sha256": {
+            "model": "610dcca449e5172b9e937dd9b27bd4d52e28d421f56e559c45ab1ac49a7b73f5",
+            "scaler": "4dd4a9fa801e7420430ef520c79fa867d284dbf3d3027085717b01ecc7fae3de",
+            "training_history": "42290888b4515adf32e986ba61ad0710cd4e2348e7f0421581c986492c3efef7"
+          }
+        },
+        {
+          "target": "household_3039",
+          "fold_id": 4,
+          "held_out_days": [
+            135,
+            167
+          ],
+          "held_out_range": [
+            "2018-05-15 00:00:00",
+            "2018-06-16 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-05-11 23:00:00",
+            "2018-06-20 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-05-11 22:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 73,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 3064,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 13,
+          "seeds": {
+            "python_random": 46,
+            "numpy": 46,
+            "torch_cpu": 46,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.37394467237412776,
+          "fit_seconds": 22.35,
+          "sha256": {
+            "model": "e5fb765d000b439ff7246636b35465398c4f750924572987b742f62b141717f7",
+            "scaler": "470015ab6a021194c9d841565673e7ea20e10e029d342416f55add15289cdd10",
+            "training_history": "6c5f9a0b98dbe7126e165f746c0e77920db496ce63e8f18eb04e2b35282776ab"
+          }
+        }
+      ],
+      "oof_file": "crossfit_results/household_3039/oof_predictions.csv",
+      "oof_sha256": "31b4b114f2aca816347f2887eee5178d9866f8da8a71d626af2b46be34724d65",
+      "fixed_epochs": {
+        "history_file": "results/forecast/load/lstm_load_house_3039_history.csv",
+        "best_epoch": 13,
+        "last_epoch": 53,
+        "best_validation_loss": 0.6739784876505533,
+        "history_sha256": "7a6fc83aea7f4cf7ed0dac857572c613cb34f396a050b2e00d1d45749dfdd9ec"
+      },
+      "startup_padded_training_samples": 55
+    },
+    "household_8565": {
+      "folds": [
+        {
+          "target": "household_8565",
+          "fold_id": 0,
+          "held_out_days": [
+            2,
+            35
+          ],
+          "held_out_range": [
+            "2018-01-02 00:00:00",
+            "2018-02-04 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2017-12-29 23:00:00",
+            "2018-02-08 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-02-08 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 816,
+            "excluded_buffer": 73,
+            "excluded_startup_padding": 0,
+            "accepted_fitting_samples": 3095,
+            "held_out_forecast_hours": 816,
+            "held_out_padded_hours": 55
+          },
+          "fixed_epochs": 3,
+          "seeds": {
+            "python_random": 42,
+            "numpy": 42,
+            "torch_cpu": 42,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.4321487829546551,
+          "fit_seconds": 5.35,
+          "sha256": {
+            "model": "d7cbc292769815be4d98cd7f8c73e54472e26df8602a3bf23cb1b7a341948605",
+            "scaler": "7d95a19d9221c5590ba1bd25f94e97bef4e9f16e0a48a3164a129efd1ffbdc65",
+            "training_history": "20ae81edee541aaae1c37f5af987947c4ee747135d57001940f4468b4f703f1e"
+          }
+        },
+        {
+          "target": "household_8565",
+          "fold_id": 1,
+          "held_out_days": [
+            36,
+            68
+          ],
+          "held_out_range": [
+            "2018-02-05 00:00:00",
+            "2018-03-09 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-02-01 23:00:00",
+            "2018-03-13 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-02-01 22:00:00"
+            ],
+            [
+              "2018-03-13 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 3,
+          "seeds": {
+            "python_random": 43,
+            "numpy": 43,
+            "torch_cpu": 43,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.4051674060481163,
+          "fit_seconds": 4.88,
+          "sha256": {
+            "model": "c04e8396c4e81041cdd3c1e5e2e57448c69c69ffc287c2b91195834920b38576",
+            "scaler": "fdade789a3dbe0c227bb1e207cae3d0d24496b8793316ca51fbb757298a50a39",
+            "training_history": "da04da937b19b484023a6971f36f32ce220f53734d0f07591d7173709ad2ae86"
+          }
+        },
+        {
+          "target": "household_8565",
+          "fold_id": 2,
+          "held_out_days": [
+            69,
+            101
+          ],
+          "held_out_range": [
+            "2018-03-10 00:00:00",
+            "2018-04-11 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-03-06 23:00:00",
+            "2018-04-15 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-03-06 22:00:00"
+            ],
+            [
+              "2018-04-15 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 3,
+          "seeds": {
+            "python_random": 44,
+            "numpy": 44,
+            "torch_cpu": 44,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.39817072094901673,
+          "fit_seconds": 4.7,
+          "sha256": {
+            "model": "b828837ce9f87c7c9c7fb1ac001e5266e33891477a7fc2fd905cac7d1da77088",
+            "scaler": "f8782ca31c04c965553619ea7fc75ee5d3834d7c5f4380665393017647fb5fd0",
+            "training_history": "253900835b632caf4cd0ce01cda9510e67b76076c238903ff17b0c22f93f29c9"
+          }
+        },
+        {
+          "target": "household_8565",
+          "fold_id": 3,
+          "held_out_days": [
+            102,
+            134
+          ],
+          "held_out_range": [
+            "2018-04-12 00:00:00",
+            "2018-05-14 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-04-08 23:00:00",
+            "2018-05-18 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-04-08 22:00:00"
+            ],
+            [
+              "2018-05-18 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 2991,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 3,
+          "seeds": {
+            "python_random": 45,
+            "numpy": 45,
+            "torch_cpu": 45,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.42748661037872004,
+          "fit_seconds": 4.84,
+          "sha256": {
+            "model": "6dd390d19687aaadb8b8ae22478236ee8efc90d4f78490f89c1891c386130045",
+            "scaler": "ab42e9bad2682cfef5ca0353b72d45f4d7b71f1520915af64e78ae69c4a6bf63",
+            "training_history": "bce62a59cd0cdab5c19ce2de536273bca12c82da6847d2da0332177b98d89abc"
+          }
+        },
+        {
+          "target": "household_8565",
+          "fold_id": 4,
+          "held_out_days": [
+            135,
+            167
+          ],
+          "held_out_range": [
+            "2018-05-15 00:00:00",
+            "2018-06-16 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-05-11 23:00:00",
+            "2018-06-20 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 07:00:00",
+              "2018-05-11 22:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 73,
+            "excluded_startup_padding": 55,
+            "accepted_fitting_samples": 3064,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 3,
+          "seeds": {
+            "python_random": 46,
+            "numpy": 46,
+            "torch_cpu": 46,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.5587692775863269,
+          "fit_seconds": 5.23,
+          "sha256": {
+            "model": "b9f797570442918a0a42ab731e2fa3f63ba3ac871ca90c5a02139ccdd2b44949",
+            "scaler": "4b0c68b8e82a920981b39bc1ee259e0266f4dfce9c7695edb23972be633b1b3c",
+            "training_history": "7ed952008f84bcb87fe6772c13755828e6dab93c62dd28623affcaef337e69da"
+          }
+        }
+      ],
+      "oof_file": "crossfit_results/household_8565/oof_predictions.csv",
+      "oof_sha256": "2d25d7c20bca75067cff4260c5f2afd158a5937d7929e45d6d7f52b0530e4fd4",
+      "fixed_epochs": {
+        "history_file": "results/forecast/load/lstm_load_house_8565_history.csv",
+        "best_epoch": 3,
+        "last_epoch": 43,
+        "best_validation_loss": 0.7296484793935504,
+        "history_sha256": "e357e286333c3b699e19db3c9bb5ce52c72f47633d5190fddbd5378881bfb8b8"
+      },
+      "startup_padded_training_samples": 55
+    },
+    "price": {
+      "folds": [
+        {
+          "target": "price",
+          "fold_id": 0,
+          "held_out_days": [
+            2,
+            35
+          ],
+          "held_out_range": [
+            "2018-01-02 00:00:00",
+            "2018-02-04 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2017-12-29 23:00:00",
+            "2018-02-08 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-02-08 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 816,
+            "excluded_buffer": 73,
+            "excluded_startup_padding": 0,
+            "accepted_fitting_samples": 3095,
+            "held_out_forecast_hours": 816,
+            "held_out_padded_hours": 49
+          },
+          "fixed_epochs": 19,
+          "seeds": {
+            "python_random": 42,
+            "numpy": 42,
+            "torch_cpu": 42,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.3971716084874119,
+          "fit_seconds": 33.02,
+          "sha256": {
+            "model": "62cc23c445cd49693533ffa82457480b14e2e6001bab75082130bfca5551f820",
+            "scaler": "954e415df9b0dc4c6729653f388dbdbd839f27b27f6c3963857d19612827f773",
+            "training_history": "e61a336035032adb47344fbb2339fe2a60086c62d723bed5ac5fc433b84078b0"
+          }
+        },
+        {
+          "target": "price",
+          "fold_id": 1,
+          "held_out_days": [
+            36,
+            68
+          ],
+          "held_out_range": [
+            "2018-02-05 00:00:00",
+            "2018-03-09 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-02-01 23:00:00",
+            "2018-03-13 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 01:00:00",
+              "2018-02-01 22:00:00"
+            ],
+            [
+              "2018-03-13 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 49,
+            "accepted_fitting_samples": 2997,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 19,
+          "seeds": {
+            "python_random": 43,
+            "numpy": 43,
+            "torch_cpu": 43,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.4544363220765799,
+          "fit_seconds": 31.03,
+          "sha256": {
+            "model": "660bd17adb77346995ab08291094949665c6252b7740f503a0226ec778d99913",
+            "scaler": "a8c5efe6a0b4e42b9db07d1e1d75133cd23141a276e84def89c81ee29501b7bc",
+            "training_history": "9e52a4fbae8331ea24887320b94a074b50aaacc26ee4e7a4ac10341aa4dbe1e7"
+          }
+        },
+        {
+          "target": "price",
+          "fold_id": 2,
+          "held_out_days": [
+            69,
+            101
+          ],
+          "held_out_range": [
+            "2018-03-10 00:00:00",
+            "2018-04-11 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-03-06 23:00:00",
+            "2018-04-15 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 01:00:00",
+              "2018-03-06 22:00:00"
+            ],
+            [
+              "2018-04-15 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 49,
+            "accepted_fitting_samples": 2997,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 19,
+          "seeds": {
+            "python_random": 44,
+            "numpy": 44,
+            "torch_cpu": 44,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.45794903394052355,
+          "fit_seconds": 30.58,
+          "sha256": {
+            "model": "e37fa9d0dd3de3c92f9248ca7810b3b89c912b2d9e0463b34973d3b576f982cb",
+            "scaler": "8c1172414941f2c20a4ad42308b63065c9cd3b84c3bc6a0b03e52c2db4f377d3",
+            "training_history": "26e61dc5b903565c207861dea84162e02e14a71c71c989adfee017a8eb2bcdfd"
+          }
+        },
+        {
+          "target": "price",
+          "fold_id": 3,
+          "held_out_days": [
+            102,
+            134
+          ],
+          "held_out_range": [
+            "2018-04-12 00:00:00",
+            "2018-05-14 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-04-08 23:00:00",
+            "2018-05-18 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 01:00:00",
+              "2018-04-08 22:00:00"
+            ],
+            [
+              "2018-05-18 01:00:00",
+              "2018-06-16 23:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 146,
+            "excluded_startup_padding": 49,
+            "accepted_fitting_samples": 2997,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 19,
+          "seeds": {
+            "python_random": 45,
+            "numpy": 45,
+            "torch_cpu": 45,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.5142834618361962,
+          "fit_seconds": 33.6,
+          "sha256": {
+            "model": "fb6bedad21576895617868ff26c454a578093f6fbf94a72e4112476a58160caa",
+            "scaler": "fa86b4b71cc814c418c4f3bc05659171c893e8cf2b9652728f380a6e8db0169e",
+            "training_history": "1c57880683a57a0a5f2ce49731773c407e2aea5dcc18d888c7298803092d8c95"
+          }
+        },
+        {
+          "target": "price",
+          "fold_id": 4,
+          "held_out_days": [
+            135,
+            167
+          ],
+          "held_out_range": [
+            "2018-05-15 00:00:00",
+            "2018-06-16 23:00:00"
+          ],
+          "buffer_hours": 73,
+          "excluded_range_with_buffer": [
+            "2018-05-11 23:00:00",
+            "2018-06-20 00:00:00"
+          ],
+          "fitting_target_ranges": [
+            [
+              "2018-01-04 01:00:00",
+              "2018-05-11 22:00:00"
+            ]
+          ],
+          "sample_counts": {
+            "training_period_samples": 3984,
+            "excluded_held_out_block": 792,
+            "excluded_buffer": 73,
+            "excluded_startup_padding": 49,
+            "accepted_fitting_samples": 3070,
+            "held_out_forecast_hours": 792,
+            "held_out_padded_hours": 0
+          },
+          "fixed_epochs": 19,
+          "seeds": {
+            "python_random": 46,
+            "numpy": 46,
+            "torch_cpu": 46,
+            "torch_cuda": "not_applicable (CPU run)"
+          },
+          "device": "cpu",
+          "torch_num_threads": 4,
+          "scaler_fit_on": "accepted fitting samples of this fold only",
+          "final_train_loss": 0.5786598967661298,
+          "fit_seconds": 31.32,
+          "sha256": {
+            "model": "809b901657df146e5b4b47d5dd90d3db4746eb0c97bb3588c7e509832781dedd",
+            "scaler": "fe6395a4cffe8a73cf6a665154f61b454bd891edd110a4eec1e85e457f46828d",
+            "training_history": "705bc21ef79899bafc2ced17a50c73b8eeca7b850e862de05640854bb559315e"
+          }
+        }
+      ],
+      "oof_file": "crossfit_results/price/oof_predictions.csv",
+      "oof_sha256": "ca321af7659a990506c3f726d3e9ab4d87ce69c912bf1352d1ad79f976eb65f7",
+      "fixed_epochs": {
+        "history_file": "results/forecast/price/lstm_price_history.csv",
+        "best_epoch": 19,
+        "last_epoch": 59,
+        "best_validation_loss": 0.006488104040424,
+        "history_sha256": "6606aae716413689979d9ce46ea5e58260a262bdf6d6410a533a788ebecd7953"
+      },
+      "startup_padded_training_samples": 49
+    }
+  },
+  "provenance": {
+    "load": {
+      "manifest": "results/forecast/load/lstm_load_manifest.json",
+      "manifest_sha256": {
+        "script": "e8781487a16bfa5ebc8e8aa7138de9ad278e8a07a427c174333cf207cdc05f2a",
+        "config": "ba3588b678fa0436b6a29c63a0384fe79895873cdf06c0bbc1832530db622574",
+        "data": "c183ce463f4364a9f517d4b0eab24133445f1772c12a3621023ea2cdb999947e",
+        "predictions": "e2a149ac610ddd897a81e33007766b2538af97d2e9d1eb16d1f2481255c17c3d",
+        "metrics": "1043f6e9292de7e2f2c653f586a3385489b37f95d46ff49097bbf3ed10bfd2e4"
+      },
+      "holiday_backend": "holidays.US"
+    },
+    "price": {
+      "manifest": "results/forecast/price/lstm_price_manifest.json",
+      "manifest_sha256": {
+        "script": "7f4a78631702aef9d87f2c15ac286ad3504efea8b1b6cbbe60da8a80a720268d",
+        "config": "ba3588b678fa0436b6a29c63a0384fe79895873cdf06c0bbc1832530db622574",
+        "data": "56fdd5b489269d7a95cd6a3816b278a8b46eed02a30688e61712ce3bd8c90593",
+        "predictions": "c7446d11066e8cdfc394700306385449d8e67b6b1f69dc51403266d9e24bea65",
+        "metrics": "4a55195e5a94d3c578ef32bc9a29dd7e4ebc6266f7e96ad6f44af781758a1d3f"
+      },
+      "holiday_backend": "holidays.US"
+    }
+  },
+  "environment": {
+    "python": "3.13.16",
+    "platform": "Linux-6.18.44-fc-v70-x86_64-with-glibc2.39",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "torch": "2.14.1+cu130",
+    "holidays": "0.105",
+    "device": "cpu",
+    "torch_num_threads": 4,
+    "deterministic_algorithms": true
+  },
+  "sha256": {
+    "crossfit_lstm.py": "da0aecdbfeea8680c373019f0d7f646f9c19874e275c5f0abc8187f7d0a2ca7b",
+    "verify_crossfit.py": "532925f87356642452460938563ccaf65fe0d15145e25d700885a34c39cee1d9",
+    "crossfit_config.yaml": "744ee8bc00e8033f4ea5f4f1aceaaa7ad5121a922958fd2f9793a7e7f30885f2",
+    "predict_load_lstm.py": "e8781487a16bfa5ebc8e8aa7138de9ad278e8a07a427c174333cf207cdc05f2a",
+    "predict_price_lstm.py": "7f4a78631702aef9d87f2c15ac286ad3504efea8b1b6cbbe60da8a80a720268d",
+    "main_config": "ba3588b678fa0436b6a29c63a0384fe79895873cdf06c0bbc1832530db622574",
+    "load_data": "c183ce463f4364a9f517d4b0eab24133445f1772c12a3621023ea2cdb999947e",
+    "price_data": "56fdd5b489269d7a95cd6a3816b278a8b46eed02a30688e61712ce3bd8c90593"
+  },
+  "artifact_sha256": {
+    "audit/crossfit_oof_metrics.csv": "15a8a7f812d28be4ac27a2017fa5433b421762b29518ad9a9b9d98c943e84a6e",
+    "audit/determinism_report.json": "fc7abb4b1053abdd93523e5a0287a14087d827f0508899f971096b24b2d94f64",
+    "audit/full_model_integrity.json": "84b0bedbf62125eea2f8399d07100bfa2b74201f7273522d814e4fbac4459052",
+    "audit/leakage_report.json": "913e2e6f1f300ebba89d7322db07713e4c7155554c34f8910a4231a14f51c203",
+    "combined/column_map.json": "79bfb085b7e0b208afa1b89489c84d7c12740a8ac9105ca724933a2f80c24a56",
+    "combined/ddqn_crossfit_forecasts_days_002_167.csv": "7ffbed0c3af69b9421fc534fc4998df5b1cbeef7eb3968863f7aa955e1e4d11b",
+    "household_3039/fold_0/fold_meta.json": "ed0d339034a34aa56366e0cd2735c07415cc3b2a701283ad0f99530d5d0688e4",
+    "household_3039/fold_0/model.pt": "06afa8e95771850ba84d128aa09865ff7bd5714b06992d6a7c1af476746ff37f",
+    "household_3039/fold_0/scaler.npz": "5e3c7a057ad018e09687da622c0a871f25d93fa8f5ac143152703a5df493f1f1",
+    "household_3039/fold_0/training_history.csv": "e891548e10eb34c5a23fb97c9fb89243c35529d934ad78f2f0bef2304a262524",
+    "household_3039/fold_1/fold_meta.json": "a97fba6373f686378fe8edbc57c0b75d038e6aca7369728849d847a0eb7157f2",
+    "household_3039/fold_1/model.pt": "f2dbe0b152625b594e5ca46a7e9171cd23496a31bf2df3ddf9581c30d81c8d84",
+    "household_3039/fold_1/scaler.npz": "d487a60e55fc5cd132d68c54174928b99a1bb82d776adb93be03b8ba378a691a",
+    "household_3039/fold_1/training_history.csv": "b67f1fd03faa2e91aeb7e3a6421709af7e57b0e18c985d6ff601be80120127b6",
+    "household_3039/fold_2/fold_meta.json": "4c9790d79aca3aac6538be7f53c6a1cbf8c561dc87646d9d725a7590195e6d11",
+    "household_3039/fold_2/model.pt": "0d1557a05d213afecc649b585fa68b03b2d88673ce051eca0b0ff2eb50264abc",
+    "household_3039/fold_2/scaler.npz": "78bd1191acc5cc18431650a1dfb7bb8dc1b485843c509f10079542efaffc2117",
+    "household_3039/fold_2/training_history.csv": "4368733be4f632253ba8d65b0e257b8a0ec7306d26f13c38724c7881567fb716",
+    "household_3039/fold_3/fold_meta.json": "99efa8099bdf71f7a4c5e7db49c3da4c5d34d3e29b122c7f62c12c99eaca8e20",
+    "household_3039/fold_3/model.pt": "610dcca449e5172b9e937dd9b27bd4d52e28d421f56e559c45ab1ac49a7b73f5",
+    "household_3039/fold_3/scaler.npz": "4dd4a9fa801e7420430ef520c79fa867d284dbf3d3027085717b01ecc7fae3de",
+    "household_3039/fold_3/training_history.csv": "42290888b4515adf32e986ba61ad0710cd4e2348e7f0421581c986492c3efef7",
+    "household_3039/fold_4/fold_meta.json": "e94b2dfa1146296e8db0c5e2a89d68d0ab3456f7c951cb9e3acc36d7f3cd834c",
+    "household_3039/fold_4/model.pt": "e5fb765d000b439ff7246636b35465398c4f750924572987b742f62b141717f7",
+    "household_3039/fold_4/scaler.npz": "470015ab6a021194c9d841565673e7ea20e10e029d342416f55add15289cdd10",
+    "household_3039/fold_4/training_history.csv": "6c5f9a0b98dbe7126e165f746c0e77920db496ce63e8f18eb04e2b35282776ab",
+    "household_3039/oof_predictions.csv": "31b4b114f2aca816347f2887eee5178d9866f8da8a71d626af2b46be34724d65",
+    "household_661/fold_0/fold_meta.json": "3d00514b22604b780f100aef177b16d3b21a3631d6a4c47bf0c5d0c8d5993d47",
+    "household_661/fold_0/model.pt": "5a1b864c4de91cf74a15addd71a39555f9e8006c2875f9fa9496af60d45b4cf3",
+    "household_661/fold_0/scaler.npz": "a150dc77cb10b436b76cd46bf5b424dee148901c5fd0c7a56e8f0ff100abff59",
+    "household_661/fold_0/training_history.csv": "ec763f96255a55cdfb5aa98262ff659d69a692bf07cbfa101427a35935604ec8",
+    "household_661/fold_1/fold_meta.json": "fb0344b6c17daadeca6779de43086418ca913c33e5d15b8763261950827399c0",
+    "household_661/fold_1/model.pt": "dbe76a56a443d9cce2027dca28b58633df644661d48a566b36fd1a53524b5c73",
+    "household_661/fold_1/scaler.npz": "955404629cc5313127dc8e30e49a9245edf2f14bc5d527bd134752c46e0e5c98",
+    "household_661/fold_1/training_history.csv": "2058623dbb1e09ef51d9fc2bedcf0754a3e7f90b80d8c5679c8d6efca23788c7",
+    "household_661/fold_2/fold_meta.json": "b72a5cb8eeb69be7ef5919d1d95033933f0450e1913c437351233b3cc42ba346",
+    "household_661/fold_2/model.pt": "28971534f83ebff5dc5640da8b44f2df1c1c5af3b2fed948afe5df95c939e8a6",
+    "household_661/fold_2/scaler.npz": "689ad586ca14f46e0a93aad9e34735b59c1d735e0991920deaa1667390edf762",
+    "household_661/fold_2/training_history.csv": "4fcc6945571fc821e38516242fb4ac0cd31acf08ab2e8e3676afe38ce0308057",
+    "household_661/fold_3/fold_meta.json": "d577305b3512cefe9b62a245ff89a7675cca9ccb2784dcf7154efe398cd895de",
+    "household_661/fold_3/model.pt": "94af409dc004c8785a9fb03689163f619a7330ab8531d4ac0c708f036b7ebfc2",
+    "household_661/fold_3/scaler.npz": "e337d184cf133c6a2e4dde203d401afe270176011b3abba04089b2691d1db3f7",
+    "household_661/fold_3/training_history.csv": "5201ed19753a70c695f723af6078a1c3cac4c92787012218f2741c445843e9e9",
+    "household_661/fold_4/fold_meta.json": "ce091a8d7b37246e8ce8db8993b20b4889251241a86aaf59d56ad720c0cb3d8d",
+    "household_661/fold_4/model.pt": "ef3f451d494f96794ff88fb57b3bbd46ad27ef6a7aa81d7cafd95b51593d21a9",
+    "household_661/fold_4/scaler.npz": "21ea341e4236b90934938da825ae8afa3b415f213230ea418319851f772b838d",
+    "household_661/fold_4/training_history.csv": "9e1dc745f80dba31b9a549136bfde8429b385f94c0f9b7fffb2b55742249be25",
+    "household_661/oof_predictions.csv": "a4568d4dcab50830892fde145ccc1f03bb86b425262dc4092664f15c73256d76",
+    "household_8565/fold_0/fold_meta.json": "1a2cafa8c74a614bfe47fc189dfbca8f838a6cf18951a251fab5bb90eb70f5c1",
+    "household_8565/fold_0/model.pt": "d7cbc292769815be4d98cd7f8c73e54472e26df8602a3bf23cb1b7a341948605",
+    "household_8565/fold_0/scaler.npz": "7d95a19d9221c5590ba1bd25f94e97bef4e9f16e0a48a3164a129efd1ffbdc65",
+    "household_8565/fold_0/training_history.csv": "20ae81edee541aaae1c37f5af987947c4ee747135d57001940f4468b4f703f1e",
+    "household_8565/fold_1/fold_meta.json": "13d1854a43bdb78ac2415f477f68b4c8b56f04d47d701f4f12b91fc9752b692a",
+    "household_8565/fold_1/model.pt": "c04e8396c4e81041cdd3c1e5e2e57448c69c69ffc287c2b91195834920b38576",
+    "household_8565/fold_1/scaler.npz": "fdade789a3dbe0c227bb1e207cae3d0d24496b8793316ca51fbb757298a50a39",
+    "household_8565/fold_1/training_history.csv": "da04da937b19b484023a6971f36f32ce220f53734d0f07591d7173709ad2ae86",
+    "household_8565/fold_2/fold_meta.json": "f37e13eea31f0f89ee2822353d3918ac7ab0bf30059ff4b1bcb02e7906410557",
+    "household_8565/fold_2/model.pt": "b828837ce9f87c7c9c7fb1ac001e5266e33891477a7fc2fd905cac7d1da77088",
+    "household_8565/fold_2/scaler.npz": "f8782ca31c04c965553619ea7fc75ee5d3834d7c5f4380665393017647fb5fd0",
+    "household_8565/fold_2/training_history.csv": "253900835b632caf4cd0ce01cda9510e67b76076c238903ff17b0c22f93f29c9",
+    "household_8565/fold_3/fold_meta.json": "a0356779da695412d4e082590533312a45d9aa355ad35fefa6aa59bc5ce952d3",
+    "household_8565/fold_3/model.pt": "6dd390d19687aaadb8b8ae22478236ee8efc90d4f78490f89c1891c386130045",
+    "household_8565/fold_3/scaler.npz": "ab42e9bad2682cfef5ca0353b72d45f4d7b71f1520915af64e78ae69c4a6bf63",
+    "household_8565/fold_3/training_history.csv": "bce62a59cd0cdab5c19ce2de536273bca12c82da6847d2da0332177b98d89abc",
+    "household_8565/fold_4/fold_meta.json": "9021df5e1bcbf5b7f5f2a891952e5d0cfb330278854ad1c0ad082c07575317e4",
+    "household_8565/fold_4/model.pt": "b9f797570442918a0a42ab731e2fa3f63ba3ac871ca90c5a02139ccdd2b44949",
+    "household_8565/fold_4/scaler.npz": "4b0c68b8e82a920981b39bc1ee259e0266f4dfce9c7695edb23972be633b1b3c",
+    "household_8565/fold_4/training_history.csv": "7ed952008f84bcb87fe6772c13755828e6dab93c62dd28623affcaef337e69da",
+    "household_8565/oof_predictions.csv": "2d25d7c20bca75067cff4260c5f2afd158a5937d7929e45d6d7f52b0530e4fd4",
+    "price/fold_0/fold_meta.json": "0a412e6795e4ca09581c91e2e73786ff880a58b555669018d3431e380c1b1d81",
+    "price/fold_0/model.pt": "62cc23c445cd49693533ffa82457480b14e2e6001bab75082130bfca5551f820",
+    "price/fold_0/scaler.npz": "954e415df9b0dc4c6729653f388dbdbd839f27b27f6c3963857d19612827f773",
+    "price/fold_0/training_history.csv": "e61a336035032adb47344fbb2339fe2a60086c62d723bed5ac5fc433b84078b0",
+    "price/fold_1/fold_meta.json": "32b0dc22d9ddfaa5f780e935d71b2b07a3065d739e6c756ac7f59fa17ee44f87",
+    "price/fold_1/model.pt": "660bd17adb77346995ab08291094949665c6252b7740f503a0226ec778d99913",
+    "price/fold_1/scaler.npz": "a8c5efe6a0b4e42b9db07d1e1d75133cd23141a276e84def89c81ee29501b7bc",
+    "price/fold_1/training_history.csv": "9e52a4fbae8331ea24887320b94a074b50aaacc26ee4e7a4ac10341aa4dbe1e7",
+    "price/fold_2/fold_meta.json": "ba24a5930fac382b27726367e8a7b8201a13d297a6a30b7e26f7fad4928994c4",
+    "price/fold_2/model.pt": "e37fa9d0dd3de3c92f9248ca7810b3b89c912b2d9e0463b34973d3b576f982cb",
+    "price/fold_2/scaler.npz": "8c1172414941f2c20a4ad42308b63065c9cd3b84c3bc6a0b03e52c2db4f377d3",
+    "price/fold_2/training_history.csv": "26e61dc5b903565c207861dea84162e02e14a71c71c989adfee017a8eb2bcdfd",
+    "price/fold_3/fold_meta.json": "fc279ef9dea45a6c94a13a2c80a2993ee44f3327a56734029bd00d2e4d80f9bf",
+    "price/fold_3/model.pt": "fb6bedad21576895617868ff26c454a578093f6fbf94a72e4112476a58160caa",
+    "price/fold_3/scaler.npz": "fa86b4b71cc814c418c4f3bc05659171c893e8cf2b9652728f380a6e8db0169e",
+    "price/fold_3/training_history.csv": "1c57880683a57a0a5f2ce49731773c407e2aea5dcc18d888c7298803092d8c95",
+    "price/fold_4/fold_meta.json": "0b305d4ef6a9ae3989c4455705fe99b1a97ad99d4403debece206fd2216c707f",
+    "price/fold_4/model.pt": "809b901657df146e5b4b47d5dd90d3db4746eb0c97bb3588c7e509832781dedd",
+    "price/fold_4/scaler.npz": "fe6395a4cffe8a73cf6a665154f61b454bd891edd110a4eec1e85e457f46828d",
+    "price/fold_4/training_history.csv": "705bc21ef79899bafc2ced17a50c73b8eeca7b850e862de05640854bb559315e",
+    "price/oof_predictions.csv": "ca321af7659a990506c3f726d3e9ab4d87ce69c912bf1352d1ad79f976eb65f7"
+  }
+}

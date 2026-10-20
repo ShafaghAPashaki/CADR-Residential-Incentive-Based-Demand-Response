@@ -10,9 +10,14 @@ import numpy as np
 import torch
 import yaml
 
+from utils.final_run_protocol import require_real_holidays as _require_real_holidays_before_env_import
+_require_real_holidays_before_env_import()
 from env import Environment
 from agent.agent_ddqn import DDQNAgent
 from utils.config_loader import load_config
+from utils.final_run_protocol import (
+    collect_run_provenance, enforce_lambda_calibration, require_real_holidays,
+)
 
 
 plt.rcParams.update({
@@ -47,6 +52,9 @@ class DDQNTrainer:
 
     def __init__(self, cfg_override=None):
         self.cfg = cfg_override or load_config()
+        require_real_holidays()
+        enforce_lambda_calibration(self.cfg)
+        self.run_provenance = collect_run_provenance(self.cfg, Environment.VERSION)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         house_ids = list(self.cfg["environment"]["house_ids"])
@@ -122,7 +130,7 @@ class DDQNTrainer:
 
         self.run_seed = int(self.cfg.get("general", {}).get("seed", 0))
         self.results_dir = os.path.abspath(
-            os.path.join("results", f"seed_{self.run_seed}", "training")
+            os.path.join(self.cfg.get("general", {}).get("results_root", "results"), f"seed_{self.run_seed}", "training")
         )
         if os.path.isdir(self.results_dir) and os.listdir(self.results_dir):
             raise FileExistsError(
@@ -130,6 +138,8 @@ class DDQNTrainer:
                 "Move or remove it before starting this seed again."
             )
         os.makedirs(self.results_dir, exist_ok=True)
+        with open(os.path.join(self.results_dir, "run_provenance.json"), "w", encoding="utf-8") as handle:
+            json.dump(self.run_provenance, handle, indent=2)
         with open(os.path.join(self.results_dir, "config.yaml"), "w", encoding="utf-8") as handle:
             yaml.safe_dump(self.cfg, handle, sort_keys=False)
         print(
@@ -145,9 +155,8 @@ class DDQNTrainer:
         ):
             raise RuntimeError(
                 "Training is blocked because symmetric_tracking.lambda_c "
-                "is still the pre-audit placeholder. Run the counterfactual "
-                "calibration audit, write its recommended lambda_C into the "
-                "training config, and update lambda_source before training."
+                "is still a pre-audit placeholder. Keep the frozen original "
+                "lambda_c and its verified retention-audit source before training."
             )
 
     def _greedy_action(self, state):
@@ -597,10 +606,12 @@ class DDQNTrainer:
             "model_type": str(model_type),
             "script_version": SCRIPT_VERSION,
             "environment_version": self.train_env.VERSION,
+            "run_provenance": self.run_provenance,
             "accounting_version": self.train_env.ACCOUNTING_VERSION,
             "config_signature": self.train_env.get_config_signature(),
             "state_dim": int(self.state_dim),
             "state_feature_names": self.train_env.get_state_feature_names(),
+            **self.train_env.get_forecast_metadata(),
             "action_dim": int(self.action_dim),
             "seed": int(self.run_seed),
             "household_coefficients_source": str(
@@ -693,6 +704,7 @@ class DDQNTrainer:
         metrics = {
             "script_version": SCRIPT_VERSION,
             "environment_version": self.train_env.VERSION,
+            "run_provenance": self.run_provenance,
             "accounting_version": self.train_env.ACCOUNTING_VERSION,
             "config_signature": self.train_env.get_config_signature(),
             "run_seed": int(self.run_seed),
@@ -704,6 +716,7 @@ class DDQNTrainer:
             ),
             "state_dim": self.state_dim,
             "state_feature_names": self.train_env.get_state_feature_names(),
+            **self.train_env.get_forecast_metadata(),
             "episode_rewards": self.episode_rewards,
             "episode_losses": self.episode_losses,
             "episode_lengths": self.episode_lengths,
@@ -1002,6 +1015,7 @@ def set_global_seeds(seed=0):
 
 
 def main():
+    require_real_holidays()
     parser = argparse.ArgumentParser(
         description="Train one DDQN run using an explicit configuration."
     )
@@ -1048,6 +1062,7 @@ def main():
             "preferences remain identical across seeds."
         )
 
+    enforce_lambda_calibration(cfg)
     set_global_seeds(seed=seed)
     trainer = DDQNTrainer(cfg_override=cfg)
     trainer.train()

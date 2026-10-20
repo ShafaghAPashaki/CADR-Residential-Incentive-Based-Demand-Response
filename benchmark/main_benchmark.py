@@ -32,6 +32,7 @@ import yaml
 from agent.agent_ddqn import DDQNAgent
 from benchmark.env_benchmark import Environment
 from utils.config_loader import load_config
+from utils.final_run_protocol import collect_run_provenance, require_real_holidays
 
 
 SCRIPT_VERSION = "benchmark_ddqn_training_v2"
@@ -55,6 +56,8 @@ class BenchmarkTrainer:
 
     def __init__(self, cfg: dict[str, Any], smoke_test: bool = False) -> None:
         self.cfg = cfg
+        require_real_holidays()
+        self.run_provenance = collect_run_provenance(cfg, Environment.VERSION)
         self.seed = int(cfg["general"]["seed"])
         set_reproducible_seed(self.seed)
 
@@ -98,6 +101,8 @@ class BenchmarkTrainer:
                 "Move or remove it before rerunning this seed."
             )
         self.results_dir.mkdir(parents=True, exist_ok=True)
+        with (self.results_dir / "run_provenance.json").open("w", encoding="utf-8") as handle:
+            json.dump(self.run_provenance, handle, indent=2)
         with (self.results_dir / "config_snapshot.yaml").open("w", encoding="utf-8") as handle:
             yaml.safe_dump(cfg, handle, sort_keys=False)
 
@@ -128,6 +133,7 @@ class BenchmarkTrainer:
             "model_type": str(model_type),
             "script_version": SCRIPT_VERSION,
             "environment_version": self.train_env.VERSION,
+            "run_provenance": self.run_provenance,
             "accounting_version": self.train_env.ACCOUNTING_VERSION,
             "response_model_version": self.train_env.RESPONSE_MODEL_VERSION,
             "reward_version": self.train_env.REWARD_VERSION,
@@ -358,6 +364,7 @@ class BenchmarkTrainer:
         payload = {
             "script_version": SCRIPT_VERSION,
             "environment_version": self.train_env.VERSION,
+            "run_provenance": self.run_provenance,
             "accounting_version": self.train_env.ACCOUNTING_VERSION,
             "response_model_version": self.train_env.RESPONSE_MODEL_VERSION,
             "reward_version": self.train_env.REWARD_VERSION,
@@ -423,12 +430,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--smoke-test",
         action="store_true",
-        help="Run two episodes into results/benchmark_smoke; never use for paper results.",
+        help="Run two episodes into results/benchmark_smoke; never use for final evaluation results.",
     )
     return parser.parse_args()
 
 
 def main() -> None:
+    require_real_holidays()
     args = parse_args()
     config_path = Path(args.config)
     if not config_path.is_absolute():

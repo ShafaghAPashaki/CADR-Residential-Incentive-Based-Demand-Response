@@ -1,30 +1,37 @@
-# Python
 __pycache__/
 *.py[cod]
-*.egg-info/
+.ipynb_checkpoints/
 .venv/
 venv/
-
-# IDE / OS
-.vscode/
-.idea/
+paper1_runtime_venv/
 .DS_Store
 Thumbs.db
-
-# Local data (third-party / non-redistributable)
-data/*.csv
-data/*.xlsx
-data/*.parquet
-!data/README.md
-
-# Generated training/test outputs
-results/**/ddqn_episode_*.pth
-results/**/ddqn_final.pth
-results/**/audit.xlsx
-results/**/q_diagnostic.xlsx
-results/**/q_action_diagnostic.xlsx
-results/**/*.log
-
-# Temporary / local outputs
 *.tmp
 *.bak
+
+# Licensed/private datasets and generated local outputs
+data/*.csv
+.pytest_cache/
+**/__pycache__/
+*.pyc
+local_validation/
+
+__pycache__/
+.pytest_cache/
+*.pyc
+data/*.csv
+crossfit_results/
+
+# Locally regenerated, licence-restricted or household-derived files: never commit
+results/forecast/ddqn_state_forecasts.csv
+results/forecast/load/lstm_load_predictions_all.csv
+results/forecast/load/lstm_aggregate_load_predictions.csv
+results/forecast/price/lstm_price_predictions_all.csv
+results/forecast/crossfit/ddqn_crossfit_forecasts_days_002_167.csv
+results/forecast/load/*.pt
+results/forecast/price/*.pt
+**/audit.xlsx
+forecast_regeneration/data/
+forecast_regeneration/results/
+forecast_regeneration/crossfit_results/
+eval/

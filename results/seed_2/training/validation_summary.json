@@ -1,0 +1,52 @@
+{
+  "selection_rule": [
+    "maximum deterministic mean validation reward",
+    "minimum validation reward standard deviation (tie-break)",
+    "earliest episode (final tie-break)"
+  ],
+  "run_seed": 2,
+  "config_signature": "cf594e376a4d916ca08098e9bc88b48b0b400a6f6b4f837a9bd9eb945d2f19b6",
+  "household_coefficients_source": "configured_fixed_matrix",
+  "household_coefficients_hash": "468b5b24603e49fa84ea6e71180d0e18283f556fb43d72be5733571322b5d0e0",
+  "selection_key": [
+    0.0218219671,
+    0.1078804097,
+    2100
+  ],
+  "best_metrics": {
+    "episode": 2100,
+    "validation_days": 14,
+    "mean_reward": -0.021821967146706634,
+    "std_reward": 0.10788040969438328,
+    "minimum_reward": -0.20085337853489676,
+    "maximum_reward": 0.1728091170235491,
+    "total_reward": -0.30550754005389286,
+    "violation_steps": 48,
+    "evaluated_steps": 336,
+    "violation_percentage": 14.285714285714286,
+    "cumulative_excess": 43.74770000000001,
+    "maximum_overrun": 3.380324999999999,
+    "gross_hourly_capacity_relief": 140.97708928571427,
+    "true_net_curtailment": 118.63669999999999,
+    "max_abs_energy_balance_error": 1.0262499999999761,
+    "useful_settlement_dr_energy": 104.44079285714284,
+    "excess_settlement_dr_energy": 45.666925,
+    "target_tracking_mae_kwh": 0.2398732886904762,
+    "target_tracking_penalty": 2.3782407241194825,
+    "incentive_steps": 119,
+    "unnecessary_incentive_steps": 39,
+    "positive_incentive_no_response_steps": 9,
+    "maximum_action_steps": 0,
+    "no_need_gate_steps": 247,
+    "no_need_offer_penalty": 0.7142999999999999,
+    "combined_offer_penalty": 0.7142999999999999,
+    "stakeholder_sp_normalized_component": 1.9540189242605144,
+    "stakeholder_eu_normalized_component": 4.334059666560731,
+    "stakeholder_reward_component": 2.7870331840655904,
+    "symmetric_tracking_loss": 10.730284480448763,
+    "symmetric_tracking_penalty": 2.3782407241194825,
+    "average_offered_incentive_rate": 0.25521674207341266,
+    "incentive_payment": 183.01097734950497,
+    "raw_discomfort": 417.8421379176873
+  }
+}

@@ -74,7 +74,7 @@ environment:
   symmetric_tracking:
     loss: smooth_l1
     lambda_c: 0.2216381800923157
-    lambda_source: train_p95_scenario_action_matching
+    lambda_source: train_p95_scenario_action_matching_original_retained
     huber_delta: auto_deadband_normalized
   no_need_offer_regularization:
     enabled: true
@@ -183,3 +183,67 @@ DDQN:
   eval_episodes: 10
   eval_epsilon: 0.01
   LEARNING_RATE_DDQN: 0.0001
+forecast:
+  seed: 42
+  calendar_features:
+  - month
+  - day_of_week
+  - hour
+  - is_holiday
+  - is_weekend
+  historical_lags:
+  - 1
+  - 2
+  - 3
+  - 24
+  - 25
+  - 26
+  - 48
+  - 49
+  - 50
+  window_size: 24
+  horizon: 1
+  hidden_size: 64
+  num_layers: 2
+  dropout: 0.2
+  optimizer: adam
+  loss: mse
+  batch_size: 64
+  learning_rate: 0.001
+  weight_decay: 1.0e-05
+  epochs: 200
+  patience: 40
+  log_every: 0
+  holiday_country: US
+  lag_padding: zero
+  sequence_padding: zero
+  test_ranges:
+  - - 182
+    - 212
+  - - 213
+    - 243
+  output_dir: results/forecast
+  mape_zero_tolerance: 1.0e-09
+  price_model_unit: USD_per_MWh
+  ddqn_price_unit: cent_per_kWh
+  cent_kwh_to_usd_mwh_multiplier: 10.0
+  usd_mwh_to_cent_kwh_divisor: 10.0
+  shared_across_ddqn_seeds: true
+  independent_household_models: true
+  aggregate_load_forecast: sum_household_forecasts
+  exclude_padded_samples_from_fit_and_metrics: true
+  train_validation_wape_relative_gap_threshold: 0.2
+  blocked_crossfit_if_gap_exceeded: true
+  specification_locked: true
+  plot_start: '2018-07-23 00:00:00'
+  plot_end_exclusive: '2018-07-30 00:00:00'
+  metrics_split: test
+  metrics:
+  - MAE
+  figure_layout: 2x2_four_panel
+  observed_line: solid
+  forecast_line: dashed
+  state_input_mode: forecast
+  ddqn_state_input_file: results/forecast/ddqn_state_forecasts.csv
+  ddqn_state_provenance_file: results/forecast/ddqn_state_forecasts_provenance.json
+  state_load_floor_kw: 0.0

@@ -1,0 +1,27 @@
+{
+  "protocol": "R2-SENS-2026-10-14",
+  "run": "cap8",
+  "capacity_kw": 8.0,
+  "levels": 5,
+  "purpose": "R2-C3",
+  "action_dim": 125,
+  "state_dim": 43,
+  "episodes": 2500,
+  "start_utc": "2026-10-14T13:16:26.538244+00:00",
+  "end_utc": "2026-10-14T13:25:31.301969+00:00",
+  "setup_seconds": 46.12926800001878,
+  "train_call_seconds_including_validation": 498.6348691000021,
+  "total_wall_clock_seconds": 544.7641371000209,
+  "device": "cpu",
+  "torch_version": "2.13.0+cpu",
+  "torch_num_threads": 6,
+  "cpu": "Intel64 Family 6 Model 166 Stepping 0, GenuineIntel",
+  "logical_cpus": 12,
+  "platform": "Windows-11-10.0.26100-SP0",
+  "python": "3.12.3",
+  "driver_sha256": {
+    "run_r2_sensitivity.py": "00f0438b01df65379ff46fa706d178168c4b58fd1527758044d5e69b801b5dca",
+    "r2_common.py": "b0d38cd4acc0ea78e88512999f607fabce9dc9eb23c84d0054ca2389ff1d3a27"
+  },
+  "note": "Record whether any other heavy process ran concurrently."
+}

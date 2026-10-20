@@ -1,0 +1,144 @@
+(paper1_runtime_venv) PS <LOCAL_PATH>
+TRAIN lev10 {'capacity_kw': 7.0, 'levels': 10, 'purpose': 'R2-M7'} -> <LOCAL_PATH>
+Seed 0 | device=cpu | episodes=2500 | output=<LOCAL_PATH>
+Episode 1/2500 | Reward: -0.85 | Avg Reward: -0.85 | Avg Loss: 0.0000 | Epsilon: 0.9980
+Episode 50/2500 | Reward: -0.98 | Avg Reward: -1.10 | Avg Loss: 0.0000 | Epsilon: 0.9047
+Validation at episode 50: mean reward=-0.83 | violations=27 | cumulative excess=43.1293 | max overrun=3.6523
+Best validation checkpoint: episode 50
+Episode 100/2500 | Reward: -1.46 | Avg Reward: -1.13 | Avg Loss: 0.0115 | Epsilon: 0.8186
+Validation at episode 100: mean reward=-1.24 | violations=29 | cumulative excess=48.0153 | max overrun=3.3845
+Episode 150/2500 | Reward: -1.10 | Avg Reward: -1.12 | Avg Loss: 0.0068 | Epsilon: 0.7406
+Validation at episode 150: mean reward=-0.86 | violations=40 | cumulative excess=54.4287 | max overrun=4.6826
+Episode 200/2500 | Reward: -0.95 | Avg Reward: -1.12 | Avg Loss: 0.0042 | Epsilon: 0.6701
+Validation at episode 200: mean reward=-0.94 | violations=41 | cumulative excess=58.1733 | max overrun=4.6826
+Episode 250/2500 | Reward: -1.03 | Avg Reward: -1.09 | Avg Loss: 0.0028 | Epsilon: 0.6062
+Validation at episode 250: mean reward=-0.86 | violations=31 | cumulative excess=37.7839 | max overrun=3.5383
+Episode 300/2500 | Reward: -0.91 | Avg Reward: -0.93 | Avg Loss: 0.0019 | Epsilon: 0.5485
+Validation at episode 300: mean reward=-0.78 | violations=54 | cumulative excess=70.5006 | max overrun=4.4519
+Best validation checkpoint: episode 300
+Episode 350/2500 | Reward: -0.95 | Avg Reward: -0.95 | Avg Loss: 0.0015 | Epsilon: 0.4962
+Validation at episode 350: mean reward=-0.85 | violations=30 | cumulative excess=39.0285 | max overrun=4.3370
+Episode 400/2500 | Reward: -0.90 | Avg Reward: -0.87 | Avg Loss: 0.0012 | Epsilon: 0.4490
+Validation at episode 400: mean reward=-0.67 | violations=35 | cumulative excess=61.7667 | max overrun=5.0708
+Best validation checkpoint: episode 400
+Episode 450/2500 | Reward: -0.58 | Avg Reward: -0.64 | Avg Loss: 0.0010 | Epsilon: 0.4062
+Validation at episode 450: mean reward=-0.50 | violations=33 | cumulative excess=45.5652 | max overrun=4.6822
+Best validation checkpoint: episode 450
+Episode 500/2500 | Reward: -0.72 | Avg Reward: -0.60 | Avg Loss: 0.0008 | Epsilon: 0.3675
+Validation at episode 500: mean reward=-0.24 | violations=48 | cumulative excess=56.6474 | max overrun=3.1839
+Best validation checkpoint: episode 500
+Episode 550/2500 | Reward: -0.28 | Avg Reward: -0.56 | Avg Loss: 0.0008 | Epsilon: 0.3325
+Validation at episode 550: mean reward=-0.32 | violations=43 | cumulative excess=55.6512 | max overrun=3.8032
+Episode 600/2500 | Reward: -0.56 | Avg Reward: -0.51 | Avg Loss: 0.0008 | Epsilon: 0.3008
+Validation at episode 600: mean reward=-0.26 | violations=46 | cumulative excess=72.2665 | max overrun=5.1240
+Episode 650/2500 | Reward: -0.66 | Avg Reward: -0.58 | Avg Loss: 0.0007 | Epsilon: 0.2722
+Validation at episode 650: mean reward=-0.36 | violations=42 | cumulative excess=59.1702 | max overrun=3.6795
+Episode 700/2500 | Reward: -0.26 | Avg Reward: -0.40 | Avg Loss: 0.0006 | Epsilon: 0.2463
+Validation at episode 700: mean reward=-0.49 | violations=46 | cumulative excess=52.4438 | max overrun=3.8087
+Episode 750/2500 | Reward: -0.36 | Avg Reward: -0.42 | Avg Loss: 0.0006 | Epsilon: 0.2228
+Validation at episode 750: mean reward=-0.20 | violations=42 | cumulative excess=55.2248 | max overrun=3.8087
+Best validation checkpoint: episode 750
+Episode 800/2500 | Reward: -0.51 | Avg Reward: -0.38 | Avg Loss: 0.0005 | Epsilon: 0.2016
+Validation at episode 800: mean reward=-0.23 | violations=41 | cumulative excess=52.0974 | max overrun=4.4890
+Episode 850/2500 | Reward: -0.30 | Avg Reward: -0.39 | Avg Loss: 0.0005 | Epsilon: 0.1824
+Validation at episode 850: mean reward=-0.26 | violations=53 | cumulative excess=66.7477 | max overrun=4.0757
+Episode 900/2500 | Reward: -0.16 | Avg Reward: -0.34 | Avg Loss: 0.0004 | Epsilon: 0.1650
+Validation at episode 900: mean reward=-0.28 | violations=48 | cumulative excess=64.2034 | max overrun=4.3651
+Episode 950/2500 | Reward: -0.33 | Avg Reward: -0.30 | Avg Loss: 0.0004 | Epsilon: 0.1493
+Validation at episode 950: mean reward=-0.28 | violations=38 | cumulative excess=51.2591 | max overrun=4.0308
+Episode 1000/2500 | Reward: -0.20 | Avg Reward: -0.30 | Avg Loss: 0.0004 | Epsilon: 0.1351
+Validation at episode 1000: mean reward=-0.32 | violations=40 | cumulative excess=47.4427 | max overrun=2.9446
+Episode 1050/2500 | Reward: -0.17 | Avg Reward: -0.29 | Avg Loss: 0.0003 | Epsilon: 0.1222
+Validation at episode 1050: mean reward=-0.32 | violations=41 | cumulative excess=52.6816 | max overrun=4.4842
+Episode 1100/2500 | Reward: -0.12 | Avg Reward: -0.24 | Avg Loss: 0.0004 | Epsilon: 0.1106
+Validation at episode 1100: mean reward=-0.34 | violations=40 | cumulative excess=50.3766 | max overrun=4.1855
+Episode 1150/2500 | Reward: -0.31 | Avg Reward: -0.22 | Avg Loss: 0.0003 | Epsilon: 0.1000
+Validation at episode 1150: mean reward=-0.24 | violations=48 | cumulative excess=59.1295 | max overrun=3.7903
+Episode 1200/2500 | Reward: -0.50 | Avg Reward: -0.22 | Avg Loss: 0.0003 | Epsilon: 0.0905
+Validation at episode 1200: mean reward=-0.24 | violations=39 | cumulative excess=46.2358 | max overrun=4.6822
+Episode 1250/2500 | Reward: -0.39 | Avg Reward: -0.21 | Avg Loss: 0.0003 | Epsilon: 0.0819
+Validation at episode 1250: mean reward=-0.34 | violations=33 | cumulative excess=44.2507 | max overrun=4.1855
+Episode 1300/2500 | Reward: -0.21 | Avg Reward: -0.20 | Avg Loss: 0.0003 | Epsilon: 0.0741
+Validation at episode 1300: mean reward=-0.25 | violations=35 | cumulative excess=46.2639 | max overrun=3.0093
+Episode 1350/2500 | Reward: -0.22 | Avg Reward: -0.23 | Avg Loss: 0.0003 | Epsilon: 0.0670
+Validation at episode 1350: mean reward=-0.22 | violations=41 | cumulative excess=48.1519 | max overrun=3.3233
+Episode 1400/2500 | Reward: -0.33 | Avg Reward: -0.20 | Avg Loss: 0.0003 | Epsilon: 0.0606
+Validation at episode 1400: mean reward=-0.28 | violations=36 | cumulative excess=51.5425 | max overrun=4.1855
+Episode 1450/2500 | Reward: -0.32 | Avg Reward: -0.19 | Avg Loss: 0.0003 | Epsilon: 0.0549
+Validation at episode 1450: mean reward=-0.30 | violations=28 | cumulative excess=30.4513 | max overrun=2.5483
+Episode 1500/2500 | Reward: -0.06 | Avg Reward: -0.21 | Avg Loss: 0.0003 | Epsilon: 0.0496
+Validation at episode 1500: mean reward=-0.20 | violations=42 | cumulative excess=56.3915 | max overrun=4.4588
+Best validation checkpoint: episode 1500
+Episode 1550/2500 | Reward: -0.14 | Avg Reward: -0.19 | Avg Loss: 0.0003 | Epsilon: 0.0449
+Validation at episode 1550: mean reward=-0.22 | violations=40 | cumulative excess=49.6310 | max overrun=3.7203
+Episode 1600/2500 | Reward: -0.26 | Avg Reward: -0.17 | Avg Loss: 0.0003 | Epsilon: 0.0406
+Validation at episode 1600: mean reward=-0.34 | violations=28 | cumulative excess=41.1851 | max overrun=4.4890
+Episode 1650/2500 | Reward: -0.17 | Avg Reward: -0.17 | Avg Loss: 0.0003 | Epsilon: 0.0368
+Validation at episode 1650: mean reward=-0.14 | violations=37 | cumulative excess=40.5527 | max overrun=4.4890
+Best validation checkpoint: episode 1650
+Episode 1700/2500 | Reward: -0.23 | Avg Reward: -0.19 | Avg Loss: 0.0002 | Epsilon: 0.0333
+Validation at episode 1700: mean reward=-0.19 | violations=45 | cumulative excess=50.5361 | max overrun=4.6822
+Episode 1750/2500 | Reward: -0.23 | Avg Reward: -0.18 | Avg Loss: 0.0002 | Epsilon: 0.0301
+Validation at episode 1750: mean reward=-0.25 | violations=31 | cumulative excess=36.1607 | max overrun=3.4977
+Episode 1800/2500 | Reward: -0.26 | Avg Reward: -0.14 | Avg Loss: 0.0002 | Epsilon: 0.0272
+Validation at episode 1800: mean reward=-0.20 | violations=33 | cumulative excess=44.7096 | max overrun=3.6068
+Episode 1850/2500 | Reward: -0.08 | Avg Reward: -0.15 | Avg Loss: 0.0003 | Epsilon: 0.0246
+Validation at episode 1850: mean reward=-0.27 | violations=26 | cumulative excess=34.3549 | max overrun=3.0778
+Episode 1900/2500 | Reward: -0.11 | Avg Reward: -0.13 | Avg Loss: 0.0002 | Epsilon: 0.0223
+Validation at episode 1900: mean reward=-0.30 | violations=28 | cumulative excess=40.4514 | max overrun=4.4890
+Episode 1950/2500 | Reward: -0.09 | Avg Reward: -0.11 | Avg Loss: 0.0002 | Epsilon: 0.0202
+Validation at episode 1950: mean reward=-0.20 | violations=24 | cumulative excess=28.8551 | max overrun=2.9332
+Episode 2000/2500 | Reward: -0.16 | Avg Reward: -0.13 | Avg Loss: 0.0002 | Epsilon: 0.0182
+Validation at episode 2000: mean reward=-0.27 | violations=27 | cumulative excess=39.9316 | max overrun=3.0093
+Episode 2050/2500 | Reward: -0.29 | Avg Reward: -0.10 | Avg Loss: 0.0002 | Epsilon: 0.0165
+Validation at episode 2050: mean reward=-0.27 | violations=25 | cumulative excess=32.6099 | max overrun=3.7164
+Episode 2100/2500 | Reward: -0.08 | Avg Reward: -0.13 | Avg Loss: 0.0002 | Epsilon: 0.0149
+Validation at episode 2100: mean reward=-0.23 | violations=29 | cumulative excess=38.4083 | max overrun=3.5096
+Episode 2150/2500 | Reward: -0.26 | Avg Reward: -0.14 | Avg Loss: 0.0002 | Epsilon: 0.0135
+Validation at episode 2150: mean reward=-0.24 | violations=30 | cumulative excess=39.9066 | max overrun=3.7164
+Episode 2200/2500 | Reward: -0.16 | Avg Reward: -0.14 | Avg Loss: 0.0002 | Epsilon: 0.0122
+Validation at episode 2200: mean reward=-0.23 | violations=37 | cumulative excess=38.7135 | max overrun=3.2768
+Episode 2250/2500 | Reward: -0.22 | Avg Reward: -0.10 | Avg Loss: 0.0002 | Epsilon: 0.0111
+Validation at episode 2250: mean reward=-0.17 | violations=32 | cumulative excess=34.8085 | max overrun=2.7596
+Episode 2300/2500 | Reward: -0.17 | Avg Reward: -0.10 | Avg Loss: 0.0002 | Epsilon: 0.0100
+Validation at episode 2300: mean reward=-0.20 | violations=40 | cumulative excess=46.7747 | max overrun=3.7164
+Episode 2350/2500 | Reward: -0.34 | Avg Reward: -0.09 | Avg Loss: 0.0002 | Epsilon: 0.0100
+Validation at episode 2350: mean reward=-0.27 | violations=26 | cumulative excess=36.1988 | max overrun=3.7164
+Episode 2400/2500 | Reward: -0.15 | Avg Reward: -0.12 | Avg Loss: 0.0002 | Epsilon: 0.0100
+Validation at episode 2400: mean reward=-0.17 | violations=29 | cumulative excess=34.3621 | max overrun=3.7164
+Episode 2450/2500 | Reward: -0.40 | Avg Reward: -0.13 | Avg Loss: 0.0002 | Epsilon: 0.0100
+Validation at episode 2450: mean reward=-0.25 | violations=26 | cumulative excess=32.4046 | max overrun=3.2005
+Episode 2500/2500 | Reward: -0.65 | Avg Reward: -0.13 | Avg Loss: 0.0002 | Epsilon: 0.0100
+Validation at episode 2500: mean reward=-0.21 | violations=38 | cumulative excess=36.5951 | max overrun=2.7557
+Seed 0 complete | best_episode=1650 | checkpoint=<LOCAL_PATH>
+{
+  "protocol": "R2-SENS-2026-10-14",
+  "run": "lev10",
+  "capacity_kw": 7.0,
+  "levels": 10,
+  "purpose": "R2-M7",
+  "action_dim": 1000,
+  "state_dim": 43,
+  "episodes": 2500,
+  "start_utc": "2026-10-14T15:08:58.101513+00:00",
+  "end_utc": "2026-10-14T15:19:45.984854+00:00",
+  "setup_seconds": 46.09096080000745,
+  "train_call_seconds_including_validation": 601.794682000007,
+  "total_wall_clock_seconds": 647.8856428000145,
+  "device": "cpu",
+  "torch_version": "2.13.0+cpu",
+  "torch_num_threads": 6,
+  "cpu": "Intel64 Family 6 Model 166 Stepping 0, GenuineIntel",
+  "logical_cpus": 12,
+  "platform": "Windows-11-10.0.26100-SP0",
+  "python": "3.12.3",
+  "driver_sha256": {
+    "run_r2_sensitivity.py": "00f0438b01df65379ff46fa706d178168c4b58fd1527758044d5e69b801b5dca",
+    "r2_common.py": "b0d38cd4acc0ea78e88512999f607fabce9dc9eb23c84d0054ca2389ff1d3a27"
+  },
+  "note": "Record whether any other heavy process ran concurrently."
+}
+(paper1_runtime_venv) PS <LOCAL_PATH>
+Testing days 182-212 | output=<LOCAL_PATH>
+Test complete | audit=<LOCAL_PATH>
+(paper1_runtime_venv) PS <LOCAL_PATH>

@@ -1,0 +1,56 @@
+{
+  "train_crossfit": {
+    "hours": 3984,
+    "aggregate_load_mae_kw": 0.9560423766752697,
+    "actual_capacity_need_hours": 276,
+    "forecast_capacity_need_hours": 111,
+    "missed_capacity_need_hours": 186,
+    "false_capacity_need_hours": 21,
+    "price_mae_cent_per_kwh": 0.9976034174794722
+  },
+  "validation": {
+    "hours": 336,
+    "aggregate_load_mae_kw": 1.2430527211666667,
+    "actual_capacity_need_hours": 90,
+    "forecast_capacity_need_hours": 74,
+    "missed_capacity_need_hours": 30,
+    "false_capacity_need_hours": 14,
+    "price_mae_cent_per_kwh": 0.33317675952380954
+  },
+  "july": {
+    "hours": 744,
+    "aggregate_load_mae_kw": 1.52077994555914,
+    "actual_capacity_need_hours": 341,
+    "forecast_capacity_need_hours": 335,
+    "missed_capacity_need_hours": 58,
+    "false_capacity_need_hours": 52,
+    "price_mae_cent_per_kwh": 1.3361834758064517
+  },
+  "august": {
+    "hours": 744,
+    "aggregate_load_mae_kw": 1.297132883017473,
+    "actual_capacity_need_hours": 335,
+    "forecast_capacity_need_hours": 369,
+    "missed_capacity_need_hours": 43,
+    "false_capacity_need_hours": 77,
+    "price_mae_cent_per_kwh": 1.0516502379032255
+  },
+  "july_august": {
+    "hours": 1488,
+    "aggregate_load_mae_kw": 1.4089564142883064,
+    "actual_capacity_need_hours": 676,
+    "forecast_capacity_need_hours": 704,
+    "missed_capacity_need_hours": 101,
+    "false_capacity_need_hours": 129,
+    "price_mae_cent_per_kwh": 1.1939168568548388
+  },
+  "november": {
+    "hours": 720,
+    "aggregate_load_mae_kw": 3.2632306873347217,
+    "actual_capacity_need_hours": 4,
+    "forecast_capacity_need_hours": 74,
+    "missed_capacity_need_hours": 0,
+    "false_capacity_need_hours": 70,
+    "price_mae_cent_per_kwh": 1.7742822533333333
+  }
+}

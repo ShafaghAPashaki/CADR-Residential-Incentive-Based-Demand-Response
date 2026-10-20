@@ -49,7 +49,7 @@ environment:
   sp_reward_weight: 0.5
   max_reduction_fraction: 0.3
   incentive_bounds:
-    reference: daily_min_strictly_positive_price
+    reference: previous_day_min_strictly_positive_price
     lower_multiplier: 0.3
     upper_multiplier: 1.0
 training:
@@ -104,3 +104,8 @@ DDQN:
   eval_interval: 50
   eval_epsilon: 0.0
   LEARNING_RATE_DDQN: 0.0001
+forecast:
+  state_input_mode: forecast
+  ddqn_state_input_file: results/forecast/ddqn_state_forecasts.csv
+  ddqn_state_provenance_file: results/forecast/ddqn_state_forecasts_provenance.json
+  state_load_floor_kw: 0.0

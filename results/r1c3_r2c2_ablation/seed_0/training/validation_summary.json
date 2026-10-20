@@ -1,0 +1,52 @@
+{
+  "selection_rule": [
+    "maximum deterministic mean validation reward",
+    "minimum validation reward standard deviation (tie-break)",
+    "earliest episode (final tie-break)"
+  ],
+  "run_seed": 0,
+  "config_signature": "c53872e22418520c25924911a5ca1acb98cf5437dfd4235499b1c39c692631f2",
+  "household_coefficients_source": "configured_fixed_matrix",
+  "household_coefficients_hash": "468b5b24603e49fa84ea6e71180d0e18283f556fb43d72be5733571322b5d0e0",
+  "selection_key": [
+    -0.8834084515,
+    0.1697881344,
+    1800
+  ],
+  "best_metrics": {
+    "episode": 1800,
+    "validation_days": 14,
+    "mean_reward": 0.8834084515125723,
+    "std_reward": 0.1697881344388361,
+    "minimum_reward": 0.5744368371559305,
+    "maximum_reward": 1.2997702947170526,
+    "total_reward": 12.367718321176012,
+    "violation_steps": 11,
+    "evaluated_steps": 336,
+    "violation_percentage": 3.2738095238095237,
+    "cumulative_excess": 8.994250000000005,
+    "maximum_overrun": 2.931000000000001,
+    "gross_hourly_capacity_relief": 450.3106642857144,
+    "true_net_curtailment": 404.40900000000005,
+    "max_abs_energy_balance_error": 2.1316282072803006e-14,
+    "useful_settlement_dr_energy": 129.1403,
+    "excess_settlement_dr_energy": 352.97792499999986,
+    "target_tracking_mae_kwh": 0.9735779761904763,
+    "target_tracking_penalty": 9.905071880988794,
+    "incentive_steps": 336,
+    "unnecessary_incentive_steps": 256,
+    "positive_incentive_no_response_steps": 45,
+    "maximum_action_steps": 0,
+    "no_need_gate_steps": 256,
+    "no_need_offer_penalty": 12.309769999999997,
+    "combined_offer_penalty": 12.309769999999997,
+    "stakeholder_sp_normalized_component": -15.098626601484145,
+    "stakeholder_eu_normalized_component": 19.21148005704501,
+    "stakeholder_reward_component": -3.0900892709989427,
+    "symmetric_tracking_loss": 44.69027798758852,
+    "symmetric_tracking_penalty": 9.905071880988794,
+    "average_offered_incentive_rate": 1.702480069732143,
+    "incentive_payment": 810.1481343163745,
+    "raw_discomfort": 977.1644941216584
+  }
+}

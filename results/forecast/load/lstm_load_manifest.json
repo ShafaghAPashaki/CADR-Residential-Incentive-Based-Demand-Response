@@ -1,0 +1,40 @@
+{
+  "seed": 42,
+  "holiday_backend": "holidays.US",
+  "feature_names": [
+    "month",
+    "day_of_week",
+    "hour",
+    "is_holiday",
+    "is_weekend",
+    "lag_1",
+    "lag_2",
+    "lag_3",
+    "lag_24",
+    "lag_25",
+    "lag_26",
+    "lag_48",
+    "lag_49",
+    "lag_50"
+  ],
+  "window_size": 24,
+  "horizon": 1,
+  "independent_household_models": [
+    661,
+    3039,
+    8565
+  ],
+  "aggregate_definition": "sum of household forecasts",
+  "output_predictions": "lstm_load_predictions_all.csv",
+  "padding_policy": "forecast all hours; exclude padded samples from fitting, scaling, and metrics",
+  "train_validation_wape_relative_gap_threshold": 0.2,
+  "blocked_crossfit_required": true,
+  "sha256": {
+    "script": "4161ade25486b0e003df94367d924bd6c0d5b56d18ecfcf4c4a9afee59fa63a0",
+    "config": "3915eae1f23b4eb2ea23bb08114a208562b89085d0b4a13f12c6d98eacfd660a",
+    "data": "c183ce463f4364a9f517d4b0eab24133445f1772c12a3621023ea2cdb999947e",
+    "predictions": "e2a149ac610ddd897a81e33007766b2538af97d2e9d1eb16d1f2481255c17c3d",
+    "metrics": "1043f6e9292de7e2f2c653f586a3385489b37f95d46ff49097bbf3ed10bfd2e4"
+  },
+  "configuration_status": "locked"
+}

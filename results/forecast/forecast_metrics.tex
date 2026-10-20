@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\caption{Accuracy of the LSTM forecasting models evaluated on the held-out July--August 2018 test period.}
+\label{tab:forecast_accuracy}
+\small
+\begin{tabular}{lcc}
+\hline
+\textbf{Forecasting target} & \textbf{Unit} & \textbf{MAE} \\
+\hline
+Wholesale electricity price & cent/kWh & 1.19 \\
+EU 1 load & kW & 0.97 \\
+EU 2 load & kW & 0.70 \\
+EU 3 load & kW & 0.44 \\
+\hline
+\end{tabular}
+\vspace{2pt}
+\begin{minipage}{0.92\columnwidth}
+\footnotesize
+Errors are evaluated exclusively on the held-out July--August 2018 test period (1,488 h). Wholesale-price errors are reported in cent/kWh and household-load errors in kW.
+\end{minipage}
+\end{table}

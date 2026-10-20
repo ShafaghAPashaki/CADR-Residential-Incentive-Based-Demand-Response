@@ -143,17 +143,22 @@ def check_environment(cfg: dict[str, Any]) -> None:
     if not np.any(np.isclose(fraction_env.reductions[0], upper, atol=1e-12)):
         fail("max_reduction_fraction wiring test did not bind as expected.")
 
-    # Day 203 contains negative prices. A mixed-price day must remain operable.
+    # The benchmark keeps the flat daily mapping from Appendix D, but the
+    # reference is the minimum strictly positive price from the previous day.
     env.reset(day=203, mode="test")
-    if not np.any(env.prices < 0.0) or not np.any(env.prices > 0.0):
-        fail("Day 203 no longer provides the expected mixed-price audit case.")
-    if env.daily_reference_price <= 0.0:
-        fail("Mixed-price day was incorrectly collapsed to a zero daily reference.")
-    if env.lambda_max[0] <= env.lambda_min[0]:
-        fail("Negative-price sign inversion remains in incentive bounds.")
-    env.step(124)
-    if float(env.reductions[0].sum()) <= 0.0:
-        fail("Mixed-price day cannot produce response after the safeguard.")
+    expected_reference = env._previous_day_positive_price_reference(203)
+    if not np.isclose(env.previous_day_reference_price, expected_reference):
+        fail("Previous-day incentive reference is wired incorrectly.")
+    if not np.allclose(
+        env.lambda_min,
+        env.lambda_min_multiplier * expected_reference,
+    ):
+        fail("Previous-day lower incentive bound is wired incorrectly.")
+    if not np.allclose(
+        env.lambda_max,
+        env.lambda_max_multiplier * expected_reference,
+    ):
+        fail("Previous-day upper incentive bound is wired incorrectly.")
 
     # Changing the external threshold must not alter environment dynamics/signature.
     cfg_external = copy.deepcopy(cfg)

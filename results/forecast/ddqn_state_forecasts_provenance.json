@@ -1,0 +1,28 @@
+{
+  "crossfit_rows": 3984,
+  "full_model_rows": 4752,
+  "household_order": [
+    661,
+    3039,
+    8565
+  ],
+  "load_unit": "kW",
+  "negative_household_load_forecast_values": 85,
+  "negative_price_forecast_hours": 15,
+  "output_sha256": "b86e09baae30d3093ecb4cf8efb71dd273104739fc690120807edda8df88cd17",
+  "price_unit": "cent/kWh",
+  "routing": {
+    "days_168_365": "fixed full-model forecasts",
+    "days_2_167": "cross-fitted out-of-fold forecasts"
+  },
+  "rows": 8736,
+  "source_sha256": {
+    "crossfit_combined": "7ffbed0c3af69b9421fc534fc4998df5b1cbeef7eb3968863f7aa955e1e4d11b",
+    "crossfit_gate": "3dfa3fb239f56c778a1e9b33eb31328349edd155a95806dac4378904e88527e5",
+    "full_load_predictions": "e2a149ac610ddd897a81e33007766b2538af97d2e9d1eb16d1f2481255c17c3d",
+    "full_price_predictions": "c7446d11066e8cdfc394700306385449d8e67b6b1f69dc51403266d9e24bea65"
+  },
+  "state_load_rule": "clip each household forecast at 0 kW before applying known current commitments",
+  "state_price_rule": "log1p(clip(price forecast, 0, 80 cent/kWh)) in the DDQN state",
+  "version": "ddqn_state_forecasts_v1"
+}

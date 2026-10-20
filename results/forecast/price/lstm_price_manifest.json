@@ -1,0 +1,37 @@
+{
+  "seed": 42,
+  "holiday_backend": "holidays.US",
+  "feature_names": [
+    "month",
+    "day_of_week",
+    "hour",
+    "is_holiday",
+    "is_weekend",
+    "lag_1",
+    "lag_2",
+    "lag_3",
+    "lag_24",
+    "lag_25",
+    "lag_26",
+    "lag_48",
+    "lag_49",
+    "lag_50"
+  ],
+  "window_size": 24,
+  "horizon": 1,
+  "training_unit": "USD_per_MWh",
+  "ddqn_unit": "cent_per_kWh",
+  "conversion": "divide forecast in USD/MWh by 10 before DDQN",
+  "output_predictions": "lstm_price_predictions_all.csv",
+  "padding_policy": "forecast all hours; exclude padded samples from fitting, scaling, and metrics",
+  "train_validation_wape_relative_gap_threshold": 0.2,
+  "blocked_crossfit_required": false,
+  "sha256": {
+    "script": "bc62a62f5967e6e905a3cb76fe990380405c26fde9107608bb31db5c8102fb4a",
+    "config": "3915eae1f23b4eb2ea23bb08114a208562b89085d0b4a13f12c6d98eacfd660a",
+    "data": "56fdd5b489269d7a95cd6a3816b278a8b46eed02a30688e61712ce3bd8c90593",
+    "predictions": "c7446d11066e8cdfc394700306385449d8e67b6b1f69dc51403266d9e24bea65",
+    "metrics": "4a55195e5a94d3c578ef32bc9a29dd7e4ebc6266f7e96ad6f44af781758a1d3f"
+  },
+  "configuration_status": "locked"
+}
