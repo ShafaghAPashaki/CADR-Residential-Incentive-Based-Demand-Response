@@ -1,5 +1,7 @@
+# Python and editor artefacts
 __pycache__/
 *.py[cod]
+.pytest_cache/
 .ipynb_checkpoints/
 .venv/
 venv/
@@ -9,18 +11,8 @@ Thumbs.db
 *.tmp
 *.bak
 
-# Licensed/private datasets and generated local outputs
+# Licensed input data: never commit
 data/*.csv
-.pytest_cache/
-**/__pycache__/
-*.pyc
-local_validation/
-
-__pycache__/
-.pytest_cache/
-*.pyc
-data/*.csv
-crossfit_results/
 
 # Locally regenerated, licence-restricted or household-derived files: never commit
 results/forecast/ddqn_state_forecasts.csv
@@ -31,7 +23,16 @@ results/forecast/crossfit/ddqn_crossfit_forecasts_days_002_167.csv
 results/forecast/load/*.pt
 results/forecast/price/*.pt
 **/audit.xlsx
+crossfit_results/
 forecast_regeneration/data/
 forecast_regeneration/results/
 forecast_regeneration/crossfit_results/
+
+# Local evaluation and diagnostic outputs
 eval/
+local_validation/
+fig5_reproduction/
+results/calibration_diagnostics/
+results/matched_hems_ablation/_smoke/
+results/benchmark_smoke/
+source_hashes.json

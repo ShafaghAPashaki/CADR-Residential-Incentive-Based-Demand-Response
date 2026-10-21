@@ -1,0 +1,66 @@
+# Ablation, sensitivity and diagnostic experiments
+
+All commands are run from the repository root. Training commands need the licensed data and the original forecast-state file (see `docs/TRAINING.md`). Evaluation drivers refuse to overwrite an existing output folder.
+
+## Matched-HEMS ablation (CBSP)
+
+**What it tests.** Whether the capacity outcomes come from the capacity-aware service-provider objective or from the capacity-aware HEMS alone. CBSP keeps the HEMS physics, scheduling rules, settlement and data unchanged. The service provider instead learns an economic-only objective (service-provider margin and end-user utility, with no tracking or no-need term), and the two capacity-need state features are set to zero. It is **not** a fully capacity-blind household controller. The protocol was frozen before training (`docs/protocols/matched_hems_ablation_protocol.md`).
+
+| File | Role |
+|---|---|
+| `experiments/matched_hems_ablation.py` | `EconomicSPEnvironment`, a subclass of the CADR environment |
+| `experiments/check_matched_hems_ablation.py` | Pre-training gates: state mask, hand-computed reward, identical physics under matched actions |
+| `experiments/run_matched_hems_ablation.py` | Training (`--dry-run`, `--smoke`, `--seed 0/1/2`) |
+| `experiments/evaluate_matched_hems_ablation.py` | July or August evaluation with the unmodified `test.py` |
+| `results/matched_hems_ablation/` | Checkpoints, validation metrics and monthly summaries for seeds 0–2 |
+
+```
+python experiments/check_matched_hems_ablation.py
+python experiments/run_matched_hems_ablation.py --seed 0
+python experiments/evaluate_matched_hems_ablation.py --seed 0 --month july --root <new folder containing a copy of seed_0/training/>
+```
+
+## Capacity-target and incentive-discretisation sensitivity
+
+**What it tests.** CADR Seed 0 retrained with a 6-kW or 8-kW capacity target (`cap6`, `cap8`), or with ten incentive levels per household instead of five (`lev10`, 1,000 joint actions). Everything else is unchanged, including λc, the data splits, the 2,500 episodes and validation-only checkpoint selection. The predeclared protocol identifier `R2-SENS-2026-10-14` is recorded in each run configuration.
+
+| File | Role |
+|---|---|
+| `experiments/capacity_incentive_sensitivity.py` | Run definitions, configuration builder, ten-level action grid, capacity gate |
+| `experiments/run_capacity_incentive_sensitivity.py` | Training (`--run cap6 / cap8 / lev10`, `--dry-run`) |
+| `experiments/evaluate_capacity_incentive_sensitivity.py` | July evaluation (`--run cap6 / cap8 / lev10`, or `ref7` for the published 7-kW Seed-0 model) |
+| `tools/summarize_capacity_incentive_sensitivity.py` | Recomputes the July summaries from the private hourly workbooks |
+| `results/capacity_incentive_sensitivity/` | Checkpoints, validation metrics, timing and July summaries |
+
+```
+python experiments/run_capacity_incentive_sensitivity.py --run cap6 --dry-run
+python experiments/evaluate_capacity_incentive_sensitivity.py --run cap6
+```
+
+The evaluation writes to `results/capacity_incentive_sensitivity/<run>/july/`, so move the stored `july/` folder aside first, or run from a copy of the repository.
+
+## Reward-parameter sensitivity (η, ρ)
+
+**What it tests.** Single-seed retraining with the no-need offer coefficient η ∈ {0, 0.01429, 0.03571, 0.07143} or the end-user weight ρ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, with all other settings unchanged.
+
+```
+python experiments/run_reward_sensitivity.py --group both --dry-run
+python experiments/run_reward_sensitivity.py --group eta
+```
+
+The summaries are in `results/sensitivity_eta/summary.csv` and `results/sensitivity_rho/summary.csv`. The ρ run configurations are recorded in `configs/rho_sensitivity/`. The per-run checkpoints are not distributed. `diagnostics/eta_sensitivity_diagnostic.py` and `diagnostics/rho_energy_balance_diagnostic.py` produce the files in `results/sensitivity_{eta,rho}/diagnostics/`; they need the per-run outputs under `results/sensitivity_{eta,rho}/runs/`, which a retraining creates.
+
+## Diagnostics
+
+| Script | Output | Purpose |
+|---|---|---|
+| `diagnostics/evaluate_value_of_information.py --method cadr --seed 0 --period july` | `results/final_diagnostics/{cadr,ebdr}/seed_*/value_of_information_*.csv` | Inference-only comparison of forecast and oracle state inputs; no retraining or reselection |
+| `diagnostics/evaluate_forecast_confusion.py` | `results/final_diagnostics/forecast_capacity_confusion.json` | Fixed 7-kW confusion counts of the archived forecasts |
+| `diagnostics/verify_retained_lambda.py` | console | Checks the retained λc, configurations and frozen hashes |
+| `diagnostics/measure_inference_time.py` | `local_validation/inference_timing_seed0.json` | CPU timing of Seed-0 inference |
+| `q_action_diagnostic.py` | `results/seed_*/q_diagnostic.xlsx` | Q-value ordering audit, run by `test_all_seeds.ps1` |
+| `reward_counterfactual_audit.py` | (module) | Counterfactual reward evaluation used by the Q-value audit |
+| `summarize_results.py` | `results/summary.xlsx` | Three-seed mean and standard deviation summary |
+| `calibrate_lambda_c.py` | `results/calibration_diagnostics/` | λc calibration sensitivity; never changes the frozen configurations |
+
+`run_inference_only_oracle_checks.ps1` runs the value-of-information evaluation for both methods, all seeds and all periods.

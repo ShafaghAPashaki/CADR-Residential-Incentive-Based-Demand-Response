@@ -7,13 +7,13 @@ python -c "from utils.final_run_protocol import require_real_holidays; print(req
 if ($LASTEXITCODE -ne 0) { throw "Runtime dependency preflight failed" }
 
 Write-Host "Verifying retained lambda_c and its immutable audit across all three CADR configs..."
-python verify_retained_lambda.py
+python diagnostics/verify_retained_lambda.py
 if ($LASTEXITCODE -ne 0) { throw "Retained lambda_c preflight failed" }
-python refresh_source_manifests.py
+python tools/refresh_source_manifests.py
 if ($LASTEXITCODE -ne 0) { throw "Source manifest refresh failed" }
 
 # Frozen, descriptive confusion counts; NEVER used to choose a model.
-python evaluate_forecast_confusion.py
+python diagnostics/evaluate_forecast_confusion.py
 if ($LASTEXITCODE -ne 0) { throw "Forecast confusion report failed" }
 
 foreach ($seed in 0,1,2) {

@@ -13,7 +13,7 @@ then run, from the project root:
     python tools/export_aggregate_metrics.py --out results/aggregate_metrics/per_seed_monthly_metrics.csv
 
 Default input locations follow test_all_seeds.ps1, benchmark/test_benchmark_seeds.ps1
-and eval_r1c3_r2c2_ablation.py. Use --cadr-root/--cbsp-root/--ebdr-root to
+and experiments/evaluate_matched_hems_ablation.py. Use --cadr-root/--cbsp-root/--ebdr-root to
 point at fresh evaluation folders instead.
 """
 from __future__ import annotations
@@ -141,9 +141,9 @@ def ebdr(path: Path) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--cadr-root", default="results")
-    ap.add_argument("--cbsp-root", default="results/r1c3_r2c2_ablation")
+    ap.add_argument("--cbsp-root", default="results/matched_hems_ablation")
     ap.add_argument("--ebdr-root", default="results/benchmark")
-    ap.add_argument("--sensitivity-root", default="results/r2_sensitivity",
+    ap.add_argument("--sensitivity-root", default="results/capacity_incentive_sensitivity",
                     help="Folder holding cap6/, cap8/ and lev10/ July evaluations (Appendix H/I).")
     ap.add_argument("--skip-sensitivity", action="store_true")
     ap.add_argument("--out", default="results/aggregate_metrics/per_seed_monthly_metrics.csv")

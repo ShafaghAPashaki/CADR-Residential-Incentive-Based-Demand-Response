@@ -1,10 +1,13 @@
 """Offline integrity check for frozen original λc, no calibration or training."""
 from pathlib import Path
 import json
+import sys
 import yaml
-from utils.final_run_protocol import enforce_lambda_calibration, config_sha256
 
-root=Path(__file__).resolve().parent
+root=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(root))
+from utils.final_run_protocol import enforce_lambda_calibration, config_sha256  # noqa: E402
+
 for seed in (0,1,2):
     cfg=yaml.safe_load((root/f"config_seed_{seed}.yaml").read_text(encoding="utf-8"))
     audit=enforce_lambda_calibration(cfg)

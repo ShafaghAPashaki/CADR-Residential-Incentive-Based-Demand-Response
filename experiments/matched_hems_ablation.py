@@ -1,9 +1,17 @@
-"""Isolated SP-objective ablation; original env/env.py remains unchanged.
+"""Matched-HEMS ablation environment (CBSP): economic-only service-provider objective.
+
+The original env/env.py remains unchanged; this subclass only masks the two
+capacity-need state features and replaces the learning reward.
 
 NOT a capacity-blind HEMS: appliance scheduling keeps the original 7-kW rules.
 """
+import sys
+from pathlib import Path
+
 import numpy as np
-from env import Environment
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from env import Environment  # noqa: E402
 
 class EconomicSPEnvironment(Environment):
     """Same household physics/settlement, no capacity-need features in SP state.

@@ -1,15 +1,16 @@
-"""Pre-training gates for the matched-HEMS economic-only SP ablation (no training).
-Run from the project root:  python check_r1c3_r2c2_gates.py
+"""Pre-training gates for the matched-HEMS ablation (CBSP); no training is performed.
+Run from the project root:  python experiments/check_matched_hems_ablation.py
 """
 import copy, hashlib, sys
 from pathlib import Path
 import numpy as np, yaml
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(1, str(Path(__file__).resolve().parent))
 from utils.final_run_protocol import require_real_holidays
 require_real_holidays()
 from env import Environment
-from r1c3_r2c2_ablation import EconomicSPEnvironment
+from matched_hems_ablation import EconomicSPEnvironment
 
 ORIGINAL_ENV_SHA = "5ae8182054e42be741a2450a5650f8f320f48e0aade06b8f3cb378af622ad9a6"
 PHYSICAL = ["after_total_per_house", "pre_action_total_per_house", "device_after", "device_curtailed",

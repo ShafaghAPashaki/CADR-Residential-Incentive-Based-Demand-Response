@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[1]
 RANGES={'train':(2,167),'validation':(168,181),'july':(182,212),'august':(213,243),'november':(305,334)}
 CAPACITY=7.0
 

@@ -1,8 +1,9 @@
-"""Train one predeclared R2 sensitivity run (Seed 0, 2500 episodes, validation-only selection).
+"""Train one predeclared capacity-target or incentive-discretisation sensitivity run
+(Seed 0, 2500 episodes, validation-only selection).
 
-    python run_r2_sensitivity.py --run cap6 [--dry-run]
+    python experiments/run_capacity_incentive_sensitivity.py --run cap6 [--dry-run]
 
-Writes only to results/r2_sensitivity/<run>/ and refuses to touch an existing folder.
+Writes only to results/capacity_incentive_sensitivity/<run>/ and refuses to touch an existing folder.
 Records wall-clock training time (including the 50 validation passes) in timing.json.
 """
 import argparse
@@ -15,8 +16,8 @@ import time
 
 import yaml
 
-from r2_common import (OUT_ROOT, PROTOCOL_ID, ROOT, RUNS, build_config,
-                       capacity_gate, environment_class, sha256_file)
+from capacity_incentive_sensitivity import (OUT_ROOT, PROTOCOL_ID, ROOT, RUNS, build_config,
+                                            capacity_gate, environment_class, sha256_file)
 
 sys.path.insert(0, str(ROOT))
 
@@ -65,7 +66,8 @@ def main():
         "torch_num_threads": torch.get_num_threads(),
         "cpu": platform.processor() or platform.machine(), "logical_cpus": os.cpu_count(),
         "platform": platform.platform(), "python": platform.python_version(),
-        "driver_sha256": {f: sha256_file(ROOT / f) for f in ("run_r2_sensitivity.py", "r2_common.py")},
+        "driver_sha256": {f: sha256_file(ROOT / f) for f in ("experiments/run_capacity_incentive_sensitivity.py",
+                                                             "experiments/capacity_incentive_sensitivity.py")},
         "note": "Record whether any other heavy process ran concurrently.",
     }
     (run_dir / "timing.json").write_text(json.dumps(timing, indent=2), encoding="utf-8")

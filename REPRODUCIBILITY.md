@@ -17,7 +17,7 @@
 All 18 primary evaluations were independently re-run from the released checkpoints with the current code: CADR, EBDR and CBSP, three seeds each, in July and August. The re-runs used the original licensed inputs and the original forecast-state file (SHA-256 `b86e09ba…`). Every numeric cell of every evaluation workbook was identical to the stored outputs.
 
 The same holds for:
-- the capacity runs at 6 and 8 kW and the ten-level incentive run (July, Seed 0);
+- the capacity runs at 6 and 8 kW and the ten-level incentive run (July, Seed 0), now in `results/capacity_incentive_sensitivity/`;
 - the checkpoints after the local machine paths were removed from their metadata (seed 0, July, all three methods). The tensors themselves are unchanged.
 
 ## 3. Regenerating the forecast inputs from licensed data
@@ -65,3 +65,13 @@ With a regenerated state file, `verify.py`, `python -m benchmark.verify_benchmar
   - *Evaluation:* the current versions reproduce every stored evaluation exactly.
   - *Training:* retraining Seed 0 with the current `main.py` gave bit-identical network weights. Seeds 1 and 2 have not been retrained.
 - **The 619.97 s training time and the inference timings** were measured on the authors' workstation. Only the inference measurements are archived (in the private project).
+
+## 6. Verification of the current repository layout
+
+The files were later reorganised (experiment drivers into `experiments/`, diagnostics into `diagnostics/`, and two result folders renamed; see `docs/FILE_RENAME_MAP.csv`). Checkpoints, configurations, results and the core code (`env/`, `agent/`, `utils/`, `main.py`, `test.py`, `benchmark/`, `tests/`, `forecast_regeneration/`) are byte-identical to the previous release. After the reorganisation, with the licensed inputs and the original forecast-state file, the following were run again:
+
+- `verify.py`, `python -m benchmark.verify_benchmark`, all 17 `tests/test_*.py` scripts and `benchmark/tests/test_fair_forecast_state.py`: all pass.
+- `experiments/check_matched_hems_ablation.py` and `diagnostics/verify_retained_lambda.py`: pass.
+- Re-evaluation of CBSP Seed 0 July (through `tools/evaluate_with_regenerated_forecasts.py`, which correctly stayed inactive with the original file), of the `cap6`, `cap8` and `lev10` July runs, and of CADR Seed 0 July: every evaluation workbook was identical to the stored one (0 differing cells).
+
+Training was not repeated after the reorganisation.

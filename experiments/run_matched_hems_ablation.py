@@ -1,11 +1,11 @@
-"""Train the predeclared matched-HEMS economic-only SP ablation.
+"""Train the predeclared matched-HEMS ablation (CBSP, economic-only SP objective).
 
-From project root:
-  python run_r1c3_r2c2_ablation.py --dry-run
-  python run_r1c3_r2c2_ablation.py --smoke
-  python run_r1c3_r2c2_ablation.py --seed 0
-  python run_r1c3_r2c2_ablation.py --seed 1
-  python run_r1c3_r2c2_ablation.py --seed 2
+From the project root:
+  python experiments/run_matched_hems_ablation.py --dry-run
+  python experiments/run_matched_hems_ablation.py --smoke
+  python experiments/run_matched_hems_ablation.py --seed 0
+  python experiments/run_matched_hems_ablation.py --seed 1
+  python experiments/run_matched_hems_ablation.py --seed 2
 
 Never overwrites existing output directories.
 """
@@ -20,7 +20,9 @@ import sys
 import time
 import yaml
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+sys.path.insert(1, str(Path(__file__).resolve().parent))
 PROTOCOL = 'MATCHED_HEMS_SP_ABLATION_2026_10_15_V1'
 
 
@@ -36,8 +38,8 @@ def config_for(seed, smoke=False):
     assert cfg['environment']['reward_mode'] == 'weighted_stakeholder_tracking_no_need'
     assert int(cfg['DDQN']['episodes']) == 2500
     assert cfg['training']['val_range'] == [168,181]
-    cfg['general']['results_root'] = ('results/r1c3_r2c2_ablation/_smoke' if smoke
-                                        else 'results/r1c3_r2c2_ablation')
+    cfg['general']['results_root'] = ('results/matched_hems_ablation/_smoke' if smoke
+                                        else 'results/matched_hems_ablation')
     if smoke:
         cfg['DDQN']['episodes'] = 20
         cfg['DDQN']['eval_interval'] = 10
@@ -64,7 +66,7 @@ def main():
         if args.dry_run: continue
         import torch
         import main as train_module
-        from r1c3_r2c2_ablation import EconomicSPEnvironment
+        from matched_hems_ablation import EconomicSPEnvironment
         train_module.Environment = EconomicSPEnvironment
         train_module.set_global_seeds(seed=seed)
         output = ROOT / cfg['general']['results_root']
@@ -72,7 +74,7 @@ def main():
         if run_dir.exists():
             raise SystemExit(f'Output already exists: {run_dir}')
         # Frozen preregistration must be present before real training.
-        prereg = ROOT / 'R1C3_R2C2_ABLATION_PREREGISTRATION.md'
+        prereg = ROOT / 'docs/protocols/matched_hems_ablation_protocol.md'
         if not args.smoke and not prereg.is_file():
             raise SystemExit('Missing frozen preregistration')
         output.mkdir(parents=True, exist_ok=True)
@@ -86,8 +88,8 @@ def main():
            'elapsed_seconds':time.perf_counter()-t0,'device':str(trainer.device),
            'python':platform.python_version(),'torch':torch.__version__,
            'original_env_sha256':digest(ROOT/'env/env.py'),
-           'ablation_sha256':digest(ROOT/'r1c3_r2c2_ablation.py'),
-           'driver_sha256':digest(ROOT/'run_r1c3_r2c2_ablation.py')}
+           'ablation_sha256':digest(ROOT/'experiments/matched_hems_ablation.py'),
+           'driver_sha256':digest(ROOT/'experiments/run_matched_hems_ablation.py')}
         (output / f'timing_seed_{seed}.json').write_text(json.dumps(timing,indent=2),encoding='utf-8')
         print('COMPLETE',seed, timing['elapsed_seconds'])
 

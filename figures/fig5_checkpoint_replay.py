@@ -1,8 +1,8 @@
 """Regenerate Fig. 5 (appliance-level curtailment and shifting, 27 July 2018, CADR Seed 0)
 directly from the archived Seed-0 checkpoint, and save the plotted values as CSV.
 
-Usage (run from the project root):
-    python make_fig5_device_schedule.py <project_root> <output_dir>
+Usage (normally called by figures/make_fig5_device_schedule.py):
+    python figures/fig5_checkpoint_replay.py <project_root> <output_dir>
 """
 import sys
 from pathlib import Path

@@ -7,7 +7,7 @@ from pathlib import Path
 import json
 import hashlib
 
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[1]
 
 def digest(p:Path)->str:
     h=hashlib.sha256()

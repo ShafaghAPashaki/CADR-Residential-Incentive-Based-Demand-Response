@@ -1,12 +1,13 @@
-"""Evaluate a run on July 2018 (days 182-212) with the unmodified test.py.
+"""Evaluate a capacity-target or incentive-discretisation run on July 2018 (days 182-212)
+with the unmodified test.py.
 
-    python eval_r2_july.py --run cap6
-    python eval_r2_july.py --run ref7      # published Seed-0 checkpoint, re-evaluated with current test.py
+    python experiments/evaluate_capacity_incentive_sensitivity.py --run cap6
+    python experiments/evaluate_capacity_incentive_sensitivity.py --run ref7   # published Seed-0 checkpoint
 """
 import argparse
 import sys
 
-from r2_common import OUT_ROOT, ROOT, RUNS, environment_class
+from capacity_incentive_sensitivity import OUT_ROOT, ROOT, RUNS, environment_class
 
 sys.path.insert(0, str(ROOT))
 

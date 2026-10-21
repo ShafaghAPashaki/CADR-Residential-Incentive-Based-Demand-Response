@@ -1,6 +1,6 @@
-# Forecasting module
+# Forecasting
 
-This module provides reproducible one-hour-ahead LSTM forecasts for household demand and wholesale electricity price.
+The forecasting scripts at the repository root (`predict_load_lstm.py`, `predict_price_lstm.py`, `build_forecast_outputs.py`, `build_ddqn_forecast_inputs.py`) produce one-hour-ahead LSTM forecasts of household demand and wholesale electricity price, and merge them into the DDQN forecast-state table. They need the licensed input data (`data/README.md`). To regenerate the exact forecast inputs of the published checkpoints, use `forecast_regeneration/REGENERATE.md` instead.
 
 ## Model specification
 
@@ -45,7 +45,7 @@ results/forecast/
 ├── forecast_comparison.pdf
 ├── forecast_metrics.csv
 ├── forecast_metrics.tex
-├── integration_gate.txt
+├── ddqn_state_integration_gate.txt
 ├── load/
 │   ├── models and scalers
 │   ├── training histories
@@ -67,6 +67,7 @@ The final forecast metric table reports MAE only. Wholesale-price outputs use ce
 Before training, the code validates the locked forecast specification, gap-free hourly indexing, input dimensions, sample counts, and absence of target/future leakage. Startup-padded samples are available for operational forecasting but excluded from fitting, scaling, and reported metrics.
 
 If the train-validation diagnostic gate is triggered, training-day forecasts must use blocked cross-fitting before controller integration.
+
 ## DDQN decision-state integration
 
 The controller consumes a forecast-only table at `results/forecast/ddqn_state_forecasts.csv`. Training days 2-167 use the frozen out-of-fold/cross-fitted forecasts. Days 168 onward use the fixed full-model forecasts. The input table contains no realised/audit target columns.

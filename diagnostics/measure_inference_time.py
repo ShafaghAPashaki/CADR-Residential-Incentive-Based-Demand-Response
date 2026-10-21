@@ -4,7 +4,7 @@ network_only: greedy_action(state) for a fixed state, excluding environment.
 policy_on_july: greedy_action(state) for each of the 744 actual July states.
 policy_plus_simulator: greedy_action(state) + env.step(action); NOT deployment latency.
 
-Run from project root: python measure_inference_local.py
+Run from project root: python diagnostics/measure_inference_time.py
 """
 import argparse
 import json
@@ -18,7 +18,7 @@ import numpy as np
 import torch
 import yaml
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 from utils.final_run_protocol import require_real_holidays  # noqa: E402
 

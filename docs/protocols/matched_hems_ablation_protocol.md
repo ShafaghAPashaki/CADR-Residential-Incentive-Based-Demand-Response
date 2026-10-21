@@ -1,4 +1,6 @@
-# R1-C3 / R2-C2: frozen protocol, 2026-10-15
+# Matched-HEMS ablation (CBSP): frozen protocol, 15 October 2026
+
+*Frozen before training. Only the title has been changed from the original document; the protocol text is unchanged. The training driver `experiments/run_matched_hems_ablation.py` refuses to start unless this file is present.*
 
 Experimental arm: economic-only **service provider** DDQN with **unchanged capacity-aware HEMS**.
 This does not test a fully capacity-blind household controller.

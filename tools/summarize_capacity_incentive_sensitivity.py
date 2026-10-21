@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Recompute July capacity/discretisation sensitivity from private Hourly_Audit workbooks.
-Requires only Python stdlib. Run from the consolidated project root.
+"""Recompute the July capacity-target and incentive-discretisation summaries from the
+private Hourly_Audit workbooks. Requires only the Python standard library.
+Run from the project root after evaluating the runs (see TABLE_MAP.md).
 DO NOT publish the audit workbooks, which include licensed household data.
 """
 import sys, zipfile, xml.etree.ElementTree as ET, re, pathlib
@@ -67,10 +68,10 @@ def summarise(rows):
 def main():
     root=pathlib.Path(__file__).resolve().parents[1]
     cases={
-      'H: 6 kW':root/'results/r2_sensitivity/cap6/july/audit.xlsx',
-      'H: 7 kW / I: 5 levels':root/'local_validation/seed0_july_check/audit.xlsx',
-      'H: 8 kW':root/'results/r2_sensitivity/cap8/july/audit.xlsx',
-      'I: 10 levels':root/'results/r2_sensitivity/lev10/july/audit.xlsx',
+      'H: 6 kW':root/'results/capacity_incentive_sensitivity/cap6/july/audit.xlsx',
+      'H: 7 kW / I: 5 levels':root/'results/seed_0/july/audit.xlsx',
+      'H: 8 kW':root/'results/capacity_incentive_sensitivity/cap8/july/audit.xlsx',
+      'I: 10 levels':root/'results/capacity_incentive_sensitivity/lev10/july/audit.xlsx',
     }
     for name,p in cases.items():
         if not p.exists():

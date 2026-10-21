@@ -19,8 +19,8 @@ Usage, from the project root (arguments after the target are passed through):
         --model_path results/seed_0/training/ddqn_best.pth --config_path config_seed_0.yaml \
         --output_dir eval_regenerated/cadr_s0_july --test_start 182 --test_end 212 --target_plot_days 208
 
-    python tools/evaluate_with_regenerated_forecasts.py eval_r1c3_r2c2_ablation.py --seed 0 --month july --root <fresh_root>
-    python tools/evaluate_with_regenerated_forecasts.py eval_r2_july.py --run lev10
+    python tools/evaluate_with_regenerated_forecasts.py experiments/evaluate_matched_hems_ablation.py --seed 0 --month july --root <fresh_root>
+    python tools/evaluate_with_regenerated_forecasts.py experiments/evaluate_capacity_incentive_sensitivity.py --run lev10
 
 EBDR (benchmark/test_benchmark.py) does not check the forecast-state hash and
 can be run directly; its outputs are approximate in the same sense.
@@ -35,7 +35,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FIELD = "forecast_state_input_sha256"
-TARGETS = {"test.py", "eval_r1c3_r2c2_ablation.py", "eval_r2_july.py"}
+TARGETS = {
+    "test.py": "test.py",
+    "evaluate_matched_hems_ablation.py": "experiments/evaluate_matched_hems_ablation.py",
+    "evaluate_capacity_incentive_sensitivity.py": "experiments/evaluate_capacity_incentive_sensitivity.py",
+}
 
 
 def main() -> None:
@@ -83,7 +87,7 @@ def main() -> None:
     cls._validate_checkpoint_metadata = validate
     cls.__init__ = init
 
-    target = ROOT / Path(sys.argv[1]).name
+    target = ROOT / TARGETS[Path(sys.argv[1]).name]
     sys.argv = [str(target)] + sys.argv[2:]
     if target.name == "test.py":
         # Call the imported (patched) module; re-executing the file would redefine the class.

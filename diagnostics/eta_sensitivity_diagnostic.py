@@ -1,9 +1,10 @@
 import sys, csv, json
 from pathlib import Path
 import numpy as np, yaml, torch
-from env import Environment
-from agent.agent_ddqn import DDQNAgent
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
+from env import Environment  # noqa: E402
+from agent.agent_ddqn import DDQNAgent  # noqa: E402
 ETA=ROOT/'results'/'sensitivity_eta'
 OUT=ETA/'diagnostics';OUT.mkdir(parents=True,exist_ok=True)
 RUNS=['eta_0','eta_0p01429','eta_0p03571','eta_0p07143']

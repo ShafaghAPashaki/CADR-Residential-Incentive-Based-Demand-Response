@@ -9,16 +9,17 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 import torch
 import yaml
 
-from agent.agent_ddqn import DDQNAgent
-from utils.final_run_protocol import collect_run_provenance, require_real_holidays
-
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from agent.agent_ddqn import DDQNAgent  # noqa: E402
+from utils.final_run_protocol import collect_run_provenance, require_real_holidays  # noqa: E402
 PERIODS = {"july": (182,212), "august": (213,243), "november": (305,334)}
 EPS=1e-9
 

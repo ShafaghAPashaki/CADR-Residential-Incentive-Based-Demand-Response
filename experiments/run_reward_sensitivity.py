@@ -1,9 +1,9 @@
-"""Final-code single-seed parameter sensitivities. Run from project root.
+"""Reward-parameter (eta, rho) single-seed sensitivity runs. Run from the project root.
 
-python run_sensitivity.py --group eta
-python run_sensitivity.py --group rho
-python run_sensitivity.py --group both
-python run_sensitivity.py --group both --dry-run
+python experiments/run_reward_sensitivity.py --group eta
+python experiments/run_reward_sensitivity.py --group rho
+python experiments/run_reward_sensitivity.py --group both
+python experiments/run_reward_sensitivity.py --group both --dry-run
 """
 import argparse
 import copy
@@ -15,7 +15,7 @@ import sys
 
 import yaml
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 VALUES = {"eta": [0, 0.01429, 0.03571, 0.07143],

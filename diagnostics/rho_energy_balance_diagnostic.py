@@ -3,13 +3,16 @@ Run from the project root in the existing virtual environment; no retraining.
 """
 import csv
 import json
+import sys
 from pathlib import Path
 import numpy as np
 import yaml
-from env import Environment
-from agent.agent_ddqn import DDQNAgent
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from env import Environment  # noqa: E402
+from agent.agent_ddqn import DDQNAgent  # noqa: E402
+
 BASE = ROOT / 'results' / 'sensitivity_rho'
 OUT = BASE / 'diagnostics'
 OUT.mkdir(parents=True, exist_ok=True)

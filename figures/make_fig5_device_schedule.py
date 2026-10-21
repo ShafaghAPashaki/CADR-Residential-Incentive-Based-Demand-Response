@@ -1,10 +1,10 @@
 """Reproduce manuscript-style Figure 5 from the Seed-0 checkpoint.
 
 Run from project root with the paper's Python environment:
-    python scripts/make_fig5_device_schedule.py
+    python figures/make_fig5_device_schedule.py
 
 Optional offline audit of the plotting code using already verified values:
-    python scripts/make_fig5_device_schedule.py --csv path/to/fig5_plotted_values.csv
+    python figures/make_fig5_device_schedule.py --csv path/to/fig5_plotted_values.csv
 
 Outputs go to fig5_reproduction/ and never alter the checkpoint/results.
 """

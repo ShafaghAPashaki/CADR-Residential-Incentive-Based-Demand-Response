@@ -1,4 +1,6 @@
-# Frozen final evaluation protocol (pre-results)
+# Evaluation protocol and checkpoint selection
+
+*This protocol was fixed before any July or August test results were produced. It is reproduced unchanged except for this title and note. References to later experiments describe the plan at that time; those experiments are documented in `docs/EXPERIMENTS.md`.*
 
 This protocol must not be revised in response to July/August test performance.
 Use **validation mean reward only**, separately per method and seed, to retain
