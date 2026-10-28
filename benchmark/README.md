@@ -91,7 +91,17 @@ The benchmark training driver uses a fixed output under `results/benchmark/` and
 powershell -ExecutionPolicy Bypass -File .\benchmark\run_benchmark_seeds.ps1 -Python $py
 ```
 
-The legacy `test_benchmark_seeds.ps1` and summary utilities also use fixed paths under `results/`. Use a separate working copy for them; the individual evaluation command above keeps the released results intact.
+The `test_benchmark_seeds.ps1` wrapper now writes all evaluation runs to `repro_runs/ebdr/seed_<seed>/<period>/` and summary workbooks under `repro_runs/` (ignored by Git). It refuses existing output folders unless `-Overwrite` is explicitly supplied; the summary tools always refuse overwriting an existing workbook, including when `-Overwrite` is used for evaluations. Select a fresh root or remove only known disposable generated runs, never any archive below `results/`.
+
+Fresh EBDR evaluations retain `Hourly_Aggregate` in `results.xlsx` for cross-seed action-consistency diagnostics, but place detailed household-hour records in the ignored `audit.xlsx` (`Household_Ledger`). Archived EBDR `results.xlsx` workbooks contain only the six historical report sheets. To compare regenerated results against the frozen archive, compare those six sheets by name and cell value; do **not** compare binary workbook hashes or assume the number of worksheets is unchanged. The summariser needs `Hourly_Aggregate` from **fresh evaluations** and cannot reconstruct `Signal_Stability` from the intentionally redacted archived workbooks.
+
+For example, after running all nine benchmark evaluations, generate the summary and optional proposed-vs-benchmark comparison without touching `results/`:
+
+```powershell
+& $py -m benchmark.summarize_benchmark --results_root repro_runs/ebdr --output repro_runs/ebdr/summary.xlsx
+& $py -m benchmark.compare_methods --proposed_summary results/summary.xlsx --benchmark_summary repro_runs/ebdr/summary.xlsx --output repro_runs/method_comparison.xlsx
+```
+
 
 ## Comparison boundary
 

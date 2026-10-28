@@ -134,13 +134,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--results_root",
-        default="results/benchmark",
-        help="Benchmark results root relative to the project root or absolute.",
+        default="repro_runs/ebdr",
+        help="Fresh benchmark evaluations (with Hourly_Aggregate) relative to project root or absolute.",
     )
     parser.add_argument(
         "--output",
-        default="results/benchmark/summary.xlsx",
-        help="Output workbook path relative to the project root or absolute.",
+        default="repro_runs/ebdr/summary.xlsx",
+        help="New summary workbook path relative to the project root or absolute.",
     )
     args = parser.parse_args()
 
@@ -150,6 +150,8 @@ def main() -> None:
     output_path = Path(args.output)
     if not output_path.is_absolute():
         output_path = PROJECT_ROOT / output_path
+    if output_path.exists():
+        raise FileExistsError(f"Refusing to overwrite existing benchmark summary: {output_path}. Select a new --output path.")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     seed_frames: list[pd.DataFrame] = []

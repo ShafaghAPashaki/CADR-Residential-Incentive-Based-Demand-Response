@@ -305,7 +305,6 @@ class BenchmarkTester:
         results_path = self.output_dir / "results.xlsx"
         with pd.ExcelWriter(results_path, engine="openpyxl") as writer:
             aggregate_df.to_excel(writer, sheet_name="Hourly_Aggregate", index=False)
-            household_df.to_excel(writer, sheet_name="Hourly_Household", index=False)
             daily_df.to_excel(writer, sheet_name="Daily", index=False)
             monthly_df.to_excel(writer, sheet_name="Monthly", index=False)
             household_summary_df.to_excel(writer, sheet_name="Household", index=False)
@@ -820,7 +819,7 @@ def main() -> None:
     output_dir = (
         resolve_path(args.output_dir)
         if args.output_dir
-        else PROJECT_ROOT / "results" / "benchmark" / f"seed_{seed}" / period
+        else PROJECT_ROOT / "repro_runs" / "ebdr" / f"seed_{seed}" / period
     )
     tester = BenchmarkTester(
         model_path=resolve_path(args.model_path),

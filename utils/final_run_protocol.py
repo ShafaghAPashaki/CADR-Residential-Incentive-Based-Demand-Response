@@ -7,6 +7,8 @@ from __future__ import annotations
 import hashlib
 import importlib.metadata
 import json
+import platform
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -51,7 +53,7 @@ def require_real_holidays() -> dict[str, Any]:
     return {
         "holiday_backend": "python-holidays / holidays.US(years=[2018])",
         "holiday_version": version,
-        "holiday_module_path": str(holidays.__file__),
+        "holiday_package": "holidays",
     }
 
 
@@ -123,8 +125,15 @@ def collect_run_provenance(config: dict[str, Any], environment_version: str) -> 
         name: sha256_file(PROJECT_ROOT / name)
         for name in files if (PROJECT_ROOT / name).exists()
     }
+    import torch
     return {
         **holidays_meta,
+        "python_version": sys.version.split()[0],
+        "runtime_platform": platform.platform(),
+        "runtime_processor": platform.processor() or platform.machine(),
+        "torch_version": str(torch.__version__),
+        "torch_num_threads": int(torch.get_num_threads()),
+        "torch_cuda_available": bool(torch.cuda.is_available()),
         "environment_version": environment_version,
         "forecast_file_sha256": sha256_file(forecast_path),
         "configuration_sha256": config_sha256(config),

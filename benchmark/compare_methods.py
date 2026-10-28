@@ -157,8 +157,8 @@ def differences(mean_sd: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--proposed_summary", default="results/summary.xlsx")
-    parser.add_argument("--benchmark_summary", default="results/benchmark/summary.xlsx")
-    parser.add_argument("--output", default="results/method_comparison.xlsx")
+    parser.add_argument("--benchmark_summary", default="repro_runs/ebdr/summary.xlsx")
+    parser.add_argument("--output", default="repro_runs/method_comparison.xlsx")
     args = parser.parse_args()
 
     proposed = prepare_proposed(resolve_path(args.proposed_summary))
@@ -192,6 +192,8 @@ def main() -> None:
     )
 
     output = resolve_path(args.output)
+    if output.exists():
+        raise FileExistsError(f"Refusing to overwrite existing comparison workbook: {output}. Select a new --output path.")
     output.parent.mkdir(parents=True, exist_ok=True)
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         combined.to_excel(writer, sheet_name="Seed_Comparison", index=False)

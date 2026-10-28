@@ -19,7 +19,8 @@ try {
                 "-m", "benchmark.test_benchmark",
                 "--model_path", $Model,
                 "--config_path", $Config,
-                "--period", $Period
+                "--period", $Period,
+                "--output_dir", "repro_runs/ebdr/seed_$Seed/$Period"
             )
             if ($Overwrite) { $Arguments += "--overwrite" }
             & $Python @Arguments
@@ -29,19 +30,19 @@ try {
         }
     }
 
-    & $Python -m benchmark.summarize_benchmark
+    & $Python -m benchmark.summarize_benchmark --results_root repro_runs/ebdr --output repro_runs/ebdr/summary.xlsx
     if ($LASTEXITCODE -ne 0) {
         throw "Benchmark summarisation failed."
     }
 
     if (Test-Path "results/summary.xlsx") {
-        & $Python -m benchmark.compare_methods
+        & $Python -m benchmark.compare_methods --proposed_summary results/summary.xlsx --benchmark_summary repro_runs/ebdr/summary.xlsx --output repro_runs/method_comparison.xlsx
         if ($LASTEXITCODE -ne 0) {
             throw "Cross-method comparison failed."
         }
     }
     else {
-        Write-Warning "results/summary.xlsx was not found; method_comparison.xlsx was not generated."
+        Write-Warning "results/summary.xlsx was not found; repro_runs/method_comparison.xlsx was not generated."
     }
 }
 finally {

@@ -12,6 +12,16 @@ python tools/export_aggregate_metrics.py --cadr-root repro_runs/eval/published -
 - An hour counts as a capacity exceedance when the aggregate load exceeds the target by more than 1e-6 kW.
 - Mean daily peak and PAR are computed per day and then averaged over the month.
 
+## Source-only, structural and forecasting items
+
+| Item | Source / public mapping | Publication boundary |
+|---|---|---|
+| Table 1, 43-element state groups | `env/env.py` state construction, `config_seed_*.yaml`, Section 3.1 in the manuscript | No licensed demand file required to inspect the structural definition |
+| Table 2, DDQN and reward settings | `config_seed_{0,1,2}.yaml` and checkpoint-adjacent `results/seed_*/training/config.yaml`; Appendix B/E for calibrated terms | Original frozen configuration, not newly selected settings |
+| Table A.9, LSTM inputs and settings | `forecast_regeneration/REGENERATE.md` and its referenced original scripts/configurations | Raw training observations and household forecast-state CSV are not redistributed |
+| Fig. A.6, forecast and observed load/price profiles | `build_forecast_outputs.py`, historical forecast outputs and licensed input observations; numerical aggregate forecast errors in `results/forecast/forecast_metrics.csv` | Household-level image and source traces are excluded from the public tree; generate only with authorised inputs |
+| Fig. F.7, three households' day-208 profiles | `test.py` July Seed 0 household-level figure outputs; checkpoint in `results/seed_0/training/ddqn_best.pth` | Household-level hourly plots removed from the public release tree; recreate locally with authorised inputs |
+
 ## Main text
 
 | Item | Metrics in the CSV | Method rows | Produced by |

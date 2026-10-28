@@ -39,12 +39,12 @@ The data directory includes tested scripts and **schema-only/synthetic examples*
 - [`examples/synthetic_hourly_price.csv`](examples/synthetic_hourly_price.csv) — deliberately fabricated prices, not a usable 2018 series.
 - [`prepare_load.py`](prepare_load.py) and [`prepare_price.py`](prepare_price.py) — preparation/validation commands.
 
-For a properly licensed `15minute_data_austin.csv` export of 2018, run from the project root:
+For a properly licensed `15minute_data_austin.csv` and the raw EnergyOnline `Date,Price,Zone` 2018 CSV, run from the project root (Windows PowerShell; `$py` is defined in the main README):
 
 ```powershell
-python data/prepare_load.py --input downloads/15minute_data_austin.csv --output data/load_hourly_2018.csv --year 2018
-python data/prepare_price.py --input downloads/ercot_hourly_2018.csv --output data/ercot_hourly_price.csv --year 2018
-python -m unittest discover -s tests -p test_data_preparation.py -v
+& $py data/prepare_load.py --input downloads/15minute_data_austin.csv --output data/load_hourly_2018.csv --year 2018
+& $py data/prepare_price.py --input "downloads/20180101-20181231 ERCOT Real-time Price.csv" --zone LZ_AEN --output data/ercot_hourly_price.csv --year 2018
+& $py -m unittest discover -s tests -p "test_data_preparation.py" -v
 ```
 
 **Original load transformations recovered.** The independent preparation code follows the
