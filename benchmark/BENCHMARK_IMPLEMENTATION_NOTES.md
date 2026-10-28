@@ -53,9 +53,9 @@ load-shifting, or proposed-method reward-normalisation term was introduced.
 3. **State cleanup**
    - Removed three archived current-reduction inputs that were always zero when
      the current action was selected.
-   - The 12-feature state retains the archived feature structure. The current
-     version uses forecast household loads and forecast price in place of
-     realised current load and price; see the forecast-state fairness note below.
+   - The active 12-feature state contains three forecast household loads,
+     clipped-log forecast price, elasticity, normalised hour, aggregate
+     forecast load, holiday, weekend and on/mid/off-peak flags.
    - No capacity-derived feature is present.
 
 4. **Response wiring**
