@@ -43,10 +43,10 @@ class DataPreparationTests(unittest.TestCase):
         y=pd.DataFrame({"timestamp":times.strftime("%d/%m/%Y %H:%M"),"Price":np.full(8760,27.55)})
         y.loc[12,"Price"]=-4
         self.assertEqual(prepare_price(y).loc[12,"Price"],-4)
-        with self.assertRaisesRegex(ValueError,"coverage incomplete"):prepare_price(y.drop(index=100))
+        with self.assertRaisesRegex(ValueError,"cover every hour"):prepare_price(y.drop(index=100))
 
     def test_wrong_price_file_rejected(self):
-        with self.assertRaisesRegex(ValueError,"Expected timestamp,Price"):
+        with self.assertRaisesRegex(ValueError,"Expected raw Date,Price,Zone"):
             prepare_price(pd.DataFrame({"datetime":[],"price":[]}))
 
 if __name__=="__main__":unittest.main()
