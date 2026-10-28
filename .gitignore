@@ -43,3 +43,10 @@ repro_runs/
 
 # User-supplied raw licensed downloads
 downloads/
+
+# Household-level figures derived from licensed datasets: local only
+**/energy_profile_house_*.png
+**/device_schedule_house_*.png
+**/household_*_profile_day_*.png
+results/forecast/forecast_comparison.png
+results/forecast/forecast_comparison.pdf

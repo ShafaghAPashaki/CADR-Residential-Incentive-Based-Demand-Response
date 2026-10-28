@@ -1,0 +1,14 @@
+{
+  "status": "HISTORICAL_PRIVATE_RECOVERY_DOCUMENTED",
+  "recorded_original_audit_file": "results/calibration/lambda_c_retention_audit.json",
+  "original_audit_sha256": "325d3344b881c57e37e41e55fd2fa74e019652babde56fbb8dd8316483d5028a",
+  "recovery_scope": "Historical July 2026 original 12 scenario labels and 1500 component observations independently recovered in private source materials; historical-environment replay matched recorded component series to floating-point tolerance.",
+  "historical_scenario_identifiers_available_privately": true,
+  "historical_observations_available_privately": true,
+  "historical_observations_redistributed": false,
+  "rights_boundary": "Historical workbook, individual load data, and source snapshots cannot be redistributed absent confirmed provider authorisation.",
+  "economic_q95": 0.13883091059361805,
+  "tracking_q95": 0.626385357142857,
+  "original_lambda_c": 0.22163818009231573,
+  "distinction": "Replay of historical inputs is not recalibration of the current frozen environment. The implemented coefficient and archive are unchanged."
+}

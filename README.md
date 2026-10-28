@@ -12,7 +12,7 @@ Choose the route that fits your purpose; each builds on the previous one.
 | **2. Evaluate** | Run a published CADR checkpoint for any released seed and test period. No DDQN retraining. | Authorised demand and price data, plus the original or a regenerated forecast-state file |
 | **3. Train** | Regenerate the forecasts from authorised inputs, train one or more CADR seeds, and evaluate the new checkpoints. | Authorised raw or prepared demand and price data |
 
-The public repository does not contain the licensed household records or the household-derived forecast-state file. Regenerated forecasts can differ from those used in the paper; in turn, retraining can select a different checkpoint and produce different results. See [Reproducibility](REPRODUCIBILITY.md) for what was tested.
+The public release tree excludes licensed household records, household-derived forecast states, detailed hourly audits, and individual-household hourly figures. Historical commits and external caches are not thereby sanitised. Regenerated forecasts can differ from those used in the paper; in turn, retraining can select a different checkpoint and produce different results. See [Reproducibility](REPRODUCIBILITY.md) for what was tested.
 
 ## 1. Inspect the release
 
@@ -67,7 +67,7 @@ To choose any combination, use `--seeds` and `--months`. For example, this evalu
 |---|---:|---:|---|
 | `july` | 182–212 | 208 | Manuscript test period |
 | `august` | 213–243 | 220 | Manuscript test period |
-| `november` | 305–334 | 312 | Additional retained robustness period |
+| `november` | 305–334 | 312 | Retained supplementary period; not part of the revised manuscript |
 
 Use `--months july august november` for all three periods, and `--dry-run` to preview commands without loading data or running a model. Each result is stored as `repro_runs/eval/published/seed_<seed>/<month>/`. If the active forecast hash differs from the checkpoint's recorded hash, `APPROXIMATE_FORECAST_INPUTS.json` identifies the run as an approximate evaluation. Other checkpoint checks remain active.
 
@@ -87,7 +87,7 @@ After preparing the data and forecast-state file, train all three seeds with reg
 & $py tools/run_cadr.py train --regenerated-forecasts
 ```
 
-Each seed uses its own `config_seed_<seed>.yaml`, 2,500 episodes, and validation-based checkpoint selection. Training can take substantial time. To train a subset, add, for example, `--seeds 1 2`. If using the original forecast-state file, omit `--regenerated-forecasts` to retain the original strict forecast-hash check.
+Each seed uses its own `config_seed_<seed>.yaml`, 2,500 episodes, and validation-based checkpoint selection. **This is an independent training rerun, not a guarantee of identical weights or selected checkpoints**, even with identical authorised forecast-state bytes; see [Reproducibility](REPRODUCIBILITY.md). Training can take substantial time. To train a subset, add, for example, `--seeds 1 2`. If using the original forecast-state file, omit `--regenerated-forecasts` to retain the original strict forecast-hash check.
 
 New checkpoints and their saved configurations are written to `repro_runs/train/seed_<seed>/training/`. Evaluate those checkpoints, using the **same active forecast-state file** used for training:
 
@@ -101,7 +101,7 @@ The same `--seeds`, `--months` and custom `--days` options apply. To run only th
 & $py tools/run_cadr.py evaluate --source trained --seeds 1 2 --months july august november
 ```
 
-The launcher refuses to reuse an existing output directory. Choose another `--train-root` for training or `--output-root` for evaluation when rerunning; pass the same `--train-root` when evaluating a newly trained checkpoint from a custom root. It does not overwrite published results.
+If an interrupted run leaves a partial directory, inspect or archive it first and then use a **new output root**; remove only a known disposable incomplete run, never the released `results/` archive. The launcher refuses to reuse an existing output directory. Choose another `--train-root` for training or `--output-root` for evaluation when rerunning; pass the same `--train-root` when evaluating a newly trained checkpoint from a custom root. It does not overwrite published results.
 
 ## Reading and comparing outputs
 
@@ -110,6 +110,25 @@ Each CADR evaluation folder contains `results.xlsx` with monthly tables, `audit.
 Windows can reject very long paths when saving figures, especially in network folders. If this happens, move the checkout to a shorter local path or set a shorter, new `--output-root`.
 
 For EBDR, see [benchmark/README.md](benchmark/README.md); for CBSP and sensitivity experiments, see [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md). These are separate methods/experiments, not options of the CADR launcher. The evaluation and validation-selection rules are in [docs/EVALUATION_PROTOCOL.md](docs/EVALUATION_PROTOCOL.md).
+
+## Verification and safe output boundaries
+
+Run these commands from the repository root after installing the pinned environment. The standard-library inspection needs no third-party packages or licensed input data:
+
+```powershell
+& $py tools/inspect_release.py
+& $py verify.py
+& $py -m unittest discover -s tests -p "test_run_cadr.py"
+& $py -m unittest discover -s tests -p "test_output_safety.py"
+& $py -m unittest discover -s tests -p "test_data_preparation.py"
+& $py -m unittest discover -s tests -p "test_price_pipeline.py"
+& $py -m unittest discover -s tests -p "test_forecast_installation.py"
+& $py -m unittest discover -s tests -p "test_reproduction_mode_contract.py"
+```
+
+These six test modules must be run with `-m unittest`, rather than directly as scripts. Some other tests in `tests/`, `benchmark.verify_benchmark`, and the retained experiment gates require the authorised demand, price and original/regenerated forecast files; a missing-data error is not evidence of a failed model result. See [Data requirements](data/README.md) and [Experiment instructions](docs/EXPERIMENTS.md). `inspect_release.py` checks that the files exist; its `PASS` is **not** cryptographic validation or a fresh evaluation. Always keep generated results and household-level audits under the ignored `repro_runs/` directory.
+
+On Linux, a standard PyPI PyTorch installation may download CUDA dependencies even when using the CPU, requiring several gigabytes. For a CPU-only installation, check the official PyTorch instructions for the pinned version and verify the installed build before executing the scripts.
 
 ## Licence
 

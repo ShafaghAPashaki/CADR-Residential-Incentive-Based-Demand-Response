@@ -2,7 +2,7 @@
   "status": "ORIGINAL_RETAINED",
   "lambda_source": "train_p95_scenario_action_matching_original_retained",
   "retained_lambda_c": 0.2216381800923157,
-  "capacity_reference_kw": 7,
+  "capacity_reference_kw": 7.0,
   "environment_version": "forecast_state_v1",
   "method_original": "train-only Q95(abs(stakeholder component)) / Q95(unweighted tracking loss)",
   "historical_component_magnitudes": {
@@ -11,15 +11,9 @@
     "derived_lambda_c": 0.2216381800923157,
     "historical_scenarios": 12,
     "historical_actions": 1500,
-    "historical_scenario_identifiers_available": true,
-    "historical_scenario_identifiers_in_public_repository": false,
-    "original_observations_recovered_privately": true,
-    "original_observations_in_public_repository": false,
-    "original_replay_economic_q95": 0.13883091059361805,
-    "original_replay_tracking_q95": 0.626385357142857,
-    "original_replay_lambda_c": 0.22163818009231573
+    "historical_scenario_identifiers_available": false
   },
-  "retention_basis": "The original 12 scenario labels and 1,500 component-level observations were subsequently recovered in a private July 2026 workbook; a historical-environment replay matched the archived components to floating-point tolerance and reproduced the reported calibration statistics. These materials are not included in this public repository pending rights review. The separate deterministic quantile-sampling diagnostic is not a replay of the original sample, and its alternative coefficients were not substituted. The original coefficient was retained without adjustment based on validation or test performance.",
+  "retention_basis": "Original historical scenario IDs were not archived. Independent review compared zero-action-prefix counterfactual re-evaluations on legacy versus frozen causal dynamics using alternative training-only selections. At 12 scenarios the compared values were equal to reported precision; at 48 they differed by 0.00006. The replacement quantile-sampling estimate varied materially with sample count (12, 48, 96), so replacing the original coefficient from that sample was rejected. No test-set model performance or policy reward was used to select a coefficient.",
   "independent_reviewer_reported_replays_not_recomputed_in_this_package": [
     {
       "scenario_count": 12,
@@ -49,6 +43,5 @@
     "learning_rate",
     "network_architecture"
   ],
-  "alternative_capacity_protocol": "Hold the same lambda_c for 6/8 kW; recompute automatic economic normalisation and delta=0.1033/Lcap. Separate future sensitivity runs are not launched by this 7-kW script.",
-  "historical_recovery_note": "Original scenario identifiers and records have been recovered privately, but the historical workbook, licensed data and historical source snapshot are not publicly distributed. Reproduction on the historical inputs is distinct from recalibration in the final forecast-state environment."
+  "alternative_capacity_protocol": "Hold the same lambda_c for 6/8 kW; recompute automatic economic normalisation and delta=0.1033/Lcap. Separate future sensitivity runs are not launched by this 7-kW script."
 }
