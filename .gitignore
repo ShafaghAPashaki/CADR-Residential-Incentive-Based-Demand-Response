@@ -39,3 +39,6 @@ source_hashes.json
 
 # New independent one-seed reproduction outputs
 repro_runs/
+
+# User-supplied raw licensed downloads
+downloads/
