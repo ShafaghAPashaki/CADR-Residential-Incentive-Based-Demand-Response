@@ -7,7 +7,7 @@ The frozen configurations expect two local, untracked files:
 - `data/load_hourly_2018.csv`, columns `dataid,time,air,car,clotheswasher,dishwasher,dry,non-shiftable,total`; dataids `661`, `3039`, `8565`. `time` is parsed by `utils/load_demand.py` (format below). Consumption values are in hourly kWh (numerically equal to mean kW over each one-hour bin). `non-shiftable` is total usage minus the listed flexible appliances, subject to consistent aggregation and treatment of missing values. **The exact private Dataport export and preprocessing provenance must be matched for exact numerical replication.**
 - `data/ercot_hourly_price.csv`, columns `timestamp,Price`; verify the units and source against `utils/load_price.py` and the paper.
 
-Place these files in `data/` locally. Never add them to a public commit. The data hashes of the published study were `c183ce46…` (`load_hourly_2018.csv`) and `56fdd5b4…` (`ercot_hourly_price.csv`); exact reproduction of the forecasts requires byte-identical inputs. To regenerate the forecast inputs used by the DDQN, follow `forecast_regeneration/REGENERATE.md`.
+Place these files in `data/` locally. Never add them to a public commit. The published input hashes were `c183ce46…` (`load_hourly_2018.csv`) and `56fdd5b4…` (`ercot_hourly_price.csv`). A matching hash confirms byte identity; numerically equivalent data alone do not guarantee identical regenerated forecasts. To regenerate the DDQN forecast inputs, follow [`forecast_regeneration/REGENERATE.md`](../forecast_regeneration/REGENERATE.md).
 
 ## Required file names (downloaded name vs. model name)
 
@@ -20,7 +20,7 @@ The downloaded filename can be arbitrary; the final paths below are **mandatory*
 
 The same processed CSVs must be copied to `forecast_regeneration/data/`
 when running the preserved historical LSTM source scripts; see
-`START_HERE_SINGLE_SEED.md`. Neither licensed data files nor downloaded
+the [main guide](../README.md). Neither licensed data files nor downloaded
 source archives should be committed to Git.
 
 **Official acquisition pages:** [Pecan Street Dataport](https://dataport.pecanstreet.org/);

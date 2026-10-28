@@ -1,6 +1,6 @@
 # Development history
 
-This document preserves the implementation history of CADR and EBDR before the validated research release. It is kept for scientific traceability. `CHANGELOG.md` summarises the release itself.
+This document preserves the implementation history of CADR and EBDR before the validated research release for scientific traceability.
 
 ## How to read the version labels
 

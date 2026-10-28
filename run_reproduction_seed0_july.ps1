@@ -84,7 +84,7 @@ if (-not (Test-Path "results\forecast\ddqn_state_forecasts.csv")) {
     throw "Forecast-state file missing; no DDQN training permitted."
 }
 if ($ForecastOnly) {
-    Write-Host "FORECAST-ONLY COMPLETE: now run .\\run_checkpoint_july.ps1 to evaluate the published checkpoint." -ForegroundColor Green
+    Write-Host "FORECAST-ONLY COMPLETE: see README.md for evaluation across seeds and months." -ForegroundColor Green
     return
 }
 RunPython -Arguments @("main.py","--config_path","config_seed_0.yaml",
