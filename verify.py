@@ -109,7 +109,6 @@ def main():
 
     root = Path('.')
     forbidden = [
-        root / '.venv',
         root / 'phd_project.egg-info',
         root / 'setup.py',
         root / 'README_REPORTING_REFRESH.txt',
@@ -129,7 +128,9 @@ def main():
     files = {}
     for path in sorted(p for p in root.rglob('*') if p.is_file()):
         relative = path.as_posix()
-        if '__pycache__' in relative or relative.endswith('.pyc'):
+        if ('__pycache__' in relative or relative.endswith('.pyc')
+                or relative.startswith(('.venv/', 'venv/', 'downloads/', 'repro_runs/'))
+                or relative.startswith(('data/load_hourly_2018.csv', 'data/ercot_hourly_price.csv'))):
             continue
         if 'benchmark/results' in relative or relative == 'source_hashes.json':
             continue
