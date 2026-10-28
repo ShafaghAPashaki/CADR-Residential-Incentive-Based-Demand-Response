@@ -9,6 +9,29 @@ The frozen configurations expect two local, untracked files:
 
 Place these files in `data/` locally. Never add them to a public commit. The data hashes of the published study were `c183ce46…` (`load_hourly_2018.csv`) and `56fdd5b4…` (`ercot_hourly_price.csv`); exact reproduction of the forecasts requires byte-identical inputs. To regenerate the forecast inputs used by the DDQN, follow `forecast_regeneration/REGENERATE.md`.
 
+## Required file names (downloaded name vs. model name)
+
+The downloaded filename can be arbitrary; the final paths below are **mandatory** for the frozen `config_seed_*.yaml` files. Run from the repository root.
+
+| Download or source file | Prepare / rename to | Requirement |
+|---|---|---|
+| Pecan Street Austin 2018, 15-minute Dataport export (e.g. `15minute_data_austin.csv`) | `data/load_hourly_2018.csv` | **Convert with `data/prepare_load.py`; do not merely rename the raw file.** |
+| EnergyOnline ERCOT 2018 hourly price export (Excel/CSV; arbitrary downloaded name) | `data/ercot_hourly_price.csv` | **Select the correct price series first**, produce `timestamp,Price` (USD/MWh), and validate with `data/prepare_price.py`. A raw Excel export with multiple zones cannot merely be renamed. |
+
+The same processed CSVs must be copied to `forecast_regeneration/data/`
+when running the preserved historical LSTM source scripts; see
+`START_HERE_SINGLE_SEED.md`. Neither licensed data files nor downloaded
+source archives should be committed to Git.
+
+**Official acquisition pages:** [Pecan Street Dataport](https://dataport.pecanstreet.org/);
+[EnergyOnline ERCOT Real-time Price](https://www.energyonline.com/Data/GenericData.aspx?DataId=4).
+An alternative official historical market-data index is
+[ERCOT Market Prices](https://www.ercot.com/mktinfo/prices).
+The original EnergyOnline **price zone and extraction settings have not yet
+been recovered**. Do not select a zone arbitrarily or claim an unrelated
+series matches the study. Match a candidate against the locally retained
+historical `ercot_hourly_price.csv` before accepting it as exact.
+
 ## Preparing the inputs yourself
 
 The data directory includes tested scripts and **schema-only/synthetic examples**:
