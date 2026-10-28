@@ -60,8 +60,13 @@ def config_sha256(config: dict[str, Any]) -> str:
     return hashlib.sha256(canonical).hexdigest()
 
 
-def enforce_lambda_calibration(config: dict[str, Any]) -> dict[str, Any]:
+def enforce_lambda_calibration(
+    config: dict[str, Any], *, allow_regenerated_forecasts: bool = False
+) -> dict[str, Any]:
     """Fail closed unless the original, independently reviewed λc is retained.
+
+    Independent reproduction may explicitly allow regenerated forecast bytes;
+    all retained-λc and frozen-environment checks remain mandatory.
 
     The original historical calibration scenario identifiers were recovered
     privately after this training protocol was frozen. They are not shipped
@@ -94,7 +99,8 @@ def enforce_lambda_calibration(config: dict[str, Any]) -> dict[str, Any]:
     if record.get("environment_version") != "forecast_state_v1":
         raise RuntimeError("FINAL CADR TRAINING BLOCKED: retention audit environment mismatch.")
     forecast_path = PROJECT_ROOT / config["forecast"]["ddqn_state_input_file"]
-    if sha256_file(forecast_path) != record.get("training_forecast_file_sha256"):
+    if (sha256_file(forecast_path) != record.get("training_forecast_file_sha256")
+            and not allow_regenerated_forecasts):
         raise RuntimeError("FINAL CADR TRAINING BLOCKED: frozen forecast SHA changed.")
     if sha256_file(PROJECT_ROOT / "env/env.py") != record.get(
         "frozen_cadr_environment_sha256"
