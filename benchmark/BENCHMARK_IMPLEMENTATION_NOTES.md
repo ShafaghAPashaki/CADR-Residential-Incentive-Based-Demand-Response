@@ -53,9 +53,9 @@ load-shifting, or proposed-method reward-normalisation term was introduced.
 3. **State cleanup**
    - Removed three archived current-reduction inputs that were always zero when
      the current action was selected.
-   - The active state has 12 features: three household baselines, clipped-log
-     current price, elasticity, normalized hour, aggregate baseline, holiday,
-     weekend, and on/mid/off-peak flags.
+   - The 12-feature state retains the archived feature structure. The current
+     version uses forecast household loads and forecast price in place of
+     realised current load and price; see the forecast-state fairness note below.
    - No capacity-derived feature is present.
 
 4. **Response wiring**
@@ -65,8 +65,8 @@ load-shifting, or proposed-method reward-normalisation term was introduced.
 
 5. **Negative-price correction**
    - Real hourly prices, including negative values, remain in `R_SP`.
-   - Day-level incentive bounds use the previous day's minimum strictly positive price; the
-     day, preventing one negative hour from inverting the bound gap and
+   - Day-level incentive bounds use the previous day's minimum strictly positive price,
+     preventing one negative hour from inverting the bound gap and
      disabling response for the whole day.
    - A hypothetical day with no positive price has zero nominal bounds and zero
      physical response.

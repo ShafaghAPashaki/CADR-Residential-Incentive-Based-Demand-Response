@@ -85,11 +85,3 @@ verifies that none has changed. The DDQN will use:
 * **Determinism:** fold 0 of every target is retrained from scratch and must
   reproduce its predictions (≤ 1e-6).
 * **Hashes:** SHA-256 of every output artifact, re-verified independently.
-
-## Suggested manuscript sentence
-
-> Forecasts supplied during DDQN training (days 2–167) were generated
-> out-of-fold using five contiguous blocks with 73-h exclusion buffers, so that
-> no training-day forecast was produced by a model fitted on that day's data;
-> all fitting used training-period data only, and validation and test forecasts
-> were produced by the models fitted on the full training period.

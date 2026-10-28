@@ -17,7 +17,7 @@ Usage, from the project root (arguments after the target are passed through):
 
     python tools/evaluate_with_regenerated_forecasts.py test.py \
         --model_path results/seed_0/training/ddqn_best.pth --config_path config_seed_0.yaml \
-        --output_dir eval_regenerated/cadr_s0_july --test_start 182 --test_end 212 --target_plot_days 208
+        --output_dir repro_runs/eval_regenerated/cadr_s0_july --test_start 182 --test_end 212 --target_plot_days 208
 
     python tools/evaluate_with_regenerated_forecasts.py experiments/evaluate_matched_hems_ablation.py --seed 0 --month july --root <fresh_root>
     python tools/evaluate_with_regenerated_forecasts.py experiments/evaluate_capacity_incentive_sensitivity.py --run lev10

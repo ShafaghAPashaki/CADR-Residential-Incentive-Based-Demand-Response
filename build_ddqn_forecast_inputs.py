@@ -20,7 +20,7 @@ LOAD_FULL = FORECAST_DIR / "load" / "lstm_load_predictions_all.csv"
 PRICE_FULL = FORECAST_DIR / "price" / "lstm_price_predictions_all.csv"
 CROSSFIT_GATE = FORECAST_DIR / "crossfit" / "crossfit_gate.txt"
 OUTPUT = FORECAST_DIR / "ddqn_state_forecasts.csv"
-PROVENANCE = FORECAST_DIR / "ddqn_state_forecasts_provenance.json"
+PROVENANCE = ROOT / "repro_runs" / "forecast" / "ddqn_state_forecasts_provenance.json"
 HOUSE_IDS = [661, 3039, 8565]
 
 
@@ -33,6 +33,9 @@ def sha256_file(path: Path) -> str:
 
 
 def main() -> None:
+    for target in (OUTPUT, PROVENANCE):
+        if target.exists():
+            raise FileExistsError(f"Refusing to overwrite existing output: {target}")
     if CROSSFIT_GATE.read_text(encoding="utf-8").strip() != "READY":
         raise RuntimeError("Cross-fit gate is not READY.")
 
@@ -123,7 +126,10 @@ def main() -> None:
     if aggregate_error > 1e-9:
         raise RuntimeError(f"Aggregate forecast mismatch: {aggregate_error:.3e}")
 
-    combined.to_csv(OUTPUT, index=False)
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    PROVENANCE.parent.mkdir(parents=True, exist_ok=True)
+    with OUTPUT.open("x", encoding="utf-8", newline="") as handle:
+        combined.to_csv(handle, index=False)
     provenance = {
         "version": "ddqn_state_forecasts_v1",
         "routing": {
@@ -156,9 +162,8 @@ def main() -> None:
         },
         "output_sha256": sha256_file(OUTPUT),
     }
-    PROVENANCE.write_text(
-        json.dumps(provenance, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    with PROVENANCE.open("x", encoding="utf-8") as handle:
+        handle.write(json.dumps(provenance, indent=2, sort_keys=True) + "\n")
     print(json.dumps(provenance, indent=2))
 
 

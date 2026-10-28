@@ -175,7 +175,12 @@ def main():
     parser.add_argument('--method',choices=['cadr','ebdr'],required=True)
     parser.add_argument('--seed',type=int,choices=[0,1,2],required=True)
     parser.add_argument('--period',choices=PERIODS,required=True)
+    parser.add_argument('--output-root',default='repro_runs/diagnostics')
     args=parser.parse_args()
+    out=Path(args.output_root)/args.method/f'seed_{args.seed}'
+    destination=out/f'value_of_information_{args.period}.csv'
+    if destination.exists():
+        raise FileExistsError(f'Immutable evaluation output already exists: {destination}')
     require_real_holidays()
     if args.method=='cadr':
         path=ROOT/f'config_seed_{args.seed}.yaml'
@@ -188,12 +193,8 @@ def main():
     rows=[]
     for mode in ('forecast','oracle_actual'):
         rows.extend(evaluate_one(args.method,cfg,checkpoint,mode,args.period))
-    out=ROOT/'results'/'final_diagnostics'/args.method/f'seed_{args.seed}'
     out.mkdir(parents=True,exist_ok=True)
-    destination=out/f'value_of_information_{args.period}.csv'
-    if destination.exists():
-        raise FileExistsError(f'Immutable evaluation output already exists: {destination}')
-    with destination.open('w',newline='',encoding='utf-8') as f:
+    with destination.open('x',newline='',encoding='utf-8') as f:
         writer=csv.DictWriter(f,fieldnames=list(rows[0]))
         writer.writeheader(); writer.writerows(rows)
     print(f'Wrote {destination}; inference only, no policy update or tuning')

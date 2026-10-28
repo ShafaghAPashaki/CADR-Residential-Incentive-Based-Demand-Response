@@ -6,7 +6,9 @@ with the unmodified test.py.
 """
 import argparse
 import sys
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from capacity_incentive_sensitivity import OUT_ROOT, ROOT, RUNS, environment_class
 
 sys.path.insert(0, str(ROOT))
@@ -15,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--run", choices=sorted(RUNS) + ["ref7"], required=True)
+    p.add_argument("--output-root", default="repro_runs/sensitivity")
     args = p.parse_args()
     if args.run == "ref7":
         model = ROOT / "results/seed_0/training/ddqn_best.pth"
@@ -23,7 +26,7 @@ def main():
     else:
         train_dir = OUT_ROOT / args.run / "seed_0" / "training"
         model, config, levels = train_dir / "ddqn_best.pth", train_dir / "config.yaml", RUNS[args.run]["levels"]
-    out = OUT_ROOT / args.run / "july"
+    out = Path(args.output_root) / args.run / "july"
     if out.exists():
         raise SystemExit(f"Refusing to overwrite {out}")
 

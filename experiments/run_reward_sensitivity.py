@@ -56,7 +56,7 @@ def configure(group, value):
         )
     else:
         cfg['environment']['rho'] = float(value)
-    rel = f'results/sensitivity_{group}/runs/{dirname(group, value)}'
+    rel = f'repro_runs/sensitivity_{group}/runs/{dirname(group, value)}'
     cfg['general']['results_root'] = rel
     return cfg, hashlib.sha256(raw).hexdigest()
 
@@ -112,7 +112,7 @@ def write_summary(group):
         rec = selected_row(group, value, sha, cfg)
         if rec:
             records.append(rec)
-    target = ROOT / 'results' / f'sensitivity_{group}' / 'summary.csv'
+    target = ROOT / 'repro_runs' / f'sensitivity_{group}' / 'summary.csv'
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open('w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)

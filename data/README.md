@@ -44,7 +44,7 @@ For a properly licensed `15minute_data_austin.csv` export of 2018, run from the 
 ```powershell
 python data/prepare_load.py --input downloads/15minute_data_austin.csv --output data/load_hourly_2018.csv --year 2018
 python data/prepare_price.py --input downloads/ercot_hourly_2018.csv --output data/ercot_hourly_price.csv --year 2018
-python -m unittest tests.test_data_preparation -v
+python -m unittest discover -s tests -p test_data_preparation.py -v
 ```
 
 **Original load transformations recovered.** The independent preparation code follows the
@@ -60,7 +60,8 @@ This method was tested against the locally held 2018 original processed file:
 all **218,835 household-hours across 25 IDs** matched in every consumption column
 within `1e-9`; maximum absolute difference `1.7763568394002505e-15`.
 The generated CSV may have a different byte-level SHA-256 because of row ordering,
-float-to-text formatting and column serialization, despite numerically matching.
+float-to-text formatting, column serialization or operating-system line endings,
+despite numerically matching.
 The original Pecan Street source is not redistributed.
 
 A fresh Dataport download must still cover the correct channels, household IDs and
@@ -128,7 +129,7 @@ USD/MWh by ten to obtain cent/kWh.
 ## Exact parsing and units
 
 - Residential `time`: strictly `dd/mm/yyyy HH:MM` (the loader uses `%d/%m/%Y %H:%M`); one row per house per hour.
-- The study's file contained 25 Dataport households with 8,754 hourly rows each; only `661`, `3039` and `8565` are used (the loaders filter by `dataid`). Its SHA-256 (`c183ce46…`) therefore depends on the full 25-household export; a file containing only the three households will not match that hash (the code filters by `dataid`, but a three-household file has not been tested).
+- The study's file contained 218,835 rows for 25 Dataport households: 23 households have 8,754 rows, one has 8,752, and one has 8,741. The three used households (`661`, `3039`, `8565`) each have 8,754 rows. Its SHA-256 (`c183ce46…`) depends on the full 25-household export; a file containing only the three households will not match that hash (the code filters by `dataid`, but a three-household file has not been tested).
 - In the study's file `total` equals the sum of the six other columns for every row of the three households (maximum difference 2e-15).
 - `air`, `car`, `clotheswasher`, `dishwasher`, `dry`, `non-shiftable`, `total`: hourly energy in kWh. In hourly bins the numerical value equals mean kW.
 - Appliances correspond to the like-named hourly Pecan Street Dataport channels after aggregation into hourly intervals. Determine the source export's original granularity, timezone and missing-value treatment under your own Dataport license.

@@ -1,6 +1,6 @@
 # Forecasting
 
-The forecasting scripts at the repository root (`predict_load_lstm.py`, `predict_price_lstm.py`, `build_forecast_outputs.py`, `build_ddqn_forecast_inputs.py`) produce one-hour-ahead LSTM forecasts of household demand and wholesale electricity price, and merge them into the DDQN forecast-state table. They need the licensed input data (`data/README.md`). To regenerate the exact forecast inputs of the published checkpoints, use `forecast_regeneration/REGENERATE.md` instead.
+The forecasting scripts produce one-hour-ahead LSTM forecasts of household demand and wholesale electricity price, and merge them into the DDQN forecast-state table. They need the licensed input data (`data/README.md`). For the sources and steps used to regenerate the published forecast inputs, see `forecast_regeneration/REGENERATE.md`. The regenerated inputs are not guaranteed to be byte-identical; see `REPRODUCIBILITY.md`.
 
 ## Model specification
 
@@ -21,6 +21,8 @@ The forecasting scripts at the repository root (`predict_load_lstm.py`, `predict
 
 ## Run
 
+The legacy root driver below writes reports into `results/forecast/`. Run it in a separate working copy if you need to preserve the archived results. For the reader-facing reproduction route, use the forecast preparation in the main `README.md` instead.
+
 ```powershell
 .\run_lstm_forecasts.ps1 `
   -Python "C:\path\to\python.exe" `
@@ -37,6 +39,8 @@ Static validation only:
 ```
 
 ## Output structure
+
+The tree below describes a complete local forecast run; the public release contains only selected outputs and does not distribute licensed data or household-derived forecasts.
 
 ```text
 results/forecast/

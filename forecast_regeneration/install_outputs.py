@@ -44,8 +44,6 @@ COPIES = [
      ROOT / "results/forecast/price/lstm_price_predictions_all.csv"),
     (HERE / "crossfit_results/combined/ddqn_crossfit_forecasts_days_002_167.csv",
      ROOT / "results/forecast/crossfit/ddqn_crossfit_forecasts_days_002_167.csv"),
-    (HERE / "crossfit_results/audit/crossfit_gate.txt",
-     ROOT / "results/forecast/crossfit/crossfit_gate.txt"),
 ]
 
 
@@ -65,24 +63,26 @@ def main() -> None:
         if not src.exists():
             raise SystemExit(f"Missing regenerated output: {src}")
 
+    installed_gate = ROOT / "results/forecast/crossfit/crossfit_gate.txt"
+    if installed_gate.exists() and installed_gate.read_text(encoding="utf-8").strip() != "READY":
+        raise SystemExit(f"Existing gate is not READY: {installed_gate}")
+    generated_copy = ROOT / "repro_runs/forecast/ddqn_state_forecasts_provenance.json"
+    targets = [dst for _, dst in COPIES] + [
+        ROOT / "results/forecast/ddqn_state_forecasts.csv", generated_copy
+    ]
+    for target in targets:
+        if target.exists():
+            raise SystemExit(f"Refusing to overwrite existing output: {target}")
+
     for src, dst in COPIES:
         dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
-    # The original builder rewrites a tracked reference provenance JSON.
-    # Keep that historical record intact, while retaining the independently
-    # generated provenance under the ignored reproduction output directory.
-    reference = ROOT / "results/forecast/ddqn_state_forecasts_provenance.json"
-    historical_bytes = reference.read_bytes() if reference.exists() else None
-    generated_copy = ROOT / "repro_runs/forecast/ddqn_state_forecasts_provenance.json"
-    try:
-        subprocess.run([sys.executable, str(ROOT / "build_ddqn_forecast_inputs.py")], cwd=ROOT, check=True)
-        generated_copy.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(reference, generated_copy)
-    finally:
-        if historical_bytes is None:
-            reference.unlink(missing_ok=True)
-        else:
-            reference.write_bytes(historical_bytes)
+        with src.open("rb") as source, dst.open("xb") as target:
+            shutil.copyfileobj(source, target)
+    if not installed_gate.exists():
+        installed_gate.parent.mkdir(parents=True, exist_ok=True)
+        with installed_gate.open("x", encoding="utf-8") as target:
+            target.write("READY\n")
+    subprocess.run([sys.executable, str(ROOT / "build_ddqn_forecast_inputs.py")], cwd=ROOT, check=True)
     print(f"Regenerated forecast provenance saved to {generated_copy}")
 
     actual = {

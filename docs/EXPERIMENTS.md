@@ -46,12 +46,11 @@ Choose seeds 0, 1 or 2 and `july` or `august`; use a new root for each independe
 | `tools/summarize_capacity_incentive_sensitivity.py` | Recomputes the July summaries from the private hourly workbooks |
 | `results/capacity_incentive_sensitivity/` | Checkpoints, validation metrics, timing and July summaries |
 
-```
-python experiments/run_capacity_incentive_sensitivity.py --run cap6 --dry-run
-python experiments/evaluate_capacity_incentive_sensitivity.py --run cap6
+```powershell
+& $py tools/evaluate_with_regenerated_forecasts.py experiments/evaluate_capacity_incentive_sensitivity.py --run cap6
 ```
 
-The evaluation writes to `results/capacity_incentive_sensitivity/<run>/july/`, so move the stored `july/` folder aside first, or run from a copy of the repository.
+Replace `cap6` with `cap8`, `lev10`, or `ref7`. New evaluations are written to `repro_runs/sensitivity/<run>/july/`; choose a new `--output-root` for a repeat. After evaluating all three sensitivity runs and CADR Seed 0 for July, `& $py tools/summarize_capacity_incentive_sensitivity.py` reads the new audit workbooks. Historical sensitivity retraining uses a fixed `results/` location and refuses to reuse stored runs; run it only in a separate working copy.
 
 ## Reward-parameter sensitivity (η, ρ)
 
@@ -62,19 +61,19 @@ python experiments/run_reward_sensitivity.py --group both --dry-run
 python experiments/run_reward_sensitivity.py --group eta
 ```
 
-The summaries are in `results/sensitivity_eta/summary.csv` and `results/sensitivity_rho/summary.csv`. The ρ run configurations are recorded in `configs/rho_sensitivity/`. The per-run checkpoints are not distributed. `diagnostics/eta_sensitivity_diagnostic.py` and `diagnostics/rho_energy_balance_diagnostic.py` produce the files in `results/sensitivity_{eta,rho}/diagnostics/`; they need the per-run outputs under `results/sensitivity_{eta,rho}/runs/`, which a retraining creates.
+The archived summaries are in `results/sensitivity_eta/summary.csv` and `results/sensitivity_rho/summary.csv`. New runs and summaries are written under `repro_runs/sensitivity_{eta,rho}/`; the ρ run configurations are recorded in `configs/rho_sensitivity/`. The per-run checkpoints are not distributed. The two sensitivity diagnostics require newly trained runs and write to `repro_runs/diagnostics/sensitivity_{eta,rho}/`.
 
 ## Diagnostics
 
 | Script | Output | Purpose |
 |---|---|---|
-| `diagnostics/evaluate_value_of_information.py --method cadr --seed 0 --period july` | `results/final_diagnostics/{cadr,ebdr}/seed_*/value_of_information_*.csv` | Inference-only comparison of forecast and oracle state inputs; no retraining or reselection |
-| `diagnostics/evaluate_forecast_confusion.py` | `results/final_diagnostics/forecast_capacity_confusion.json` | Fixed 7-kW confusion counts of the archived forecasts |
+| `diagnostics/evaluate_value_of_information.py --method cadr --seed 0 --period july` | `repro_runs/diagnostics/{cadr,ebdr}/seed_*/value_of_information_*.csv` | Inference-only comparison of forecast and oracle state inputs; no retraining or reselection |
+| `diagnostics/evaluate_forecast_confusion.py` | `repro_runs/diagnostics/forecast_capacity_confusion.json` | Fixed 7-kW confusion counts for the active forecast inputs |
 | `diagnostics/verify_retained_lambda.py` | console | Checks the retained λc, configurations and frozen hashes |
 | `diagnostics/measure_inference_time.py` | `local_validation/inference_timing_seed0.json` | CPU timing of Seed-0 inference |
-| `q_action_diagnostic.py` | `results/seed_*/q_diagnostic.xlsx` | Q-value ordering audit, run by `test_all_seeds.ps1` |
+| `q_action_diagnostic.py` | configurable | Q-value ordering audit |
 | `reward_counterfactual_audit.py` | (module) | Counterfactual reward evaluation used by the Q-value audit |
-| `summarize_results.py` | `results/summary.xlsx` | Three-seed mean and standard deviation summary |
+| `summarize_results.py` | `repro_runs/summary.xlsx` | Three-seed mean and standard deviation summary |
 | `calibrate_lambda_c.py` | `results/calibration_diagnostics/` | λc calibration sensitivity; never changes the frozen configurations |
 
-`run_inference_only_oracle_checks.ps1` runs the value-of-information evaluation for both methods, all seeds and all periods.
+`run_inference_only_oracle_checks.ps1 -Python $py` runs the value-of-information evaluation for both methods, all seeds and all periods. Results produced with regenerated forecasts inherit the reproducibility limitation described in the main guide.

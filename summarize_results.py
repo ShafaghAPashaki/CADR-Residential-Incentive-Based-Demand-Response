@@ -112,8 +112,13 @@ def main():
         default="results",
         help="Directory containing seed_0, seed_1 and seed_2 outputs.",
     )
+    parser.add_argument("--output", default="repro_runs/summary.xlsx",
+                        help="New output workbook; existing files are not overwritten.")
     args = parser.parse_args()
     root = Path(args.results_root)
+    out = Path(args.output)
+    if out.exists():
+        raise FileExistsError(f"Refusing to overwrite existing output: {out}")
     per_seed_rows = []
     stability_rows = []
     for period in PERIODS:
@@ -142,13 +147,14 @@ def main():
     failures = per_seed[failure_cols].copy()
     q = q_summary(root)
 
-    out = root / "summary.xlsx"
-    with pd.ExcelWriter(out, engine="openpyxl") as writer:
-        per_seed.to_excel(writer, sheet_name="Seed_Performance", index=False)
-        aggregate.to_excel(writer, sheet_name="Mean_SD", index=False)
-        stability.to_excel(writer, sheet_name="Signal_Stability", index=False)
-        failures.to_excel(writer, sheet_name="Failure_Cases", index=False)
-        q.to_excel(writer, sheet_name="Q_Diagnostic", index=False)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("xb") as handle:
+        with pd.ExcelWriter(handle, engine="openpyxl") as writer:
+            per_seed.to_excel(writer, sheet_name="Seed_Performance", index=False)
+            aggregate.to_excel(writer, sheet_name="Mean_SD", index=False)
+            stability.to_excel(writer, sheet_name="Signal_Stability", index=False)
+            failures.to_excel(writer, sheet_name="Failure_Cases", index=False)
+            q.to_excel(writer, sheet_name="Q_Diagnostic", index=False)
     print(f"Summary saved: {out.resolve()}")
 
 

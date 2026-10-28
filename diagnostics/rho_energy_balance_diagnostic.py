@@ -13,8 +13,8 @@ sys.path.insert(0, str(ROOT))
 from env import Environment  # noqa: E402
 from agent.agent_ddqn import DDQNAgent  # noqa: E402
 
-BASE = ROOT / 'results' / 'sensitivity_rho'
-OUT = BASE / 'diagnostics'
+BASE = ROOT / 'repro_runs' / 'sensitivity_rho'
+OUT = ROOT / 'repro_runs' / 'diagnostics' / 'sensitivity_rho'
 OUT.mkdir(parents=True, exist_ok=True)
 RUNS = ['rho_0p1', 'rho_0p3', 'rho_0p5', 'rho_0p7', 'rho_0p9']
 daily_rows = []
@@ -58,7 +58,7 @@ for run in RUNS:
 
 for name, rows in [('rho_daily_energy_balance.csv', daily_rows),
                    ('rho_energy_audit_summary.csv', summary_rows)]:
-    with (OUT / name).open('w', newline='', encoding='utf-8') as f:
+    with (OUT / name).open('x', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)

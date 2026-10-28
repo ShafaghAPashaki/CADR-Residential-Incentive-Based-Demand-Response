@@ -10,11 +10,10 @@ The hourly workbooks contain licensed household data and are not distributed.
 Re-create them by evaluating the released checkpoints with licensed inputs,
 then run, from the project root:
 
-    python tools/export_aggregate_metrics.py --out results/aggregate_metrics/per_seed_monthly_metrics.csv
+    python tools/export_aggregate_metrics.py --out repro_runs/per_seed_monthly_metrics.csv
 
-Default input locations follow test_all_seeds.ps1, benchmark/test_benchmark_seeds.ps1
-and experiments/evaluate_matched_hems_ablation.py. Use --cadr-root/--cbsp-root/--ebdr-root to
-point at fresh evaluation folders instead.
+Use --cadr-root/--cbsp-root/--ebdr-root/--sensitivity-root to point at fresh
+evaluation folders. Existing outputs are never overwritten.
 """
 from __future__ import annotations
 
@@ -34,7 +33,10 @@ HOUSES = ("661", "3039", "8565")
 
 def _sheet(path: Path, name: str) -> list[dict]:
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
-    rows = list(wb[name].iter_rows(values_only=True))
+    try:
+        rows = list(wb[name].iter_rows(values_only=True))
+    finally:
+        wb.close()
     header = rows[0]
     return [dict(zip(header, r)) for r in rows[1:] if r[0] is not None]
 
@@ -111,6 +113,7 @@ def cadr_like(path: Path, cap_kw: float = CAP_KW) -> dict:
             m[f"{name}_curtailment_kWh"] = r[4]
             m[f"{name}_shifted_out_kWh"] = r[5]
             m[f"{name}_shifted_in_kWh"] = r[6]
+    wb.close()
     return m
 
 
@@ -146,8 +149,11 @@ def main() -> None:
     ap.add_argument("--sensitivity-root", default="results/capacity_incentive_sensitivity",
                     help="Folder holding cap6/, cap8/ and lev10/ July evaluations (Appendix H/I).")
     ap.add_argument("--skip-sensitivity", action="store_true")
-    ap.add_argument("--out", default="results/aggregate_metrics/per_seed_monthly_metrics.csv")
+    ap.add_argument("--out", default="repro_runs/per_seed_monthly_metrics.csv")
     args = ap.parse_args()
+    out = Path(args.out)
+    if out.exists():
+        raise FileExistsError(f"Refusing to overwrite existing output: {out}")
 
     rows = []
     for seed in SEEDS:
@@ -175,9 +181,8 @@ def main() -> None:
                 rows.append({"method": f"CADR_{run}", "seed": 0, "month": "july",
                              "metric": metric, "value": value})
 
-    out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    with out.open("w", newline="", encoding="utf-8") as handle:
+    with out.open("x", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["method", "seed", "month", "metric", "value"])
         writer.writeheader()
         writer.writerows(rows)

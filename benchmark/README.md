@@ -67,63 +67,31 @@ reward-normalisation term is present.
 - `run_benchmark_seeds.ps1`: sequential fail-stop training
 - `test_benchmark_seeds.ps1`: three seeds × three periods, then summaries
 
-## Output structure
+## Running the benchmark
 
-```text
-results/
-  benchmark/
-    seed_0/
-      training/
-      july/
-      august/
-      november/
-    seed_1/
-    seed_2/
-    summary.xlsx
-  method_comparison.xlsx
-```
+First follow the data, environment and forecast preparation in the [main guide](../README.md). A regenerated forecast can differ from the one used for the paper, so its checkpoint evaluation is approximate; unlike the CADR wrapper, EBDR does not write a forecast-hash warning.
 
-## Required execution order
-
-Run commands from the project root.
-
-### 1. Verify before any training
+From the repository root, verify the implementation:
 
 ```powershell
-& $PY -m benchmark.verify_benchmark
+& $py -m benchmark.verify_benchmark
 ```
 
-Expected:
-
-```text
-BENCHMARK VERIFY: PASS
-```
-
-### 2. Optional local smoke test
-
-The smoke output is isolated under `results/benchmark_smoke` and must never be
-used in final method comparisons.
+Evaluate a published checkpoint into a new folder. For example, Seed 1 in August:
 
 ```powershell
-& $PY -m benchmark.main_benchmark `
-  --config benchmark/config_benchmark_seed_0.yaml `
-  --smoke-test
+& $py -m benchmark.test_benchmark --model_path results/benchmark/seed_1/training/ddqn_best.pth --config_path benchmark/config_benchmark_seed_1.yaml --period august --output_dir repro_runs/ebdr/seed_1/august
 ```
 
-### 3. Three-seed training
+Change both seed numbers to `0`, `1` or `2`, and choose `july`, `august` or `november` for the period and output folder. Use a new output folder for each run. July and August are the manuscript test periods; November is an additional retained period.
+
+The benchmark training driver uses a fixed output under `results/benchmark/` and refuses an existing training folder. To retrain, work in a separate copy of the repository without the benchmark training outputs in that copy, then run:
 
 ```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\benchmark\run_benchmark_seeds.ps1 -Python $PY
+powershell -ExecutionPolicy Bypass -File .\benchmark\run_benchmark_seeds.ps1 -Python $py
 ```
 
-### 4. Three-seed, three-period testing
-
-```powershell
-.\benchmark\test_benchmark_seeds.ps1 -Python $PY
-```
-
-On the first full test, do not pass `-Overwrite`.
+The legacy `test_benchmark_seeds.ps1` and summary utilities also use fixed paths under `results/`. Use a separate working copy for them; the individual evaluation command above keeps the released results intact.
 
 ## Comparison boundary
 

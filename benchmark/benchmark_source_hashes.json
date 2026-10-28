@@ -8,9 +8,9 @@
   "main_benchmark.py": "32c9df08e35ed6c644690b97b95110cbaa873ac4bfb5432c259ed4b69446d8ee",
   "env_benchmark.py": "b8e5ea4685fd7809dc402ae66da080bb9c47c3e873629efc8a82877ea08d30d7",
   "verify_benchmark.py": "0e330c60d1d02bc366f23591f66cd3d7baf52c373f64bb03186b511d5f323f81",
-  "BENCHMARK_IMPLEMENTATION_NOTES.md": "da6d63105452820ded27d843745d642f4b0cf5ceb64159e323a11094b7a3ab82",
+  "BENCHMARK_IMPLEMENTATION_NOTES.md": "0482b9ca10a3586cff29183b34b5894e5108248170736df94be0a60395f3a292",
   "test_benchmark.py": "d8ae69f15cde0b4c5fa132888eec25945180d6facaceab1b3a818ac9d999e549",
-  "README.md": "be1e76a20bf20dc976750b957a3702f886dc35462027c2466e899d4d7a69bf6d",
+  "README.md": "083ee252015a7f3338b50670ab92466af07805aac9b2e66ea2bc031d6efaeb04",
   "compare_methods.py": "18afdf46eac5493cd64f38996518794f247c3117a43889ccc95c7f386dff10f7",
   "config_benchmark_seed_2.yaml": "abf1e2df5ecedf8b89507a7e22cfbc51cee243ab53ee820d64d3f5fa9119c814"
 }

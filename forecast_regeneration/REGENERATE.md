@@ -50,13 +50,13 @@ cp ../data/load_hourly_2018.csv ../data/ercot_hourly_price.csv data/
 cd ..
 ```
 
-Everything this folder writes (`data/`, `results/`, `crossfit_results/`) is listed in `.gitignore`. These files contain licensed or household-derived data and must never be committed.
+Everything this folder writes (`data/`, `results/`, `crossfit_results/`) is listed in `.gitignore`. These files contain licensed or household-derived data and must never be committed. The installer refuses to overwrite existing installed forecasts and writes its new provenance to `repro_runs/forecast/`; the archived provenance and gate remain unchanged.
 
 ## What to expect
 
 `install_outputs.py` compares each stage with the published run:
 
-| Stage | Recorded SHA-256 (prefix) | Observed in an independent rerun (Linux, Python 3.13, torch 2.13.0) |
+| Stage | Recorded SHA-256 (prefix) | Observed in an independent rerun |
 |---|---|---|
 | Load data | `c183ce46` | Historical file hash |
 | Price data | `56fdd5b4` | Historical file hash |

@@ -5,6 +5,7 @@ Rows: training, validation, July, August, November; threshold fixed at 7 kW.
 """
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -17,6 +18,11 @@ CAPACITY=7.0
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output',default=str(ROOT/'repro_runs/diagnostics/forecast_capacity_confusion.json'))
+    destination=Path(parser.parse_args().output)
+    if destination.exists():
+        raise FileExistsError(f'Refusing to overwrite existing output: {destination}')
     forecast=pd.read_csv(ROOT/'results/forecast/ddqn_state_forecasts.csv',parse_dates=['timestamp'])
     real=pd.read_csv(ROOT/'data/load_hourly_2018.csv')
     real['timestamp']=pd.to_datetime(real['time'],format='%d/%m/%Y %H:%M',errors='raise')
@@ -39,9 +45,8 @@ def main():
             'false_positives':int((~truth&prediction).sum()),
             'true_negatives':int((~truth&~prediction).sum()),
         }
-    destination=ROOT/'results/final_diagnostics/forecast_capacity_confusion.json'
     destination.parent.mkdir(parents=True,exist_ok=True)
-    destination.write_text(json.dumps({
+    result={
         'threshold_kw': CAPACITY,
         'definition':'strict forecast and actual > 7 kW',
         'forecast_aggregate_definition':(
@@ -51,7 +56,9 @@ def main():
             'controller feature itself is not redefined by this diagnostic.'
         ),
         'splits':outputs,
-    },indent=2)+'\n',encoding='utf-8')
+    }
+    with destination.open('x',encoding='utf-8') as handle:
+        handle.write(json.dumps(result,indent=2)+'\n')
     print(destination)
     for k,v in outputs.items(): print(k,v)
 

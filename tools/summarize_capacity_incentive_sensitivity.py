@@ -4,8 +4,7 @@ private Hourly_Audit workbooks. Requires only the Python standard library.
 Run from the project root after evaluating the runs (see TABLE_MAP.md).
 DO NOT publish the audit workbooks, which include licensed household data.
 """
-import sys, zipfile, xml.etree.ElementTree as ET, re, pathlib
-from collections import defaultdict
+import argparse, sys, zipfile, xml.etree.ElementTree as ET, re, pathlib
 M='{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
 
 def hourly_rows(path):
@@ -66,19 +65,24 @@ def summarise(rows):
       eu_utility_cent=sum(r['weighted_customer_utility'] for r in rows))
 
 def main():
-    root=pathlib.Path(__file__).resolve().parents[1]
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--cadr-root',default='repro_runs/eval/published')
+    parser.add_argument('--sensitivity-root',default='repro_runs/sensitivity')
+    args=parser.parse_args()
+    cadr=pathlib.Path(args.cadr_root)
+    sensitivity=pathlib.Path(args.sensitivity_root)
     cases={
-      'H: 6 kW':root/'results/capacity_incentive_sensitivity/cap6/july/audit.xlsx',
-      'H: 7 kW / I: 5 levels':root/'results/seed_0/july/audit.xlsx',
-      'H: 8 kW':root/'results/capacity_incentive_sensitivity/cap8/july/audit.xlsx',
-      'I: 10 levels':root/'results/capacity_incentive_sensitivity/lev10/july/audit.xlsx',
+      'H: 6 kW':sensitivity/'cap6/july/audit.xlsx',
+      'H: 7 kW / I: 5 levels':cadr/'seed_0/july/audit.xlsx',
+      'H: 8 kW':sensitivity/'cap8/july/audit.xlsx',
+      'I: 10 levels':sensitivity/'lev10/july/audit.xlsx',
     }
     for name,p in cases.items():
         if not p.exists():
             print(f'MISSING {name}: {p}',file=sys.stderr)
             return 1
         m=summarise(list(hourly_rows(p)))
-        print(f'\n{name} — {p.relative_to(root)}')
+        print(f'\n{name} — {p}')
         for k,v in m.items():print(f'  {k}: {v:.6f}' if isinstance(v,float) else f'  {k}: {v}')
     print('\nNote: checkpoint selections and training durations are checked from separate training records.')
     return 0

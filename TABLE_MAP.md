@@ -1,8 +1,8 @@
 # Manuscript tables and figures: where each number comes from
 
-**Data file.** `results/aggregate_metrics/per_seed_monthly_metrics.csv` holds the seed-level monthly values behind the main tables. It has one row per (method, seed, month, metric). Every table reports the mean and sample standard deviation (ddof = 1) over seeds 0, 1 and 2.
+**Data file.** `results/aggregate_metrics/per_seed_monthly_metrics.csv` holds the seed-level monthly values behind the main tables. It has one row per (method, seed, month, metric). Primary three-seed method comparisons use the mean and sample standard deviation (ddof = 1) over seeds 0, 1 and 2; seed-specific sensitivity results are identified below.
 
-**Regenerating it.** The file was produced by `tools/export_aggregate_metrics.py` from evaluation workbooks (`audit.xlsx`, `results.xlsx`). Detailed audits contain licensed household data and are not distributed. Recreate the CADR, CBSP, EBDR and sensitivity evaluations with licensed inputs, then point the exporter to their new roots. Choose a new output path: the exporter's default overwrites the archived CSV.
+**Regenerating it.** The file was produced by `tools/export_aggregate_metrics.py` from evaluation workbooks (`audit.xlsx`, `results.xlsx`). Detailed audits contain licensed household data and are not distributed. Recreate the CADR, CBSP, EBDR and sensitivity evaluations with licensed inputs, then point the exporter to their new roots. The default output is `repro_runs/per_seed_monthly_metrics.csv`; existing outputs are not overwritten.
 
 ```
 python tools/export_aggregate_metrics.py --cadr-root repro_runs/eval/published --cbsp-root repro_runs/cbsp --ebdr-root repro_runs/ebdr --sensitivity-root repro_runs/sensitivity --out repro_runs/per_seed_monthly_metrics.csv
@@ -16,7 +16,7 @@ python tools/export_aggregate_metrics.py --cadr-root repro_runs/eval/published -
 
 | Item | Metrics in the CSV | Method rows | Produced by |
 |---|---|---|---|
-| Table 3, operational performance | `baseline_*`, `exceedance_hours`, `cumulative_excess_kWh`, `mean_load_kW`, `mean_daily_peak_kW`, `daily_PAR`, `useful_DR_kWh` | CADR | `test.py` via `test_all_seeds.ps1` |
+| Table 3, operational performance | `baseline_*`, `exceedance_hours`, `cumulative_excess_kWh`, `mean_load_kW`, `mean_daily_peak_kW`, `daily_PAR`, `useful_DR_kWh` | CADR | `test.py` via `tools/run_cadr.py` |
 | §5.1 percentage reductions | ratios of Table 3 means to the baselines | CADR | as for Table 3 |
 | Table 4, appliance decomposition | `AC_curtailment_kWh`; `{EV,WM,DW,Dryer}_shifted_{out,in}_kWh`; `unserved_EV_kWh` | CADR | `test.py` (`Table_2_Appliances` sheet) |
 | §5.2, new and rebound-induced violations | `newly_created_violation_hours`, `rebound_induced_violation_hours` | CADR | `test.py` |

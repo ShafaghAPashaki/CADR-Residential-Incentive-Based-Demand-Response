@@ -5,8 +5,8 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from env import Environment  # noqa: E402
 from agent.agent_ddqn import DDQNAgent  # noqa: E402
-ETA=ROOT/'results'/'sensitivity_eta'
-OUT=ETA/'diagnostics';OUT.mkdir(parents=True,exist_ok=True)
+ETA=ROOT/'repro_runs'/'sensitivity_eta'
+OUT=ROOT/'repro_runs'/'diagnostics'/'sensitivity_eta';OUT.mkdir(parents=True,exist_ok=True)
 RUNS=['eta_0','eta_0p01429','eta_0p03571','eta_0p07143']
 
 def init(r):
@@ -33,7 +33,7 @@ for day in range(168,182):
         st,_,done,_=env.step(zero)
 probes=probes[:20]
 print('PROBES',len(probes),probes[:4],flush=True)
-with (OUT/'controlled_state_specs.csv').open('w',newline='') as f:
+with (OUT/'controlled_state_specs.csv').open('x',newline='') as f:
     w=csv.writer(f);w.writerow(['day','hour','pre_action_kw']);w.writerows(probes)
 rows=[];balances=[]; probe_rows=[]
 for r in RUNS:
@@ -58,5 +58,5 @@ for r in RUNS:
     result=dict(run=r,zero_actions=sum(decisions),total_probes=len(decisions),max_abs_raw_error=max(abs(x['raw_balance_error']) for x in daily),max_abs_corrected_error=max(abs(x['corrected_balance_error']) for x in daily),total_unmet=sum(x['unmet_energy'] for x in daily))
     rows.append(result);print('RESULT',json.dumps(result),flush=True)
 for name,data in [('eta_audit_summary.csv',rows),('eta_daily_energy_balance.csv',balances),('eta_controlled_20_actions.csv',probe_rows)]:
-    with (OUT/name).open('w',newline='') as f:
+    with (OUT/name).open('x',newline='') as f:
         w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)

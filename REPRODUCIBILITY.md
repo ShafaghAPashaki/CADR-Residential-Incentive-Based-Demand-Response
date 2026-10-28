@@ -2,6 +2,8 @@
 
 The public release contains source code, configurations, selected checkpoints, validation records, and seed-level aggregate results. Licensed household data, household-level forecasts and hourly audits are not distributed. Obtain the data as described in [data/README.md](data/README.md). [README.md](README.md) gives the steps for inspection, checkpoint evaluation and new training.
 
+The historical `results/forecast/README_OUTPUTS.md` describes a complete local forecast run, not a promise that every listed file is included in this public release.
+
 ## What has been checked
 
 - **Published results:** The archived July and August CADR, EBDR and CBSP checkpoint evaluations for all three seeds were re-run with the original authorised inputs and forecast-state file; reported numeric workbook cells matched their archived counterparts. These are checkpoint evaluations, not fresh training.
