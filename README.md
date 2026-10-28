@@ -49,8 +49,17 @@ Sensitivity experiments vary the capacity target (6 and 8 kW), the number of inc
 | **2. Evaluate checkpoint** | Evaluate the released CADR Seed-0 checkpoint on July 2018, **no DDQN retraining** | Authorised hourly demand and price, plus original or regenerated forecast-state matrix | `powershell -ExecutionPolicy Bypass -File .\run_checkpoint_july.ps1` |
 | **3. Train from raw** | Prepare raw authorised data, regenerate LSTMs/cross-fit, train DDQN Seed 0 for 2500 episodes, evaluate July | Authorised Pecan Street 2018 15-minute export and EnergyOnline LZ_AEN price export | `powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1` |
 
-**Important:** Level 2 requires generating forecast-state inputs first; use the
-forecast-only steps in [START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md).
+**Important:** Level 2 requires generating forecast-state inputs first; first run the full input/forecast preparation **without DDQN training**:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1 -ForecastOnly
+powershell -ExecutionPolicy Bypass -File .\run_checkpoint_july.ps1
+```
+
+The preceding commands assume you have placed authorised raw exports in
+`downloads/`. Alternatively use `-ReusePreparedData -ForecastOnly` if you
+already have validated local hourly CSV inputs. See
+[START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md).
 With a regenerated forecast whose SHA differs from the original, the results
 are explicitly labelled approximate. Level 3 includes LSTM regeneration.
 Neither workflow should be called independently verified until a clean-machine
