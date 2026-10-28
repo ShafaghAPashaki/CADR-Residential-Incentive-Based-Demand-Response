@@ -27,10 +27,7 @@ source archives should be committed to Git.
 [EnergyOnline ERCOT Real-time Price](https://www.energyonline.com/Data/GenericData.aspx?DataId=4).
 An alternative official historical market-data index is
 [ERCOT Market Prices](https://www.ercot.com/mktinfo/prices).
-The original EnergyOnline **price zone and extraction settings have not yet
-been recovered**. Do not select a zone arbitrarily or claim an unrelated
-series matches the study. Match a candidate against the locally retained
-historical `ercot_hourly_price.csv` before accepting it as exact.
+The historical zone is now confirmed as **LZ_AEN** by an exact comparison with the downloaded EnergyOnline 2018 export. See the step-by-step instructions below.
 
 ## Preparing the inputs yourself
 
@@ -75,15 +72,58 @@ and should be reported as an explicit preprocessing assumption.
 
 **Price preparation is different.** `prepare_price.py` validates a *previously
 selected hourly* `timestamp,Price` series in USD/MWh and checks full 2018
-coverage, allowing the extra 1 January 2019 boundary hour. It **does not**
-identify or download the original EnergyOnline/ ERCOT price zone, product, or
-aggregation. Users must choose a series consistent with the manuscript and
-check its provenance. On the historical 8,761-row price file, the validator
+coverage, allowing the extra 1 January 2019 boundary hour. It also accepts raw EnergyOnline `Date,Price,Zone` CSV, selects `LZ_AEN`, and applies the documented three-hour repair. Users must still acquire the correct market product under the provider's terms. On the historical 8,761-row price file, the validator
 preserved the input SHA-256 exactly.
 
 The separate `utils/load_demand.py` and `utils/load_price.py` modules
 load these processed CSVs into the CADR simulator and do **not** themselves
 perform raw Dataport or market-data acquisition.
+
+## Step-by-step EnergyOnline download and conversion (2018)
+
+1. Open [EnergyOnline — ERCOT Real-time Price](https://www.energyonline.com/Data/GenericData.aspx?DataId=4).
+2. Select **1 January 2018 through 31 December 2018**, ERCOT **Real-time Price**, and download/export as **CSV**. Exporting all eight listed price zones is acceptable because the conversion script filters them. The historical study used **`LZ_AEN`**, confirmed by **8,757/8,757 exact hourly price matches** against the historical CSV.
+3. Keep the raw downloaded file unmodified. Its observed name was `20180101-20181231 ERCOT Real-time Price.csv`; save it under `downloads/` (the name can be anything as long as the command matches).
+4. Confirm that its first line is **`Date,Price,Zone`** (see [`examples/energyonline_raw_schema.csv`](examples/energyonline_raw_schema.csv)); `Date` uses US month/day/year with 12-hour AM/PM, and `Price` is USD/MWh.
+5. From the repository root, run:
+
+```powershell
+python data/prepare_price.py --input "downloads/20180101-20181231 ERCOT Real-time Price.csv" --zone LZ_AEN --output data/ercot_hourly_price.csv
+```
+
+The script keeps only **LZ_AEN**, validates 2018 hourly coverage, and forward-fills
+only three historically observed missing hours: **2018-03-11 02:00**,
+**2018-05-22 05:00**, and **2018-06-04 05:00**. Unexpected gaps are fatal,
+not silently interpolated. The downloaded 2018 raw export had 70,056 rows
+(8 zones × 8,757 timestamps). This generates **8,760** hourly 2018 prices.
+Its values matched all 8,760 overlapping rows of the historical price input
+**exactly** (including the three forward-filled hours).
+
+**Optional boundary hour for exact historical input:** The historical CADR CSV
+also contains **2019-01-01 00:00**, with a recorded price of 14.89 USD/MWh.
+The 2018-only export does **not** include that observation. Download the
+corresponding **2019-01-01** price from the same EnergyOnline Real-time Price
+page, save as `downloads/20190101 ERCOT Real-time Price.csv` (raw
+`Date,Price,Zone`), and then run:
+
+```powershell
+python data/prepare_price.py --input "downloads/20180101-20181231 ERCOT Real-time Price.csv" --zone LZ_AEN --boundary-file "downloads/20190101 ERCOT Real-time Price.csv" --output data/ercot_hourly_price.csv --overwrite
+```
+
+This creates 8,761 rows (all 2018 hours + the source-supplied boundary hour).
+**Do not manually insert or invent the extra price**; check the source's actual
+zone/time values. Numeric matching is distinct from byte-identical matching,
+because CSV serialization can differ. The reference SHA-256 is
+`56fdd5b489269d7a95cd6a3816b278a8b46eed02a30688e61712ce3bd8c90593`.
+
+If the source offers **Excel rather than CSV**, export or convert the workbook
+to CSV preserving the columns `Date,Price,Zone`; changing the filename extension
+from `.xlsx` to `.csv` alone does **not** convert a workbook.
+
+If you already have an authorised `timestamp,Price` file with the expected
+hourly values, run `prepare_price.py` **without** `--zone`. The loader
+`utils/load_price.py` then reads `data/ercot_hourly_price.csv` and divides
+USD/MWh by ten to obtain cent/kWh.
 
 ## Exact parsing and units
 
@@ -92,5 +132,5 @@ perform raw Dataport or market-data acquisition.
 - In the study's file `total` equals the sum of the six other columns for every row of the three households (maximum difference 2e-15).
 - `air`, `car`, `clotheswasher`, `dishwasher`, `dry`, `non-shiftable`, `total`: hourly energy in kWh. In hourly bins the numerical value equals mean kW.
 - Appliances correspond to the like-named hourly Pecan Street Dataport channels after aggregation into hourly intervals. Determine the source export's original granularity, timezone and missing-value treatment under your own Dataport license.
-- `non-shiftable = total - (air + car + clotheswasher + dishwasher + dry)` only when these are the exact channels included in `total` and the source readings are consistent; validate non-negativity, no gaps and per-house/hour totals. No source-data preparation script is supplied that proves the original export-to-CSV transformation, so byte-identical reproduction from arbitrary exports is **not guaranteed**.
+- `non-shiftable = total - (air + car + clotheswasher + dishwasher + dry)` only when these are the exact channels included in `total` and the source readings are consistent; validate non-negativity, no gaps and per-house/hour totals. The recovered conversion procedure is provided in `data/prepare_load.py` and numerically reconciles all archived hourly load values; byte-identical CSV serialization from arbitrary exports is **not guaranteed**.
 - Electricity price `timestamp` is parsed day-first; `Price` is expressed in **USD/MWh**, converted by `utils/load_price.py` to **cent/kWh** via division by 10. Match source, timezone and any missing-hour handling to the study.
