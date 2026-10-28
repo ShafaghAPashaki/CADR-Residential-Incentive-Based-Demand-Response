@@ -50,11 +50,25 @@ class DDQNTrainer:
       3) earliest episode in the final tie.
     """
 
-    def __init__(self, cfg_override=None):
+    def __init__(self, cfg_override=None, *, allow_regenerated_forecasts=False):
         self.cfg = cfg_override or load_config()
         require_real_holidays()
-        enforce_lambda_calibration(self.cfg)
+        enforce_lambda_calibration(
+            self.cfg, allow_regenerated_forecasts=allow_regenerated_forecasts
+        )
         self.run_provenance = collect_run_provenance(self.cfg, Environment.VERSION)
+        historical_sha = enforce_lambda_calibration(
+            self.cfg, allow_regenerated_forecasts=allow_regenerated_forecasts
+        )["training_forecast_file_sha256"]
+        active_sha = self.run_provenance["forecast_file_sha256"]
+        self.run_provenance["reproduction_mode"] = (
+            "regenerated_forecast_training" if allow_regenerated_forecasts
+            else "frozen_forecast_training"
+        )
+        self.run_provenance["forecast_differs_from_original"] = (
+            active_sha != historical_sha
+        )
+        self.run_provenance["original_forecast_sha256"] = historical_sha
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         house_ids = list(self.cfg["environment"]["house_ids"])
@@ -1036,6 +1050,16 @@ def main():
             "general.seed before environments and networks are created."
         ),
     )
+    parser.add_argument(
+        "--allow_regenerated_forecasts", action="store_true",
+        help="Independent reproduction only: accept a regenerated forecast-state "
+             "file while retaining frozen lambda-c and scientific-environment checks."
+    )
+    parser.add_argument(
+        "--results_root", default=None,
+        help="Write training outputs to a new isolated root (recommended for "
+             "independent reproductions); never overwrites existing runs."
+    )
     args = parser.parse_args()
 
     if args.config_path:
@@ -1062,9 +1086,15 @@ def main():
             "preferences remain identical across seeds."
         )
 
-    enforce_lambda_calibration(cfg)
+    if args.results_root is not None:
+        cfg.setdefault("general", {})["results_root"] = args.results_root
+    enforce_lambda_calibration(
+        cfg, allow_regenerated_forecasts=args.allow_regenerated_forecasts
+    )
     set_global_seeds(seed=seed)
-    trainer = DDQNTrainer(cfg_override=cfg)
+    trainer = DDQNTrainer(
+        cfg_override=cfg, allow_regenerated_forecasts=args.allow_regenerated_forecasts
+    )
     trainer.train()
 
 
