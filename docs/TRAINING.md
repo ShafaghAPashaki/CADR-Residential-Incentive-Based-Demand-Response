@@ -10,6 +10,8 @@ The CADR environment version is `forecast_state_v1` and the EBDR environment ver
 
 The historical training-only Q95 stakeholder/tracking calibration gave 0.138830910593618 / 0.626385357142857 = 0.2216381800923157. The original scenario identifiers and 1,500 component-level observations were subsequently recovered from a private July 2026 calibration workbook and replayed against the historical environment to the reported precision. These source materials are not distributed in this public repository; the released diagnostic script uses a different sample and does not recreate the historical calibration. An independent re-evaluation with a new, deterministic training-only scenario sample found virtually no difference between the earlier and the revised causal dynamics at comparable sample sizes. However, the estimates varied considerably when the selection sample itself changed, so substituting a new estimate would introduce sample-selection arbitrariness. The original λc is therefore retained. The independent review figures are recorded, as reported and not re-executed, in `results/calibration/lambda_c_retention_audit.json`.
 
+The public method and data-access boundaries are documented in [`docs/LAMBDA_C_HISTORICAL_CALIBRATION.md`](LAMBDA_C_HISTORICAL_CALIBRATION.md).
+
 `calibrate_lambda_c.py` is an optional diagnostic only. It writes to `results/calibration_diagnostics/` and refuses `--write-config`. Do not use it to change the three production configurations.
 
 ## Workflow (Windows PowerShell; the Python commands are platform-independent)
