@@ -5,7 +5,7 @@ Set-StrictMode -Version Latest
 Set-Location $PSScriptRoot
 if (-not (Test-Path $Python)) { throw "Missing Python executable: $Python" }
 foreach ($path in @("results\forecast\ddqn_state_forecasts.csv","data\load_hourly_2018.csv","data\ercot_hourly_price.csv","results\seed_0\training\ddqn_best.pth")) {
-    if (-not (Test-Path $path)) { throw "Missing input: $path. See START_HERE_SINGLE_SEED.md for generating forecasts." }
+    if (-not (Test-Path $path)) { throw "Missing input: $path. See README.md for preparing inputs and forecasts." }
 }
 if (Test-Path $OutputDir) { throw "Output directory already exists: $OutputDir" }
 $argsList = @("tools/evaluate_with_regenerated_forecasts.py", "test.py", "--model_path", "results/seed_0/training/ddqn_best.pth", "--config_path", "config_seed_0.yaml", "--output_dir", $OutputDir, "--test_start", "182", "--test_end", "212", "--target_plot_days", "208")

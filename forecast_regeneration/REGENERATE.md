@@ -15,20 +15,40 @@ This folder holds the forecasting sources exactly as they were used on 5 October
 
 ## Steps
 
-Use Python 3.12 with `../requirements.txt` installed. Run every command from inside this folder, with the project root on `PYTHONPATH` so that `utils/` can be imported.
+Use Python 3.12 with `../requirements.txt` installed. The Windows driver in the [main guide](../README.md) performs these stages; the commands below expose them individually. Start from a fresh forecast-regeneration directory to avoid replacing existing outputs. The project root must be on `PYTHONPATH` so `utils/` can be imported.
 
 ```powershell
-cd forecast_regeneration
-$env:PYTHONPATH = ".."; $env:PYTHONHASHSEED = "0"
-mkdir data; copy ..\data\load_hourly_2018.csv data\; copy ..\data\ercot_hourly_price.csv data\
-python predict_load_lstm.py --config config_seed_0.yaml
-python predict_price_lstm.py --config config_seed_0.yaml
-python crossfit_lstm.py --config config_seed_0.yaml
-python verify_crossfit.py --config config_seed_0.yaml      # must end with "Gate: READY"
-python install_outputs.py                                   # copies outputs, builds the state file, compares hashes
+Push-Location forecast_regeneration
+$env:PYTHONPATH = ".."
+$env:PYTHONHASHSEED = "0"
+New-Item -ItemType Directory data | Out-Null
+Copy-Item ..\data\load_hourly_2018.csv data\
+Copy-Item ..\data\ercot_hourly_price.csv data\
+& $py predict_load_lstm.py --config config_seed_0.yaml
+& $py predict_price_lstm.py --config config_seed_0.yaml
+& $py crossfit_lstm.py --config config_seed_0.yaml
+& $py verify_crossfit.py --config config_seed_0.yaml
+# Continue only if the gate says READY.
+& $py install_outputs.py
+Pop-Location
 ```
 
-On Linux or macOS, use `export PYTHONPATH=.. PYTHONHASHSEED=0` and `cp` instead.
+`$py` is the full interpreter path set in the main guide. On Linux or macOS, start from the repository root and run:
+
+```bash
+CADR_PYTHON="$(pwd)/.venv/bin/python"
+cd forecast_regeneration
+export PYTHONPATH=.. PYTHONHASHSEED=0
+mkdir data
+cp ../data/load_hourly_2018.csv ../data/ercot_hourly_price.csv data/
+"$CADR_PYTHON" predict_load_lstm.py --config config_seed_0.yaml
+"$CADR_PYTHON" predict_price_lstm.py --config config_seed_0.yaml
+"$CADR_PYTHON" crossfit_lstm.py --config config_seed_0.yaml
+"$CADR_PYTHON" verify_crossfit.py --config config_seed_0.yaml
+# Continue only if the gate says READY.
+"$CADR_PYTHON" install_outputs.py
+cd ..
+```
 
 Everything this folder writes (`data/`, `results/`, `crossfit_results/`) is listed in `.gitignore`. These files contain licensed or household-derived data and must never be committed.
 
@@ -38,16 +58,16 @@ Everything this folder writes (`data/`, `results/`, `crossfit_results/`) is list
 
 | Stage | Recorded SHA-256 (prefix) | Observed in an independent rerun (Linux, Python 3.13, torch 2.13.0) |
 |---|---|---|
-| Load data | `c183ce46` | Must match. A different Dataport export cannot reproduce the forecasts. |
-| Price data | `56fdd5b4` | Must match |
+| Load data | `c183ce46` | Historical file hash |
+| Price data | `56fdd5b4` | Historical file hash |
 | Full-model load forecasts | `e2a149ac` | `e49ff932`, **not** byte-identical: maximum difference 8.8e-6 kW, same best epochs |
 | Full-model price forecasts | `c7446d11` | `17e16b26`, **not** byte-identical: maximum difference 1.2e-4 cent/kWh |
 | Cross-fit training-day forecasts | `7ffbed0c` | `7ffbed0c`, **byte-identical** |
 | DDQN forecast-state file | `b86e09ba` | `575b0ab9`, not byte-identical. Training-day rows are identical. Validation and test rows differ by at most 6.5e-6 kW (aggregate load) and 1.2e-4 cent/kWh. |
 
-The full-model forecasts were produced on the authors' Windows workstation. Floating-point results of LSTM training differ slightly across CPU and BLAS platforms, so other machines are expected to reproduce them only approximately. Cross-fitting ran with deterministic CPU settings and has been reproduced byte-for-byte on a second platform.
+The table describes that particular rerun, not a cross-platform guarantee. A later Windows reader-style run produced a different cross-fit hash; retraining the DDQN with its regenerated forecasts also produced different results. Differences can arise from input preparation and execution environments; their precise cause in that run has not been established. See [REPRODUCIBILITY.md](../REPRODUCIBILITY.md).
 
-- **If every stage prints EXACT**, evaluate the released checkpoints with `test.py` directly.
-- **Otherwise**, use `../tools/evaluate_with_regenerated_forecasts.py`, which relaxes only the forecast-state hash check, and report the results as an approximate regeneration. See `../REPRODUCIBILITY.md` for the measured effect.
+- **If the forecast-state hash matches**, published CADR checkpoints can be evaluated directly.
+- **If it differs**, use the published-checkpoint route in `../tools/run_cadr.py`; it invokes the approximate-evaluation wrapper and records the changed hash. The other checks remain active.
 
 `README_CROSSFIT.md` and `CROSSFIT_METHODOLOGY.md` are the original cross-fitting documentation. Their only change is that a local Windows path was replaced by a placeholder.

@@ -2,10 +2,10 @@
 
 **Data file.** `results/aggregate_metrics/per_seed_monthly_metrics.csv` holds the seed-level monthly values behind the main tables. It has one row per (method, seed, month, metric). Every table reports the mean and sample standard deviation (ddof = 1) over seeds 0, 1 and 2.
 
-**Regenerating it.** The file was produced by `tools/export_aggregate_metrics.py` from the evaluation workbooks (`audit.xlsx`, `results.xlsx`). Those workbooks contain licensed household data and are not distributed. To recreate them, evaluate the released checkpoints with licensed inputs, as described in `REPRODUCIBILITY.md`, and then run:
+**Regenerating it.** The file was produced by `tools/export_aggregate_metrics.py` from evaluation workbooks (`audit.xlsx`, `results.xlsx`). Detailed audits contain licensed household data and are not distributed. Recreate the CADR, CBSP, EBDR and sensitivity evaluations with licensed inputs, then point the exporter to their new roots. Choose a new output path: the exporter's default overwrites the archived CSV.
 
 ```
-python tools/export_aggregate_metrics.py
+python tools/export_aggregate_metrics.py --cadr-root repro_runs/eval/published --cbsp-root repro_runs/cbsp --ebdr-root repro_runs/ebdr --sensitivity-root repro_runs/sensitivity --out repro_runs/per_seed_monthly_metrics.csv
 ```
 
 **Metric conventions**

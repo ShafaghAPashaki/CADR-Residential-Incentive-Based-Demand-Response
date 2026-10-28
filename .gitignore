@@ -24,6 +24,7 @@ results/forecast/load/*.pt
 results/forecast/price/*.pt
 **/audit.xlsx
 crossfit_results/
+**/crossfit_results*.zip
 forecast_regeneration/data/
 forecast_regeneration/results/
 forecast_regeneration/crossfit_results/

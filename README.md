@@ -1,169 +1,116 @@
 # CADR: capacity-aware residential incentive-based demand response
 
-This repository contains the research code, frozen configurations, trained checkpoints and aggregate results for the manuscript *Capacity-Aware Residential Incentive-Based Demand Response through Appliance-Level Load Coordination*.
+Research code, frozen configurations, trained checkpoints and aggregate results for *Capacity-Aware Residential Incentive-Based Demand Response through Appliance-Level Load Coordination*. The proposed CADR method uses a Double Deep Q-Network (DDQN) to coordinate residential appliance responses. The repository also includes the elasticity-based EBDR benchmark and the matched-HEMS CBSP ablation.
 
-## The problem
+## Start here
 
-A service provider (SP) offers hourly incentives to a group of residential end users (EUs) so that their aggregate demand stays below a local capacity target, while balancing its own economic value against the users' payments and dissatisfaction. CADR casts the SP's hourly incentive decision as a Double Deep Q-Network (DDQN) problem. Each household runs an appliance-level home energy management system (HEMS) that responds to the incentive by curtailing air conditioning or shifting EV charging, washing machine, dishwasher and dryer demand. The DDQN state uses one-step LSTM forecasts of household load and wholesale price, and it contains no realised future information.
+Choose the route that fits your purpose; each builds on the previous one.
 
-The study uses three Pecan Street households (Dataport IDs 661, 3039 and 8565) and ERCOT wholesale prices for 2018. Days 2–167 are used for training, days 168–181 for validation, and July and August 2018 as held-out test months. The capacity target is 7 kW. It is a soft operational target, not an enforced network constraint, and residual exceedances, rebound, unserved energy and other side effects are reported.
-
-## Methods in this repository
-
-| Method | What it is | Code |
+| Route | What you can do | Inputs needed |
 |---|---|---|
-| **CADR** | The proposed method: a capacity-aware SP DDQN (43-element state, 125 joint incentive actions) coordinating appliance-level HEMS responses | `main.py`, `test.py`, `env/`, `agent/` |
-| **EBDR** | Elasticity-based benchmark: a capacity-blind, curtailment-only DDQN using price-elasticity responses and the same forecast inputs | `benchmark/` |
-| **CBSP** | Matched-HEMS ablation: the same capacity-aware HEMS, but the SP learns an economic-only objective and does not observe the two capacity-need features | `experiments/*matched_hems_ablation*.py` |
+| **1. Inspect** | Read archived results, configurations, checkpoint hashes and table mappings. No model is run. | Python only; no data or third-party packages |
+| **2. Evaluate** | Run a published CADR checkpoint for any released seed and test period. No DDQN retraining. | Authorised demand and price data, plus the original or a regenerated forecast-state file |
+| **3. Train** | Regenerate the forecasts from authorised inputs, train one or more CADR seeds, and evaluate the new checkpoints. | Authorised raw or prepared demand and price data |
 
-Sensitivity experiments vary the capacity target (6 and 8 kW), the number of incentive levels (10 instead of 5), and the reward parameters η and ρ.
+The public repository does not contain the licensed household records or the household-derived forecast-state file. Regenerated forecasts can differ from those used in the paper; in turn, retraining can select a different checkpoint and produce different results. See [Reproducibility](REPRODUCIBILITY.md) for what was tested.
 
-## Repository layout
+## 1. Inspect the release
 
-| Path | Contents |
-|---|---|
-| `main.py`, `test.py` | CADR training and evaluation entry points |
-| `env/`, `agent/`, `utils/` | CADR environment and HEMS, DDQN agent, data loaders and frozen-run safeguards |
-| `config_seed_{0,1,2}.yaml` | Frozen CADR configurations, identical except for the seed |
-| `benchmark/` | EBDR implementation, configurations and checks (see `benchmark/README.md`) |
-| `experiments/` | Matched-HEMS ablation, capacity-target and incentive-discretisation sensitivity, and reward-parameter sensitivity |
-| `configs/` | Configurations for the ρ sensitivity runs |
-| `predict_*_lstm.py`, `build_forecast_outputs.py`, `build_ddqn_forecast_inputs.py` | LSTM forecasting pipeline |
-| `forecast_regeneration/` | Exact forecasting and cross-fitting sources used for the published forecasts, with regeneration instructions |
-| `diagnostics/` | Value-of-information, forecast-confusion, λc-retention, sensitivity and inference-time diagnostics |
-| `q_action_diagnostic.py`, `reward_counterfactual_audit.py`, `summarize_results.py` | Q-value audit and three-seed summary used by the standard evaluation run |
-| `calibrate_lambda_c.py` | λc calibration diagnostic (never changes the frozen configurations) |
-| `figures/` | Figure 5 (appliance schedule) reproduction |
-| `tools/` | Aggregate-metric export, approximate evaluation with regenerated forecasts, manifest refresh |
-| `tests/` | Regression tests for causality, forecasting, settlement and physical constraints |
-| `results/` | Checkpoints, validation curves, evaluation summaries, aggregate metrics and provenance (see `results/README.md`) |
-| `data/` | Location for the licensed input files, which are not distributed (see `data/README.md`) |
-| `docs/` | Training, evaluation protocol, forecasting, experiments and development history |
-| `*.ps1` | Windows PowerShell drivers for the full training and evaluation runs |
+From the repository root, run:
 
-## Choose one of three reproduction levels
+```text
+python tools/inspect_release.py
+```
 
-| Level | Goal | Data needed | Command (from repository root) |
-|---|---|---|---|
-| **1. Inspect** | Examine released configs, checkpoint hashes, aggregate tables and figure mapping; does **not** rerun the model | None | `python tools/inspect_release.py` |
-| **2. Evaluate checkpoint** | Evaluate the released CADR Seed-0 checkpoint on July 2018, **no DDQN retraining** | Authorised hourly demand and price, plus original or regenerated forecast-state matrix | `powershell -ExecutionPolicy Bypass -File .\run_checkpoint_july.ps1` |
-| **3. Train from raw** | Prepare raw authorised data, regenerate LSTMs/cross-fit, train DDQN Seed 0 for 2500 episodes, evaluate July | Authorised Pecan Street 2018 15-minute export and EnergyOnline LZ_AEN price export | `powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1` |
+The inspector uses only the Python standard library. If `python` is not on the Windows `PATH`, run it with the full path to an installed interpreter, for example `& "C:\path\to\python.exe" tools/inspect_release.py`, or set up an environment as described below. `PASS` confirms that key released files exist and prints the available archive contents and selected hashes; it does not run a model. Browse [results/README.md](results/README.md), `results/aggregate_metrics/per_seed_monthly_metrics.csv`, and [TABLE_MAP.md](TABLE_MAP.md) for the published outputs and manuscript mappings.
 
-**Important:** Level 2 requires generating forecast-state inputs first; first run the full input/forecast preparation **without DDQN training**:
+## Setup for evaluation and training
+
+Install Python 3.12 and the pinned packages in [requirements.txt](requirements.txt). For example, in Windows PowerShell from the repository root:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1 -ForecastOnly
-powershell -ExecutionPolicy Bypass -File .\run_checkpoint_july.ps1
+py -3.12 -m venv .venv
+$py = (Resolve-Path .\.venv\Scripts\python.exe).Path
+& $py -m pip install -r requirements.txt
 ```
 
-The preceding commands assume you have placed authorised raw exports in
-`downloads/`. Alternatively use `-ReusePreparedData -ForecastOnly` if you
-already have validated local hourly CSV inputs. See
-[START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md).
-With a regenerated forecast whose SHA differs from the original, the results
-are explicitly labelled approximate. Level 3 includes LSTM regeneration.
-Neither workflow should be called independently verified until a clean-machine
-run completes. All scripts fail on missing required inputs rather than silently
-substituting synthetic data. Do not upload licensed inputs to GitHub.
+Activation is not required. If you already have a suitable environment, set `$py` to its full `python.exe` path instead. On macOS/Linux, create an environment with `python3.12 -m venv .venv`, install using `.venv/bin/python -m pip install -r requirements.txt`, and replace `& $py` in the examples with `.venv/bin/python`. The examples below use PowerShell.
 
-[Raw download instructions, exact filenames and synthetic schema examples](data/README.md).
-[Acceptance and validation status](INDEPENDENT_REPRODUCTION_STATUS.md).
+## Prepare data and forecasts
 
-## First-time independent reproduction (one seed, one month)
+1. Obtain authorised Pecan Street Dataport and ERCOT price data. [data/README.md](data/README.md) gives the source links, download names, schemas, units and preparation commands. The prepared files are `data/load_hourly_2018.csv` and `data/ercot_hourly_price.csv`. Keep licensed and household-derived files local.
+2. If you do not have the original authorised forecast-state file, regenerate it once for all three CADR seeds. With the two prepared input files in `data/`, run:
 
-The [single-command Windows runner](run_reproduction_seed0_july.ps1) fails fast on missing files, failed forecast gates or prior outputs; details and manual commands are in [START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md). Run from a fresh checkout after placing your licensed downloads in `downloads/`:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1 -Python $py -ReusePreparedData -ForecastOnly
+   ```
+
+   Despite the historical filename, `-ForecastOnly` prepares the common forecasts and does **not** train a DDQN. Wait for the cross-fit gate to report `READY`. On macOS/Linux, or to run the stages individually, follow [forecast_regeneration/REGENERATE.md](forecast_regeneration/REGENERATE.md). Do not rerun preparation into existing outputs; use a fresh checkout or inspect the existing outputs and provenance first.
+
+An authorised original forecast-state file can instead be placed at `results/forecast/ddqn_state_forecasts.csv` if its use and transfer are permitted by the data provider. Its recorded SHA-256 begins `b86e09ba`.
+
+## 2. Evaluate published CADR checkpoints
+
+The launcher defaults to seeds **0, 1 and 2**, and the paper's July and August test periods. It uses the installed forecast-state file and writes new results under `repro_runs/eval/published/`.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1
+& $py tools/run_cadr.py evaluate
 ```
 
-This complete training run has **not yet been independently verified** on a fresh machine. A successful execution must be demonstrated before claiming end-to-end reproduction. The historical original input SHA gate remains the default; the runner explicitly opts into the regenerated-forecast mode.
+To choose any combination, use `--seeds` and `--months`. For example, this evaluates seeds 1 and 2 in August and November:
 
-
-Follow **[START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md)** to acquire authorised data, regenerate the LSTM forecasts, train CADR Seed 0 (2,500 episodes), and evaluate July 2018. The end-to-end route is marked **unverified pending a clean-download test**; exact source-data preprocessing is not yet fully supplied.
-
-## Setup
-
-Python 3.12 with the pinned packages in `requirements.txt` (PyTorch 2.13.0, `holidays==0.100` and others):
-
-```
-python -m venv .venv
-.venv/bin/pip install -r requirements.txt          # Windows: .venv\Scripts\pip install -r requirements.txt
+```powershell
+& $py tools/run_cadr.py evaluate --seeds 1 2 --months august november
 ```
 
-Training and evaluation stop unless the genuine `holidays==0.100` package is installed.
+| Period | 2018 day-of-year range | Detailed plot day | Status |
+|---|---:|---:|---|
+| `july` | 182–212 | 208 | Manuscript test period |
+| `august` | 213–243 | 220 | Manuscript test period |
+| `november` | 305–334 | 312 | Additional retained robustness period |
 
-## Input data
+Use `--months july august november` for all three periods, and `--dry-run` to preview commands without loading data or running a model. Each result is stored as `repro_runs/eval/published/seed_<seed>/<month>/`. If the active forecast hash differs from the checkpoint's recorded hash, `APPROXIMATE_FORECAST_INPUTS.json` identifies the run as an approximate evaluation. Other checkpoint checks remain active.
 
-The Pecan Street household data and the ERCOT price series are **not** included and must be obtained under the providers' terms. `data/README.md` gives the expected file names, columns, units and the SHA-256 hashes of the files used in the study. The DDQN forecast-state file `results/forecast/ddqn_state_forecasts.csv` is derived from the household data and is also not distributed. Regenerate it with `forecast_regeneration/REGENERATE.md`.
+For another 2018 period with available inputs, use inclusive day-of-year numbers. For example, September is days 244–273:
 
-## Configuration
-
-All CADR settings (households, data splits, DDQN hyperparameters, reward coefficients, λc, the capacity target and the forecast inputs) are in `config_seed_0.yaml`, `config_seed_1.yaml` and `config_seed_2.yaml`. EBDR uses `benchmark/config_benchmark_seed_*.yaml`. The configuration actually used by each trained model is stored next to its checkpoint as `results/**/training/config.yaml`.
-
-## Quick start
-
-All commands are run from the repository root.
-
-**1. Inspect the published results (no data needed).** Seed-level monthly values behind the manuscript tables are in `results/aggregate_metrics/per_seed_monthly_metrics.csv`. `TABLE_MAP.md` gives the data file and script for every table and figure.
-
-**2. Verify the frozen configurations (no data needed).**
-
-```
-python verify.py
+```powershell
+& $py tools/run_cadr.py evaluate --seeds 0 1 2 --days 244 273 --plot-day 250
 ```
 
-**3. Run the full checks (licensed data and the forecast-state file needed).**
+The forecast-state pipeline covers days 2–365; day 1 is not available. Custom periods are exploratory and are not the published July/August comparison. Days 2–167 were used for training and days 168–181 for validation, so evaluating those days is not a held-out test. The output folder is named `days_<start>_<end>`.
 
-```
-python -m benchmark.verify_benchmark
-python tests/test_state_causality.py              # each tests/test_*.py is a standalone script
-```
+## 3. Train and evaluate new CADR checkpoints
 
-**4. Evaluate the released checkpoints.** Each command writes to a new folder; existing output folders are never overwritten.
+After preparing the data and forecast-state file, train all three seeds with regenerated forecasts:
 
-```
-python test.py --model_path results/seed_0/training/ddqn_best.pth --config_path config_seed_0.yaml \
-  --output_dir eval/cadr_s0_july --test_start 182 --test_end 212 --target_plot_days 208
-python -m benchmark.test_benchmark --model_path results/benchmark/seed_0/training/ddqn_best.pth \
-  --config_path benchmark/config_benchmark_seed_0.yaml --period july --output_dir eval/ebdr_s0_july
-python experiments/evaluate_matched_hems_ablation.py --seed 0 --month july --root <new folder containing a copy of seed_0/training/>
-python experiments/evaluate_capacity_incentive_sensitivity.py --run lev10   # cap6 | cap8 | lev10; move the stored july/ folder aside first
+```powershell
+& $py tools/run_cadr.py train --regenerated-forecasts
 ```
 
-The month windows are July (days 182–212, plot day 208) and August (days 213–243, plot day 220). `test_all_seeds.ps1` and `benchmark/test_benchmark_seeds.ps1` evaluate all seeds and months.
+Each seed uses its own `config_seed_<seed>.yaml`, 2,500 episodes, and validation-based checkpoint selection. Training can take substantial time. To train a subset, add, for example, `--seeds 1 2`. If using the original forecast-state file, omit `--regenerated-forecasts` to retain the original strict forecast-hash check.
 
-**5. Export the table values** from your evaluation folders:
+New checkpoints and their saved configurations are written to `repro_runs/train/seed_<seed>/training/`. Evaluate those checkpoints, using the **same active forecast-state file** used for training:
 
+```powershell
+& $py tools/run_cadr.py evaluate --source trained
 ```
-python tools/export_aggregate_metrics.py --cadr-root <...> --cbsp-root <...> --ebdr-root <...> --sensitivity-root <...> --out <new file>.csv
+
+The same `--seeds`, `--months` and custom `--days` options apply. To run only the trained seeds 1 and 2 for all three retained periods:
+
+```powershell
+& $py tools/run_cadr.py evaluate --source trained --seeds 1 2 --months july august november
 ```
 
-## What can be reproduced, and how
+The launcher refuses to reuse an existing output directory. Choose another `--train-root` for training or `--output-root` for evaluation when rerunning; pass the same `--train-root` when evaluating a newly trained checkpoint from a custom root. It does not overwrite published results.
 
-| Level | Needs | Result |
-|---|---|---|
-| Inspect results | Nothing | Aggregate metrics, validation curves, sensitivity summaries and checkpoints are in `results/` |
-| Static verification | Python environment | `verify.py` checks the frozen configurations |
-| Exact re-evaluation | Licensed data **and** the original forecast-state file (SHA-256 `b86e09ba…`) | Reproduces the evaluation workbooks exactly |
-| Approximate re-evaluation | Licensed data and a regenerated forecast-state file | `tools/evaluate_with_regenerated_forecasts.py`; results are labelled approximate |
-| Retraining | Licensed data, the original forecast-state file, considerable CPU time | See `docs/TRAINING.md` |
+## Reading and comparing outputs
 
-`REPRODUCIBILITY.md` describes each level and what has been verified. The public repository alone cannot reproduce the manuscript numbers, because the household data are licensed.
+Each CADR evaluation folder contains `results.xlsx` with monthly tables, `audit.xlsx` with detailed results, and a `day_<number>/figures/` folder for the selected plot day. Compare a published or newly trained run with `results/seed_<seed>/<month>/results.xlsx`, matching the **same seed and month**. The aggregate CSV and [TABLE_MAP.md](TABLE_MAP.md) identify the metrics behind the paper's tables. Outputs and plots alone do not establish that every value matches; compare the corresponding numbers.
 
-## Further documentation
+Windows can reject very long paths when saving figures, especially in network folders. If this happens, move the checkout to a shorter local path or set a shorter, new `--output-root`.
 
-- `REPRODUCIBILITY.md`: exact versus approximate reproduction and the verification record
-- `TABLE_MAP.md`: manuscript tables and figures mapped to files and scripts
-- `docs/EXPERIMENTS.md`: the ablation, sensitivity and diagnostic experiments, with commands
-- `docs/TRAINING.md`: training workflow and the retained λc
-- `docs/EVALUATION_PROTOCOL.md`: the frozen evaluation and checkpoint-selection protocol
-- `docs/FORECASTING.md`: LSTM forecasting and how forecasts enter the DDQN state
-- `forecast_regeneration/REGENERATE.md`: regenerating the forecast inputs from licensed data
-- `benchmark/README.md`: the EBDR benchmark
-- `docs/DEVELOPMENT_HISTORY.md`: implementation history before the validated release
-- `CHANGELOG.md`: release summary
+For EBDR, see [benchmark/README.md](benchmark/README.md); for CBSP and sensitivity experiments, see [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md). These are separate methods/experiments, not options of the CADR launcher. The evaluation and validation-selection rules are in [docs/EVALUATION_PROTOCOL.md](docs/EVALUATION_PROTOCOL.md).
 
 ## Licence
 
-The code is released under the MIT licence (`LICENSE`). The licence does not cover third-party data. Checkpoints are loaded with `torch.load(weights_only=False)`, so only load checkpoint files from trusted sources.
+Code is released under the [MIT licence](LICENSE); it does not grant rights to third-party data. Only load checkpoints from trusted sources.

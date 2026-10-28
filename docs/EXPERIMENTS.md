@@ -1,6 +1,16 @@
 # Ablation, sensitivity and diagnostic experiments
 
-All commands are run from the repository root. Training commands need the licensed data and the original forecast-state file (see `docs/TRAINING.md`). Evaluation drivers refuse to overwrite an existing output folder.
+All commands are run from the repository root. Obtain the authorised data and forecast-state input as described in the [main guide](../README.md). For published checkpoints, report evaluations using regenerated forecasts as approximate. The examples write to new folders rather than replacing archived outputs.
+
+## EBDR benchmark evaluation
+
+The published EBDR checkpoints cover seeds 0–2 and July, August and November. For example, in PowerShell, after setting `$py` as in the main guide:
+
+```powershell
+& $py -m benchmark.test_benchmark --model_path results/benchmark/seed_1/training/ddqn_best.pth --config_path benchmark/config_benchmark_seed_1.yaml --period august --output_dir repro_runs/ebdr/seed_1/august
+```
+
+Replace both instances of the seed and the period/output folder to select another run. EBDR does not itself check the checkpoint's forecast hash, so a run with regenerated forecasts is approximate even though it does not write the CADR warning file. See [benchmark/README.md](../benchmark/README.md) for the benchmark and training details.
 
 ## Matched-HEMS ablation (CBSP)
 
@@ -14,11 +24,15 @@ All commands are run from the repository root. Training commands need the licens
 | `experiments/evaluate_matched_hems_ablation.py` | July or August evaluation with the unmodified `test.py` |
 | `results/matched_hems_ablation/` | Checkpoints, validation metrics and monthly summaries for seeds 0–2 |
 
+To evaluate a published checkpoint, first copy its `training/` folder into a new output root, then use the CADR forecast wrapper. For example, in PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Path repro_runs/cbsp/seed_1 | Out-Null
+Copy-Item results/matched_hems_ablation/seed_1/training repro_runs/cbsp/seed_1/training -Recurse
+& $py tools/evaluate_with_regenerated_forecasts.py experiments/evaluate_matched_hems_ablation.py --seed 1 --month august --root repro_runs/cbsp
 ```
-python experiments/check_matched_hems_ablation.py
-python experiments/run_matched_hems_ablation.py --seed 0
-python experiments/evaluate_matched_hems_ablation.py --seed 0 --month july --root <new folder containing a copy of seed_0/training/>
-```
+
+Choose seeds 0, 1 or 2 and `july` or `august`; use a new root for each independent rerun. The copied checkpoint must match the seed specified to the evaluator. For training or pre-training checks, see the drivers listed above; the historical training path expects the original forecast-state file and refuses to overwrite the released training folder.
 
 ## Capacity-target and incentive-discretisation sensitivity
 
