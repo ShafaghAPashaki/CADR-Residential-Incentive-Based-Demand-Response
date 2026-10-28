@@ -68,7 +68,22 @@ def main() -> None:
     for src, dst in COPIES:
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
-    subprocess.run([sys.executable, str(ROOT / "build_ddqn_forecast_inputs.py")], cwd=ROOT, check=True)
+    # The original builder rewrites a tracked reference provenance JSON.
+    # Keep that historical record intact, while retaining the independently
+    # generated provenance under the ignored reproduction output directory.
+    reference = ROOT / "results/forecast/ddqn_state_forecasts_provenance.json"
+    historical_bytes = reference.read_bytes() if reference.exists() else None
+    generated_copy = ROOT / "repro_runs/forecast/ddqn_state_forecasts_provenance.json"
+    try:
+        subprocess.run([sys.executable, str(ROOT / "build_ddqn_forecast_inputs.py")], cwd=ROOT, check=True)
+        generated_copy.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(reference, generated_copy)
+    finally:
+        if historical_bytes is None:
+            reference.unlink(missing_ok=True)
+        else:
+            reference.write_bytes(historical_bytes)
+    print(f"Regenerated forecast provenance saved to {generated_copy}")
 
     actual = {
         "load data (data/load_hourly_2018.csv)": HERE / "data/load_hourly_2018.csv",
