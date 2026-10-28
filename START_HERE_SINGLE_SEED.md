@@ -23,7 +23,22 @@ Obtain 2018 Pecan Street Dataport hourly household channels and the price data s
 - `data/load_hourly_2018.csv`: hourly rows with `dataid,time,air,car,clotheswasher,dishwasher,dry,non-shiftable,total`; for houses 661, 3039, 8565. `time` format: `dd/mm/yyyy HH:MM`; power-channel values are hourly kWh (equivalent to hourly mean kW).
 - `data/ercot_hourly_price.csv`: `timestamp,Price`, with `Price` in USD/MWh.
 
-Read `data/README.md` for unit, completeness, timezone and total-summation constraints. **A generic Dataport export is not directly executable:** preprocessing, aggregation, local-time conventions and gaps must be reconciled first. The original raw-export-to-CSV transform is not included, and byte-identical results cannot be promised. Do not commit either data file.
+Read `data/README.md` for unit, completeness, timezone and total-summation constraints. **Raw 15-minute exports can now be prepared using a validated conversion procedure.** Compare your downloaded header to `data/examples/raw_15min_schema.csv`, and follow `data/README.md` for the 15-minute appliance rules, timezone and explicit assumptions. Source licence conditions still apply. Do not commit either data file.
+
+## 2a. Produce the hourly study inputs from your licensed downloads
+
+If you have already obtained the correct preprocessed CSVs, validate them with the helper scripts, using separate source/output paths. Otherwise download the 15-minute Austin export in the documented 79-column schema and run:
+
+```powershell
+New-Item -ItemType Directory -Force downloads | Out-Null
+# Save the authorised raw export as downloads/15minute_data_austin.csv.
+& .\.venv\Scripts\python.exe data/prepare_load.py --input downloads/15minute_data_austin.csv --output data/load_hourly_2018.csv
+# Save the already selected 2018 hourly ERCOT USD/MWh series in downloads/ercot_hourly_2018.csv.
+& .\.venv\Scripts\python.exe data/prepare_price.py --input downloads/ercot_hourly_2018.csv --output data/ercot_hourly_price.csv
+& .\.venv\Scripts\python.exe -m unittest tests.test_data_preparation -v
+```
+
+The raw source file must have offset-bearing timestamps and the required appliance channels. The load pipeline reproduced every archived 2018 load value to floating-point precision in a local audit, but the resulting CSV may not be **byte-identical** to the historical input; the exact-price-zone selection remains external and is not automated. The tests use fabricated example records only.
 
 ## 3. Regenerate the full-model and cross-fitted forecasts
 
