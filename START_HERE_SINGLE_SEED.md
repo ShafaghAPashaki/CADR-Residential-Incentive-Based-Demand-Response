@@ -61,7 +61,7 @@ Copy-Item ..\data\ercot_hourly_price.csv data\ercot_hourly_price.csv
 Pop-Location
 ```
 
-`install_outputs.py` creates `results/forecast/ddqn_state_forecasts.csv` and compares its hashes against the historical reference. The **forecast file and stage outputs are untracked**, but the builder also rewrites the tracked `results/forecast/ddqn_state_forecasts_provenance.json` with the active forecast hash. Preserve that generated provenance locally, **do not commit it**, and do not mistake it for the historical reference.
+`install_outputs.py` creates `results/forecast/ddqn_state_forecasts.csv` and compares its hashes against the historical reference. The **forecast file and stage outputs are untracked**, and the installer preserves the tracked historical `results/forecast/ddqn_state_forecasts_provenance.json`. The new provenance is saved separately to `repro_runs/forecast/ddqn_state_forecasts_provenance.json`. **Do not commit the generated forecast or provenance**.
 
 If any prerequisite fails, stop and investigate. Do not bypass leakage, cross-fit, unit, coverage or holiday gates.
 
