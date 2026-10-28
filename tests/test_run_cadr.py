@@ -5,6 +5,9 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+import shutil
+import subprocess
+import sys
 
 from tools import run_cadr
 
@@ -81,6 +84,37 @@ class LauncherTests(unittest.TestCase):
                     run_cadr.main(["train", "--seeds", "0", "1"])
                 self.assertEqual(run.call_count, 1)
                 self.assertEqual(run.call_args.kwargs, {"cwd": root, "check": True})
+
+    def test_real_subprocess_dispatch_in_synthetic_project(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            tools = root / "tools"
+            tools.mkdir()
+            shutil.copy2(Path(run_cadr.__file__), tools / "run_cadr.py")
+            (tools / "evaluate_with_regenerated_forecasts.py").write_text(
+                "import sys\nfrom pathlib import Path\n"
+                "assert sys.argv[1] == 'test.py'\n"
+                "out = Path(sys.argv[sys.argv.index('--output_dir') + 1])\n"
+                "out.mkdir(parents=True)\n"
+                "(out / 'arguments.txt').write_text(' '.join(sys.argv[1:]))\n",
+                encoding="utf-8",
+            )
+            for seed in (0, 2):
+                training = root / f"results/seed_{seed}/training"
+                training.mkdir(parents=True)
+                (training / "config.yaml").touch()
+                (training / "ddqn_best.pth").touch()
+            cmd = [sys.executable, str(tools / "run_cadr.py"), "evaluate", "--seeds", "0", "2",
+                   "--months", "july", "august"]
+            subprocess.run(cmd, cwd=root, check=True, capture_output=True, text=True)
+            for seed in (0, 2):
+                for month in ("july", "august"):
+                    output = root / f"repro_runs/eval/published/seed_{seed}/{month}/arguments.txt"
+                    self.assertTrue(output.is_file())
+                    self.assertIn(f"seed_{seed}", output.read_text())
+            repeated = subprocess.run(cmd, cwd=root, capture_output=True, text=True)
+            self.assertNotEqual(repeated.returncode, 0)
+            self.assertIn("Output already exists", repeated.stderr)
 
 
 if __name__ == "__main__":

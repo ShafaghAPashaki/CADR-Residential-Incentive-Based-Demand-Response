@@ -8,7 +8,7 @@ Choose the route that fits your purpose; each builds on the previous one.
 
 | Route | What you can do | Inputs needed |
 |---|---|---|
-| **1. Inspect** | Read archived results, configurations, checkpoint hashes and table mappings. No model is run. | None |
+| **1. Inspect** | Read archived results, configurations, checkpoint hashes and table mappings. No model is run. | Python only; no data or third-party packages |
 | **2. Evaluate** | Run a published CADR checkpoint for any released seed and test period. No DDQN retraining. | Authorised demand and price data, plus the original or a regenerated forecast-state file |
 | **3. Train** | Regenerate the forecasts from authorised inputs, train one or more CADR seeds, and evaluate the new checkpoints. | Authorised raw or prepared demand and price data |
 
@@ -22,7 +22,7 @@ From the repository root, run:
 python tools/inspect_release.py
 ```
 
-The inspector uses only the Python standard library. `PASS` confirms that key released files exist and prints the available archive contents and selected hashes; it does not run a model. Browse [results/README.md](results/README.md), `results/aggregate_metrics/per_seed_monthly_metrics.csv`, and [TABLE_MAP.md](TABLE_MAP.md) for the published outputs and manuscript mappings.
+The inspector uses only the Python standard library. If `python` is not on the Windows `PATH`, run it with the full path to an installed interpreter, for example `& "C:\path\to\python.exe" tools/inspect_release.py`, or set up an environment as described below. `PASS` confirms that key released files exist and prints the available archive contents and selected hashes; it does not run a model. Browse [results/README.md](results/README.md), `results/aggregate_metrics/per_seed_monthly_metrics.csv`, and [TABLE_MAP.md](TABLE_MAP.md) for the published outputs and manuscript mappings.
 
 ## Setup for evaluation and training
 
