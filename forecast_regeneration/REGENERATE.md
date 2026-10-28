@@ -70,4 +70,4 @@ The table describes that particular rerun, not a cross-platform guarantee. A lat
 - **If the forecast-state hash matches**, published CADR checkpoints can be evaluated directly.
 - **If it differs**, use the published-checkpoint route in `../tools/run_cadr.py`; it invokes the approximate-evaluation wrapper and records the changed hash. The other checks remain active.
 
-`README_CROSSFIT.md` and `CROSSFIT_METHODOLOGY.md` are the original cross-fitting documentation. Their only change is that a local Windows path was replaced by a placeholder.
+See [README_CROSSFIT.md](README_CROSSFIT.md) for the cross-fit file overview and [CROSSFIT_METHODOLOGY.md](CROSSFIT_METHODOLOGY.md) for the recorded methodology.
