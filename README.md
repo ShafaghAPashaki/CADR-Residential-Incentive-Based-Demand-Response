@@ -41,6 +41,47 @@ Sensitivity experiments vary the capacity target (6 and 8 kW), the number of inc
 | `docs/` | Training, evaluation protocol, forecasting, experiments and development history |
 | `*.ps1` | Windows PowerShell drivers for the full training and evaluation runs |
 
+## Choose one of three reproduction levels
+
+| Level | Goal | Data needed | Command (from repository root) |
+|---|---|---|---|
+| **1. Inspect** | Examine released configs, checkpoint hashes, aggregate tables and figure mapping; does **not** rerun the model | None | `python tools/inspect_release.py` |
+| **2. Evaluate checkpoint** | Evaluate the released CADR Seed-0 checkpoint on July 2018, **no DDQN retraining** | Authorised hourly demand and price, plus original or regenerated forecast-state matrix | `powershell -ExecutionPolicy Bypass -File .\run_checkpoint_july.ps1` |
+| **3. Train from raw** | Prepare raw authorised data, regenerate LSTMs/cross-fit, train DDQN Seed 0 for 2500 episodes, evaluate July | Authorised Pecan Street 2018 15-minute export and EnergyOnline LZ_AEN price export | `powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1` |
+
+**Important:** Level 2 requires generating forecast-state inputs first; first run the full input/forecast preparation **without DDQN training**:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1 -ForecastOnly
+powershell -ExecutionPolicy Bypass -File .\run_checkpoint_july.ps1
+```
+
+The preceding commands assume you have placed authorised raw exports in
+`downloads/`. Alternatively use `-ReusePreparedData -ForecastOnly` if you
+already have validated local hourly CSV inputs. See
+[START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md).
+With a regenerated forecast whose SHA differs from the original, the results
+are explicitly labelled approximate. Level 3 includes LSTM regeneration.
+Neither workflow should be called independently verified until a clean-machine
+run completes. All scripts fail on missing required inputs rather than silently
+substituting synthetic data. Do not upload licensed inputs to GitHub.
+
+[Raw download instructions, exact filenames and synthetic schema examples](data/README.md).
+[Acceptance and validation status](INDEPENDENT_REPRODUCTION_STATUS.md).
+
+## First-time independent reproduction (one seed, one month)
+
+The [single-command Windows runner](run_reproduction_seed0_july.ps1) fails fast on missing files, failed forecast gates or prior outputs; details and manual commands are in [START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md). Run from a fresh checkout after placing your licensed downloads in `downloads/`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1
+```
+
+This complete training run has **not yet been independently verified** on a fresh machine. A successful execution must be demonstrated before claiming end-to-end reproduction. The historical original input SHA gate remains the default; the runner explicitly opts into the regenerated-forecast mode.
+
+
+Follow **[START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md)** to acquire authorised data, regenerate the LSTM forecasts, train CADR Seed 0 (2,500 episodes), and evaluate July 2018. The end-to-end route is marked **unverified pending a clean-download test**; exact source-data preprocessing is not yet fully supplied.
+
 ## Setup
 
 Python 3.12 with the pinned packages in `requirements.txt` (PyTorch 2.13.0, `holidays==0.100` and others):

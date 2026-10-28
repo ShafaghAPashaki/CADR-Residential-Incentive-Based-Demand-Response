@@ -36,3 +36,9 @@ results/calibration_diagnostics/
 results/matched_hems_ablation/_smoke/
 results/benchmark_smoke/
 source_hashes.json
+
+# New independent one-seed reproduction outputs
+repro_runs/
+
+# User-supplied raw licensed downloads
+downloads/
