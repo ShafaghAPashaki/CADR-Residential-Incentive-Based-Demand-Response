@@ -48,7 +48,7 @@ python -m unittest tests.test_data_preparation -v
 ```
 
 **Original load transformations recovered.** The independent preparation code follows the
-MARL-iDR project's [`utils/pre_process.py`](https://github.com/ShafaghAPashaki/MARL-iDR-Multi-Agent-Reinforcement-Learning-for-Incentive-based-Residential-Demand-Response/blob/main/utils/pre_process.py):
+MARL-iDR project's [`utils/pre_process.py`](https://github.com/TU-Delft-AI-Energy-Lab/MARL-iDR-Multi-Agent-Reinforcement-Learning-for-Incentive-based-Residential-Demand-Response/blob/main/utils/pre_process.py):
 offset-aware `local_15min` timestamps converted to UTC, 15-minute max resampling,
 zero for missing values or readings below 0.1, `air1+air2+air3+airwindowunit1` capped
 at 4 kW, car/washer/dishwasher/dryer discretised to 4/1/2/2 kW when active,
