@@ -6,7 +6,8 @@ param(
     [string] $RawPrice = "downloads\20180101-20181231 ERCOT Real-time Price.csv",
     [string] $BoundaryPrice = "",
     [switch] $ReusePreparedData,
-    [switch] $ReuseForecasts
+    [switch] $ReuseForecasts,
+    [switch] $ForecastOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,7 +25,7 @@ function RunPython([string[]]$Arguments) {
 
 # Guard against mixing a new run into existing outputs.
 $selected = Join-Path $root "repro_runs\july_seed0\seed_0\training"
-if (Test-Path $selected) { throw "Training results already exist at $selected. Preserve them; use a new checkout to rerun." }
+if ((-not $ForecastOnly) -and (Test-Path $selected)) { throw "Training results already exist at $selected. Preserve them; use a new checkout to rerun." }
 
 if (-not $ReusePreparedData) {
     if (-not (Test-Path $RawLoad)) { throw "Missing licensed Dataport export: $RawLoad" }
@@ -81,6 +82,10 @@ if (-not $ReuseForecasts) {
 
 if (-not (Test-Path "results\forecast\ddqn_state_forecasts.csv")) {
     throw "Forecast-state file missing; no DDQN training permitted."
+}
+if ($ForecastOnly) {
+    Write-Host "FORECAST-ONLY COMPLETE: now run .\\run_checkpoint_july.ps1 to evaluate the published checkpoint." -ForegroundColor Green
+    return
 }
 RunPython -Arguments @("main.py","--config_path","config_seed_0.yaml",
     "--allow_regenerated_forecasts","--results_root","repro_runs/july_seed0")
