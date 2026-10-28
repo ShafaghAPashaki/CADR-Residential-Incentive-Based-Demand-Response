@@ -33,12 +33,12 @@ If you have already obtained the correct preprocessed CSVs, validate them with t
 New-Item -ItemType Directory -Force downloads | Out-Null
 # Save the authorised raw export as downloads/15minute_data_austin.csv.
 & .\.venv\Scripts\python.exe data/prepare_load.py --input downloads/15minute_data_austin.csv --output data/load_hourly_2018.csv
-# Save the already selected 2018 hourly ERCOT USD/MWh series in downloads/ercot_hourly_2018.csv.
-& .\.venv\Scripts\python.exe data/prepare_price.py --input downloads/ercot_hourly_2018.csv --output data/ercot_hourly_price.csv
+# Save the raw EnergyOnline export (Date,Price,Zone) under its original name in downloads/.
+& .\.venv\Scripts\python.exe data/prepare_price.py --input "downloads/20180101-20181231 ERCOT Real-time Price.csv" --zone LZ_AEN --output data/ercot_hourly_price.csv
 & .\.venv\Scripts\python.exe -m unittest tests.test_data_preparation -v
 ```
 
-The raw source file must have offset-bearing timestamps and the required appliance channels. The load pipeline reproduced every archived 2018 load value to floating-point precision in a local audit, but the resulting CSV may not be **byte-identical** to the historical input; the exact-price-zone selection remains external and is not automated. The tests use fabricated example records only.
+The Dataport raw file must have offset-bearing timestamps and the required appliance channels. For prices, the 2018 export gives 8,760 prices after three documented forward fills; the historical CSV has an additional 2019-01-01 00:00 boundary value, which should be downloaded separately for full source-parity. Follow the exact instructions in data/README.md. The load pipeline reproduced every archived 2018 load value to floating-point precision in a local audit, but the resulting CSV may not be **byte-identical** to the historical input; the price zone is confirmed as LZ_AEN, and the converter explicitly selects it. The tests use fabricated example records only.
 
 ## 3. Regenerate the full-model and cross-fitted forecasts
 
