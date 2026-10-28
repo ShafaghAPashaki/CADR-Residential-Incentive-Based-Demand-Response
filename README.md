@@ -41,6 +41,10 @@ Sensitivity experiments vary the capacity target (6 and 8 kW), the number of inc
 | `docs/` | Training, evaluation protocol, forecasting, experiments and development history |
 | `*.ps1` | Windows PowerShell drivers for the full training and evaluation runs |
 
+## First-time independent reproduction (one seed, one month)
+
+Follow **[START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md)** to acquire authorised data, regenerate the LSTM forecasts, train CADR Seed 0 (2,500 episodes), and evaluate July 2018. The end-to-end route is marked **unverified pending a clean-download test**; exact source-data preprocessing is not yet fully supplied.
+
 ## Setup
 
 Python 3.12 with the pinned packages in `requirements.txt` (PyTorch 2.13.0, `holidays==0.100` and others):
