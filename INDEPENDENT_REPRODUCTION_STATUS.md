@@ -21,7 +21,7 @@ forecast-state bytes and writes to a separate `repro_runs/` directory.
 | Full LSTM/cross-fit from a clean fresh checkout | NOT VERIFIED | Requires specified Python 3.12 dependencies and licensed full inputs |
 | DDQN Seed 0 / 2,500 episodes + July evaluation | NOT VERIFIED | No valid result reported or fabricated |
 | PowerShell orchestration on Windows | NOT VERIFIED | No PowerShell executable in local validation container |
-| Anonymous reviewer-release URL | NOT CREATED | Author-identifiable GitHub URL is not acceptable for blind review |
+| Anonymous reviewer-release URL | UPDATE PENDING | Existing reviewer link is accessible but its 21 October snapshot predates the 28 October changes; refresh and check anonymity before sharing |
 
 ## Runtime blocker encountered
 
