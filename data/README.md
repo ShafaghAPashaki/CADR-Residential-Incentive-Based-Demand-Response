@@ -9,6 +9,30 @@ The frozen configurations expect two local, untracked files:
 
 Place these files in `data/` locally. Never add them to a public commit. The data hashes of the published study were `c183ce46…` (`load_hourly_2018.csv`) and `56fdd5b4…` (`ercot_hourly_price.csv`); exact reproduction of the forecasts requires byte-identical inputs. To regenerate the forecast inputs used by the DDQN, follow `forecast_regeneration/REGENERATE.md`.
 
+## Raw 15-minute Dataport exports are not direct model inputs
+
+A Dataport download such as `15minute_data_austin.csv` has a different schema
+(`dataid,local_15min,air1,car1,clotheswasher1,dishwasher1,drye1,grid,solar,...`).
+Neither `utils/load_demand.py` nor the forecasting scripts convert that raw
+schema into the hourly model schema.
+
+The historical hourly file is **not** just a straightforward hourly average:
+appliance-specific transformations and non-shiftable demand construction
+are involved. The original raw-export-to-hourly transformation script has not
+been recovered. Therefore **fresh raw downloads cannot currently be claimed
+to reconstruct the manuscript input or its numerical results**.
+
+A faithful standalone converter must document and test: the timezone-aware
+`local_15min` to hourly timestamp rule, the complete appliance-channel map,
+device-level value transformations, construction of `non-shiftable` and
+`total`, missing-channel and missing-hour handling, and reconciliation with
+the original processed data. Do not fill missing data or silently reinterpret
+`grid` as `total`. These rules must be validated before marking the
+independent raw-data reproduction path READY.
+
+The public repository can supply **column headers and synthetic fixtures**,
+but not actual Dataport rows without a verified redistribution permission.
+
 ## Exact parsing and units
 
 - Residential `time`: strictly `dd/mm/yyyy HH:MM` (the loader uses `%d/%m/%Y %H:%M`); one row per house per hour.
