@@ -63,9 +63,10 @@ def config_sha256(config: dict[str, Any]) -> str:
 def enforce_lambda_calibration(config: dict[str, Any]) -> dict[str, Any]:
     """Fail closed unless the original, independently reviewed λc is retained.
 
-    The historic calibration inputs are documented but the original twelve
-    scenario identifiers were not archived. A new quantile-sampling estimate
-    would not recreate that selection and must never silently replace λc.
+    The original historical calibration scenario identifiers were recovered
+    privately after this training protocol was frozen. They are not shipped
+    in this public repository. A new quantile-sampling estimate would not
+    recreate the original selection and must never silently replace λc.
     """
     if not CALIBRATION_FILE.is_file():
         raise RuntimeError(
