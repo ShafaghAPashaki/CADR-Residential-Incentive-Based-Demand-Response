@@ -43,6 +43,15 @@ Sensitivity experiments vary the capacity target (6 and 8 kW), the number of inc
 
 ## First-time independent reproduction (one seed, one month)
 
+The [single-command Windows runner](run_reproduction_seed0_july.ps1) fails fast on missing files, failed forecast gates or prior outputs; details and manual commands are in [START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md). Run from a fresh checkout after placing your licensed downloads in `downloads/`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_reproduction_seed0_july.ps1
+```
+
+This complete training run has **not yet been independently verified** on a fresh machine. A successful execution must be demonstrated before claiming end-to-end reproduction. The historical original input SHA gate remains the default; the runner explicitly opts into the regenerated-forecast mode.
+
+
 Follow **[START_HERE_SINGLE_SEED.md](START_HERE_SINGLE_SEED.md)** to acquire authorised data, regenerate the LSTM forecasts, train CADR Seed 0 (2,500 episodes), and evaluate July 2018. The end-to-end route is marked **unverified pending a clean-download test**; exact source-data preprocessing is not yet fully supplied.
 
 ## Setup
