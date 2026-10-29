@@ -11,7 +11,7 @@ The trained checkpoints, validation curves, monthly evaluation summaries and pro
 | `sensitivity_eta/`, `sensitivity_rho/` | Reward-parameter sensitivity summaries and diagnostics |
 | `final_diagnostics/` | Inference-only value-of-information results and forecast-confusion counts |
 | `forecast/` | Forecast aggregate metrics, training histories, cross-fit records and forecast-state provenance (individual-household figures are not released) |
-| `calibration/` | The original λc retention audit (SHA-256 matches published run provenance), plus separately recorded later historical recovery metadata |
+| `calibration/` | The original λc retention audit `lambda_c_retention_audit.json` (byte-identical to the file hashed in the published run provenance). Its statement that the original scenario IDs were not archived predates their later private recovery, which is recorded separately in `lambda_c_historical_recovery_metadata.json` and does not change λc. |
 | `aggregate_metrics/per_seed_monthly_metrics.csv` | Seed-level monthly values behind the manuscript tables |
 | `checkpoint_selection.csv` | Validation-selected episodes of the CADR and EBDR checkpoints (each run's `validation_metrics.csv` covers the others) |
 | `summary.xlsx`, `method_comparison.xlsx` | Three-seed summary and CADR–EBDR comparison workbooks |
