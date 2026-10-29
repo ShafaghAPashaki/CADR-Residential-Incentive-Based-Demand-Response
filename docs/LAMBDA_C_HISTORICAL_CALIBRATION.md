@@ -1,6 +1,6 @@
 # Historical tracking-weight calibration: public reproduction boundary
 
-The coefficient `lambda_c = 0.2216381800923157` was obtained in July 2026 from a historical training-only scenario/action audit. This is a **replay of the original calculation**, not a recalibration of the released final forecast-state environment or a tuning exercise based on test performance.
+The coefficient `lambda_c = 0.2216381800923157` was obtained in July 2026 from a historical training-only scenario/action audit. The recovered evidence documents and replays that original calculation; it is not a recalibration of the released final forecast-state environment or a tuning exercise based on test performance. The earlier retention audit (`results/calibration/lambda_c_retention_audit.json`) was written before this recovery and is kept unchanged, so it still states that the scenario IDs were not archived.
 
 ## Original method
 
